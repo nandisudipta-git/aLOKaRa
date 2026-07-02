@@ -651,7 +651,7 @@ nav {
 <section class="slide" id="s1" style="padding: 0; min-height: 100vh;">
   <div class="graph3d-wrap" style="position: absolute; inset: 0; width: 100%; height: 100%; margin: 0; border: none; z-index: 1; border-radius: 0;">
     <canvas id="obsidian-graph"></canvas>
-    <div class="graph3d-hint">drag to rotate · scroll to zoom · hover a node</div>
+    <div class="graph3d-hint">drag to rotate · hover a node</div>
     <div class="graph3d-pulse">LIVE GRAPH</div>
   </div>
   <div class="s1-inner" style="z-index: 2; pointer-events: none; padding-top: 15vh;">
@@ -1069,10 +1069,7 @@ document.querySelectorAll('.card-3d').forEach(card => {
     gVX = dx * 0.0007; gVY = dy * 0.0007;
     gLX = e.clientX; gLY = e.clientY;
   });
-  el.addEventListener('wheel', e => {
-    e.preventDefault();
-    gZoom = Math.max(0.5, Math.min(2.2, gZoom - e.deltaY * 0.001));
-  }, { passive: false });
+
 
   let gMX = -9999, gMY = -9999;
   el.addEventListener('mousemove', e => {
