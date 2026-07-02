@@ -3,1287 +3,693 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>dotBro — Some conversations deserve another chance</title>
-<meta name="description" content="A decentralized canvas of curiosity. dotBro gives missed conversations, questions, and collaborations on campus another chance.">
+<title>dotBro — Stay Curious</title>
+<meta name="description" content="An Operating System for Curiosity. dotBro organizes conversations, questions, and collaborations into a living interactive graph.">
 <meta name="robots" content="index, follow">
 
-<!-- Open Graph / Facebook -->
+<!-- Open Graph -->
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://dotbro.in">
-<meta property="og:title" content="dotBro — Some conversations deserve another chance">
-<meta property="og:description" content="A decentralized canvas of curiosity. dotBro gives missed conversations, questions, and collaborations on campus another chance.">
+<meta property="og:title" content="dotBro — Operating System for Curiosity">
+<meta property="og:description" content="A fullscreen interactive knowledge graph mapping human curiosity on campus.">
 <meta property="og:image" content="https://dotbro.in/og-image.png">
-<meta property="og:site_name" content="dotBro">
 
 <!-- Twitter -->
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:url" content="https://dotbro.in">
-<meta name="twitter:title" content="dotBro — Some conversations deserve another chance">
-<meta name="twitter:description" content="A decentralized canvas of curiosity. dotBro gives missed conversations, questions, and collaborations on campus another chance.">
+<meta name="twitter:title" content="dotBro — Operating System for Curiosity">
+<meta name="twitter:description" content="A fullscreen interactive knowledge graph mapping human curiosity on campus.">
 <meta name="twitter:image" content="https://dotbro.in/og-image.png">
 
-<!-- Favicon and Apple Icons -->
-<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><circle cx=%2250%22 cy=%2250%22 r=%2240%22 fill=%22%23D10000%22/></svg>">
-<link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><circle cx=%2250%22 cy=%2250%22 r=%2240%22 fill=%22%23D10000%22/></svg>">
+<!-- Favicon -->
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><circle cx=%2250%22 cy=%2250%22 r=%2240%22 fill=%22%230087FF%22/></svg>">
+<link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><circle cx=%2250%22 cy=%2250%22 r=%2240%22 fill=%22%230087FF%22/></svg>">
 
-<!-- Structured Schema Metadata -->
-<script type="application/ld+json">
-{
-  "@context": "https://schema.org",
-  "@type": "WebSite",
-  "name": "dotBro",
-  "url": "https://dotbro.in",
-  "description": "dotBro gives missed conversations, questions, and collaborations on campus another chance."
-}
-</script>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:wght@300;400;500;700&display=swap" rel="stylesheet">
 
-<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Space+Mono:ital,wght@0,400;0,700;1,400&family=DM+Sans:wght@300;400;500;700&display=swap" rel="stylesheet">
 <style>
 :root {
-  --black: #090909;
+  --black: #050505;
   --white: #F5F5F0;
-  --red: #D10000;
-  --red2: #FF1A1A;
-  --green: #C8D400;
-  --green2: #E2EE00;
-  --olive: #1A1C0F;
-  --olive2: #252A10;
   --gray: #666660;
-  --mgray: #333330;
+  --mgray: #161616;
+  --glass-bg: rgba(10, 10, 10, 0.75);
+  --glass-border: rgba(255, 255, 255, 0.08);
+  --accent: #0087FF; /* Default Blue for Learn.Bro */
 }
 
 * { margin: 0; padding: 0; box-sizing: border-box; }
 
-html { scroll-behavior: smooth; }
-
-body {
+body, html {
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
   background: var(--black);
   color: var(--white);
   font-family: 'DM Sans', sans-serif;
-  overflow-x: hidden;
-  cursor: none;
+  user-select: none;
 }
 
-/* ── CUSTOM CURSOR ── */
-.cursor {
-  position: fixed; width: 12px; height: 12px;
-  background: var(--white); border-radius: 50%;
-  pointer-events: none; z-index: 9999;
-  transform: translate(-50%,-50%);
-  transition: transform 0.1s, width 0.2s, height 0.2s, background 0.2s;
-  mix-blend-mode: difference;
+/* ── INTERACTIVE CANVAS ── */
+#obsidian-graph {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  display: block;
+  z-index: 1;
+  cursor: grab;
 }
-.cursor-ring {
-  position: fixed; width: 40px; height: 40px;
-  border: 1px solid rgba(255,255,255,0.4); border-radius: 50%;
-  pointer-events: none; z-index: 9998;
-  transform: translate(-50%,-50%);
-  transition: transform 0.15s ease-out, width 0.3s, height 0.3s;
-}
-body:hover .cursor { opacity: 1; }
+#obsidian-graph:active { cursor: grabbing; }
 
-/* ── NAV ── */
+/* ── OVERLAYS CONTAINER ── */
+#ui-root {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 10;
+}
+
+/* ── HEADERS & TABS ── */
 nav {
-  position: fixed; top: 0; left: 0; right: 0; z-index: 100;
-  display: flex; align-items: center; justify-content: space-between;
-  padding: 1.2rem 3rem;
-  background: rgba(9,9,9,0.85);
-  backdrop-filter: blur(16px);
-  border-bottom: 1px solid rgba(255,255,255,0.05);
+  position: absolute;
+  top: 1.5rem;
+  left: 1.5rem;
+  right: 1.5rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  pointer-events: auto;
 }
+
 .nav-logo {
-  display: flex; align-items: center; gap: 8px;
-  font-family: 'Bebas Neue', sans-serif; font-size: 1.4rem;
-  letter-spacing: 2px; color: var(--white);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-family: 'DM Sans', sans-serif;
+  font-weight: 700;
+  font-size: 1.15rem;
+  letter-spacing: -0.5px;
+  color: var(--white);
   text-decoration: none;
 }
-.nav-dot {
-  width: 10px; height: 10px; border-radius: 50%;
-  background: var(--white); display: inline-block;
-  animation: colorCycle 16s infinite ease-in-out;
+
+.logo-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--accent);
+  box-shadow: 0 0 15px var(--accent);
+  transition: background 0.8s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.8s;
+  animation: logoBreathe 3s infinite ease-in-out;
 }
-.nav-links {
-  display: flex; gap: 2rem;
-}
-.nav-links a {
-  font-family: 'Space Mono', monospace; font-size: 0.7rem;
-  color: var(--gray); text-decoration: none; letter-spacing: 2px;
-  text-transform: uppercase;
-  transition: color 0.2s;
-}
-.nav-links a:hover { color: var(--white); }
-.nav-badge {
-  font-family: 'Space Mono', monospace; font-size: 0.65rem;
-  color: var(--gray); letter-spacing: 1px;
+@keyframes logoBreathe {
+  0%, 100% { transform: scale(0.98); opacity: 0.95; }
+  50% { transform: scale(1.03); opacity: 1; box-shadow: 0 0 20px var(--accent); }
 }
 
-/* ── SLIDE SYSTEM ── */
-.slide {
-  min-height: 100vh; display: flex; align-items: center;
-  justify-content: center; position: relative; overflow: hidden;
-  padding: 6rem 3rem 4rem;
+.tab-menu {
+  display: flex;
+  gap: 6px;
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  padding: 4px;
+  border-radius: 12px;
+  backdrop-filter: blur(28px) saturate(145%);
 }
 
-/* ── CANVAS 3D BG ── */
-#bg-canvas {
-  position: fixed; top: 0; left: 0;
-  width: 100%; height: 100%;
-  pointer-events: none; z-index: 0;
-  opacity: 0.35;
+.tab-btn {
+  background: transparent;
+  border: none;
+  color: var(--gray);
+  padding: 8px 16px;
+  font-size: 0.85rem;
+  font-weight: 500;
+  border-radius: 8px;
+  cursor: pointer;
+  font-family: inherit;
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.tab-btn:hover { color: var(--white); background: rgba(255,255,255,0.03); }
+.tab-btn.active { color: var(--white); background: rgba(255,255,255,0.07); box-shadow: inset 0 1px 0 rgba(255,255,255,0.06); }
+
+.nav-info {
+  font-family: 'Space Mono', monospace;
+  font-size: 0.7rem;
+  color: var(--gray);
+  letter-spacing: 1px;
 }
 
-/* ── SLIDE 1: COVER ── */
-#s1 { background: var(--black); z-index: 1; }
-.s1-inner {
-  display: grid;
-  grid-template-columns: 1.15fr 0.85fr;
-  gap: 4rem;
-  align-items: center;
-  text-align: left;
-  max-width: 1280px;
-  width: 100%;
-  margin: 0 auto;
-  position: relative;
-  z-index: 2;
+/* ── CENTER HERO OVERLAY ── */
+.center-hero {
+  position: absolute;
+  top: 45%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+  max-width: 600px;
+  width: 90%;
+  pointer-events: auto;
+  transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1), transform 0.8s;
 }
-.bro-giant {
-  font-family: 'Bebas Neue', sans-serif;
-  font-size: clamp(6.5rem, 16vw, 16rem);
-  line-height: 0.85;
-  letter-spacing: -4px;
-  transform: perspective(800px) rotateX(8deg);
-  transform-origin: center bottom;
-  animation: titleRise 1.2s cubic-bezier(0.16,1,0.3,1) both;
-  display: inline-flex;
-  align-items: center;
-  justify-content: flex-start;
+.center-hero.minimized {
+  opacity: 0;
+  transform: translate(-50%, -100%) scale(0.85);
+  pointer-events: none;
 }
-.bro-text {
-  background: linear-gradient(180deg, #fff 40%, rgba(255,255,255,0.35) 100%);
+
+.hero-title {
+  font-family: 'DM Sans', sans-serif;
+  font-weight: 300;
+  font-size: clamp(3rem, 7vw, 5.5rem);
+  letter-spacing: -2px;
+  line-height: 0.95;
+  background: linear-gradient(180deg, #fff 40%, rgba(255,255,255,0.4) 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
-  display: inline-block;
-}
-.living-dot {
-  display: inline-block;
-  width: clamp(1.2rem, 3.2vw, 3.2rem);
-  height: clamp(1.2rem, 3.2vw, 3.2rem);
-  border-radius: 50%;
-  margin-right: clamp(0.4rem, 1.2vw, 1.2rem);
-  margin-top: -0.06em;
-  background: #fff;
-  box-shadow: 0 0 35px rgba(255, 255, 255, 0.8);
-  animation: colorCycle 16s infinite ease-in-out, breathingDot 4s infinite ease-in-out;
-}
-@keyframes colorCycle {
-  0%, 100% { background-color: #F5F5F0; box-shadow: 0 0 35px rgba(245,245,240,0.8); }
-  16.6% { background-color: #C8D400; box-shadow: 0 0 35px rgba(200,212,0,0.8); }
-  33.3% { background-color: #D10000; box-shadow: 0 0 35px rgba(209,0,0,0.8); }
-  50% { background-color: #9B87FF; box-shadow: 0 0 35px rgba(155,135,255,0.8); }
-  66.6% { background-color: #0087FF; box-shadow: 0 0 35px rgba(0,135,255,0.8); }
-  83.3% { background-color: #FFD700; box-shadow: 0 0 35px rgba(255,215,0,0.8); }
-}
-@keyframes breathingDot {
-  0%, 100% { transform: scale(0.9); }
-  50% { transform: scale(1.1); }
-}
-@keyframes titleRise {
-  from { opacity:0; transform: perspective(800px) rotateX(28deg) translateY(60px); }
-  to   { opacity:1; transform: perspective(800px) rotateX(8deg) translateY(0); }
-}
-.tagline {
-  font-family: 'Space Mono', monospace; font-size: 1rem;
-  color: var(--gray); letter-spacing: 4px; text-transform: uppercase;
-  margin: 1.5rem 0 2.5rem;
-  animation: fadeUp 1s 0.4s both;
-}
-@keyframes fadeUp {
-  from { opacity:0; transform: translateY(20px); }
-  to   { opacity:1; transform: translateY(0); }
-}
-.product-pills {
-  display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;
-  animation: fadeUp 1s 0.6s both;
-}
-.pill-rb {
-  background: var(--red); color: var(--white);
-  font-family: 'Bebas Neue', sans-serif; font-size: 1.2rem;
-  letter-spacing: 3px; padding: 0.7rem 2.2rem;
-  clip-path: polygon(8px 0%, 100% 0%, calc(100% - 8px) 100%, 0% 100%);
-  transition: transform 0.2s, background 0.2s;
-}
-.pill-nb {
-  background: var(--green); color: var(--olive);
-  font-family: 'Bebas Neue', sans-serif; font-size: 1.2rem;
-  letter-spacing: 3px; padding: 0.7rem 2.2rem;
-  clip-path: polygon(8px 0%, 100% 0%, calc(100% - 8px) 100%, 0% 100%);
-  transition: transform 0.2s;
-}
-.pill-rb:hover { transform: scale(1.05) translateY(-2px); background: var(--red2); }
-.pill-nb:hover { transform: scale(1.05) translateY(-2px); }
-.founder-tag {
-  font-family: 'Space Mono', monospace; font-size: 0.7rem;
-  color: var(--mgray); letter-spacing: 2px; margin-top: 3rem;
-  animation: fadeUp 1s 0.8s both;
-}
-.scroll-hint {
-  position: absolute; bottom: 2rem; left: 50%; transform: translateX(-50%);
-  font-family: 'Space Mono', monospace; font-size: 0.6rem;
-  color: var(--gray); letter-spacing: 3px; text-align: center;
-  animation: bounce 2s infinite 1.5s;
-}
-.scroll-hint::after {
-  content: ''; display: block; width: 1px; height: 40px;
-  background: linear-gradient(to bottom, var(--gray), transparent);
-  margin: 8px auto 0;
-}
-@keyframes bounce { 0%,100%{transform:translateX(-50%) translateY(0)} 50%{transform:translateX(-50%) translateY(6px)} }
-
-/* ── SECTION LABELS ── */
-.section-label {
-  font-family: 'Space Mono', monospace; font-size: 0.65rem;
-  color: var(--red); letter-spacing: 4px; text-transform: uppercase;
-  margin-bottom: 1rem;
-}
-.section-label.green { color: var(--green); }
-
-/* ── SLIDE 2: CONTEXT ── */
-#s2 { background: #0D0D0D; }
-.s2-inner { max-width: 1100px; margin: 0 auto; width: 100%; }
-.s2-headline {
-  font-family: 'Bebas Neue', sans-serif;
-  font-size: clamp(3.5rem, 7vw, 7rem);
-  line-height: 0.9; margin-bottom: 1.5rem;
-  transform: perspective(600px) rotateY(-3deg);
-}
-.s2-sub { font-size: 1.1rem; color: var(--gray); max-width: 600px; margin-bottom: 3rem; line-height: 1.7; }
-.crisis-cards {
-  display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5px;
-}
-.crisis-card {
-  background: var(--mgray); padding: 2rem 1.5rem;
-  position: relative; overflow: hidden;
-  transition: transform 0.3s, background 0.3s;
-}
-.crisis-card::before {
-  content: ''; position: absolute; top: 0; left: 0; right: 0;
-  height: 2px; background: var(--red);
-  transform: scaleX(0); transform-origin: left;
-  transition: transform 0.4s;
-}
-.crisis-card:hover::before { transform: scaleX(1); }
-.crisis-card:hover { transform: translateY(-4px); background: #1A1A1A; }
-.crisis-icon { font-size: 2.5rem; margin-bottom: 1rem; }
-.crisis-head {
-  font-family: 'Bebas Neue', sans-serif; font-size: 1.4rem;
-  letter-spacing: 1px; margin-bottom: 0.8rem; color: var(--white);
-}
-.crisis-body { font-size: 0.88rem; color: var(--gray); line-height: 1.6; }
-.red-bar {
-  background: var(--red); padding: 1rem 2rem; margin-top: 1.5px;
-  font-size: 0.9rem; font-weight: 500; grid-column: 1/-1;
-  text-align: center;
+  margin-bottom: 1.5rem;
 }
 
-/* ── S3 now = Vision (step cards) — inherits s4-inner from below ── */
-
-/* ── SLIDE 4: HOW IT WORKS ── */
-#s4 { background: #111; }
-.s4-inner { max-width: 1100px; margin: 0 auto; width: 100%; }
-.steps-row {
-  display: grid; grid-template-columns: repeat(5, 1fr);
-  gap: 1px; margin-top: 2rem;
-}
-.step-card {
-  background: #1A1A1A; padding: 2rem 1.2rem;
-  text-align: center; position: relative;
-  transition: transform 0.3s, background 0.3s;
-}
-.step-card:hover { background: #222; transform: translateY(-8px) scale(1.02); }
-.step-num-circle {
-  width: 42px; height: 42px; border-radius: 50%;
-  background: var(--red); display: flex; align-items: center; justify-content: center;
-  font-family: 'Bebas Neue', sans-serif; font-size: 1.3rem; color: #fff;
-  margin: 0 auto 1rem;
-  box-shadow: 0 0 20px rgba(209,0,0,0.4);
-}
-.step-icon { font-size: 2rem; margin-bottom: 0.8rem; }
-.step-head { font-family: 'Bebas Neue', sans-serif; font-size: 1.1rem; letter-spacing: 1px; margin-bottom: 0.5rem; }
-.step-body { font-size: 0.8rem; color: var(--gray); line-height: 1.5; }
-.step-arrow {
-  position: absolute; right: -12px; top: 50%; transform: translateY(-50%);
-  color: var(--red); font-size: 1.2rem; z-index: 2;
-}
-.connector-bar {
-  background: var(--red); padding: 1rem; margin-top: 1px;
-  text-align: center; font-size: 0.85rem; font-weight: 500;
-}
-
-/* ── S5 now = Audience — inherits scenario/s7-inner from below ── */
-
-/* ── S6 now = Coming Soon — uses .coming-wrap / .venture-glass below ── */
-
-/* ── SLIDE 7: VISION ── */
-#s7 { background: #080808; }
-.s7-inner { max-width: 1100px; margin: 0 auto; width: 100%; }
-.vision-headline {
-  font-family: 'Bebas Neue', sans-serif;
-  font-size: clamp(4rem, 9vw, 9rem);
-  line-height: 0.85; margin-bottom: 1rem;
-  background: linear-gradient(135deg, #fff 0%, var(--red) 50%, var(--green) 100%);
-  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-  background-clip: text;
-  background-size: 200% 200%;
-  animation: gradShift 4s ease infinite;
-}
-@keyframes gradShift {
-  0%{background-position:0% 50%} 50%{background-position:100% 50%} 100%{background-position:0% 50%}
-}
-.vision-sub { font-size: 1rem; color: var(--gray); max-width: 600px; margin-bottom: 3rem; line-height: 1.7; }
-.scenario-grid {
-  display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.5px;
-}
-.scenario {
-  background: #111; padding: 1.8rem 1.4rem;
-  position: relative; transition: transform 0.3s, background 0.3s;
-  overflow: hidden;
-}
-.scenario:hover { transform: translateY(-6px); background: #1A1A1A; }
-.scenario-top { height: 3px; margin-bottom: 1.2rem; }
-.scenario-loc {
-  font-family: 'Space Mono', monospace; font-size: 0.65rem;
-  letter-spacing: 2px; margin-bottom: 0.5rem;
-}
-.scenario-prob { font-family: 'Bebas Neue', sans-serif; font-size: 1.1rem; color: var(--white); margin-bottom: 0.8rem; }
-.scenario-sep { height: 1px; background: #222; margin-bottom: 0.8rem; }
-.scenario-sol { font-size: 0.82rem; color: var(--gray); line-height: 1.5; }
-
-/* ── S8 now = Manifesto, S9 = Final CTA ── */
-.close-big {
-  font-family: 'Bebas Neue', sans-serif;
-  font-size: clamp(4rem, 10vw, 10rem);
-  line-height: 0.85; margin-bottom: 1.5rem;
-  transform: perspective(800px) rotateX(5deg);
-}
-
-/* ── 3D OBSIDIAN GRAPH ── */
-.graph3d-wrap {
-  position: relative; width: 100%; height: 72vh; min-height: 520px;
-  margin-top: 2rem; overflow: hidden;
-  border: 1px solid rgba(255,255,255,0.07);
-  background: radial-gradient(ellipse at 50% 50%, rgba(200,212,0,0.04), rgba(9,9,9,0) 68%), #0A0A0A;
-  cursor: grab;
-}
-.graph3d-wrap:active { cursor: grabbing; }
-#obsidian-graph { position:absolute; inset:0; width:100%; height:100%; display:block; }
-.graph3d-hint {
-  position: absolute; bottom: 1.2rem; left: 50%; transform: translateX(-50%);
-  font-family: 'Space Mono', monospace; font-size: 0.55rem;
-  letter-spacing: 2px; color: rgba(255,255,255,0.2);
-  pointer-events: none; text-transform: uppercase;
-}
-.graph3d-pulse {
-  position: absolute; top: 1.2rem; right: 1.4rem;
-  font-family: 'Space Mono', monospace; font-size: 0.52rem;
-  letter-spacing: 1.5px; color: var(--green); display:flex; align-items:center; gap:6px;
-  pointer-events: none;
-}
-.graph3d-pulse::before {
-  content:''; width:6px; height:6px; border-radius:50%; background:var(--green);
-  animation: livePulse 1.8s ease-in-out infinite;
-}
-@keyframes livePulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.3;transform:scale(0.7)} }
-
-/* ── PROGRESS BAR ── */
-.progress {
-  position: fixed; top: 0; left: 0; height: 2px;
-  background: linear-gradient(to right, var(--red), var(--green));
-  transition: width 0.3s; z-index: 200; width: 0%;
-}
-
-/* ── SLIDE NAV DOTS ── */
-.slide-nav {
-  position: fixed; right: 2rem; top: 50%;
-  transform: translateY(-50%); z-index: 100;
-  display: flex; flex-direction: column; gap: 0.8rem;
-}
-.snav-dot {
-  width: 6px; height: 6px; border-radius: 50%;
-  background: #333; cursor: pointer;
-  transition: background 0.3s, transform 0.3s;
-}
-.snav-dot.active { background: var(--white); transform: scale(1.6); }
-
-/* ── 3D FLOATING ELEMENTS ── */
-.float-el {
-  position: absolute; pointer-events: none;
-  animation: floatEl var(--dur, 6s) ease-in-out infinite var(--delay, 0s);
-  opacity: 0.07;
-}
-@keyframes floatEl {
-  0%,100%{transform:translateY(0) rotate(0deg)} 50%{transform:translateY(-20px) rotate(5deg)}
-}
-
-/* ── REVEAL ANIMATION ── */
-.reveal {
-  opacity: 0; transform: translateY(30px);
-  transition: opacity 0.7s ease, transform 0.7s ease;
-}
-.reveal.visible { opacity: 1; transform: translateY(0); }
-.reveal-delay-1 { transition-delay: 0.1s; }
-.reveal-delay-2 { transition-delay: 0.2s; }
-.reveal-delay-3 { transition-delay: 0.3s; }
-.reveal-delay-4 { transition-delay: 0.4s; }
-
-/* ── GLITCH TEXT ── */
-.glitch {
+.hero-prompt-wrap {
   position: relative;
-}
-.glitch::before, .glitch::after {
-  content: attr(data-text); position: absolute; top: 0; left: 0;
-  width: 100%; height: 100%;
-  background: linear-gradient(180deg, #fff 30%, rgba(255,255,255,0.15) 100%);
-  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-  background-clip: text;
-}
-.glitch::before { animation: glitch1 3s infinite 2s; color: var(--red); }
-.glitch::after  { animation: glitch2 3s infinite 2s; }
-@keyframes glitch1 {
-  0%,100%{clip-path:inset(0 0 100% 0);transform:none}
-  10%{clip-path:inset(30% 0 50% 0);transform:translateX(-3px)}
-  20%{clip-path:inset(60% 0 20% 0);transform:translateX(3px)}
-  30%{clip-path:inset(0 0 100% 0);transform:none}
-}
-@keyframes glitch2 {
-  0%,100%{clip-path:inset(0 0 100% 0);transform:none}
-  15%{clip-path:inset(50% 0 30% 0);transform:translateX(3px)}
-  25%{clip-path:inset(20% 0 60% 0);transform:translateX(-3px)}
-  35%{clip-path:inset(0 0 100% 0);transform:none}
+  width: 100%;
 }
 
-/* ── 3D CARD ── */
-.card-3d {
-  transform-style: preserve-3d;
-  transition: transform 0.4s;
-}
-
-/* ── ALL VENTURES: GLASS STACK ── */
-#sventures {
-  background:
-    radial-gradient(circle at 78% 32%, rgba(200,212,0,0.09), transparent 34%),
-    radial-gradient(circle at 20% 70%, rgba(209,0,0,0.08), transparent 38%),
-    #0B0B0B;
-}
-.ventures-inner {
-  width: 100%; max-width: 1120px; margin: 0 auto;
-  display: grid; grid-template-columns: 0.78fr 1.22fr;
-  gap: 5rem; align-items: center;
-}
-.ventures-title {
-  font-family: 'Bebas Neue', sans-serif;
-  font-size: clamp(3.5rem, 7vw, 7rem); line-height: 0.88;
-  margin-bottom: 1.4rem;
-}
-.ventures-copy {
-  color: var(--gray); font-size: 0.95rem; line-height: 1.7;
-  max-width: 430px;
-}
-.ventures-contact {
-  display: inline-flex; margin-top: 2rem; padding: 0.85rem 1.2rem;
-  border: 1px solid rgba(255,255,255,0.16); color: var(--white);
-  text-decoration: none; font-family: 'Space Mono', monospace;
-  font-size: 0.65rem; letter-spacing: 1px; text-transform: uppercase;
-  background: rgba(255,255,255,0.05); backdrop-filter: blur(16px);
-  transition: transform 0.25s, border-color 0.25s, background 0.25s;
-}
-.ventures-contact:hover { transform: translateY(-3px); border-color: var(--green); background: rgba(200,212,0,0.08); }
-.venture-stage { position: relative; min-height: 565px; perspective: 1200px; }
-.venture-glass {
-  --x: calc(var(--i) * 24px);
-  --y: calc(var(--i) * 104px);
-  --r: calc((var(--i) - 1.5) * 0.5deg);
-  position: absolute; inset: 0 auto auto 0;
-  width: calc(100% - 72px); min-height: 205px;
-  padding: 1.5rem 1.6rem; border-radius: 22px;
-  display: grid; grid-template-columns: auto 1fr auto;
-  align-items: start; gap: 1.25rem;
-  transform: translate3d(var(--x), var(--y), 0) rotate(var(--r));
-  z-index: calc(10 - var(--i)); overflow: hidden;
-  color: var(--white); text-decoration: none;
-  background: linear-gradient(135deg, rgba(255,255,255,0.12), rgba(255,255,255,0.035));
-  border: 1px solid rgba(255,255,255,0.16);
-  box-shadow: 0 28px 70px rgba(0,0,0,0.46), inset 0 1px 0 rgba(255,255,255,0.14);
+.hero-input {
+  width: 100%;
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
   backdrop-filter: blur(28px) saturate(145%);
-  transition: transform 0.45s cubic-bezier(.2,.8,.2,1), border-color 0.3s, background 0.3s;
-}
-.venture-glass::before {
-  content: ''; position: absolute; inset: 0; pointer-events: none;
-  background: radial-gradient(circle at 12% 0%, var(--accent-soft), transparent 45%);
-}
-.venture-glass:hover {
-  transform: translate3d(calc(var(--x) - 12px), calc(var(--y) - 8px), 44px) rotate(0);
-  border-color: var(--accent);
-  background: linear-gradient(135deg, rgba(255,255,255,0.17), rgba(255,255,255,0.055));
-}
-.venture-no, .venture-state, .venture-meta {
-  font-family: 'Space Mono', monospace; text-transform: uppercase;
-}
-.venture-no { color: var(--accent); font-size: 0.58rem; padding-top: 0.3rem; }
-.venture-body { position: relative; z-index: 1; }
-.venture-state { color: var(--accent); font-size: 0.54rem; letter-spacing: 1.5px; }
-.venture-name { font-family: 'Bebas Neue', sans-serif; font-size: clamp(2.2rem, 4vw, 3.5rem); line-height: 0.95; margin-top: 0.55rem; }
-.venture-desc { color: #AAA9A2; font-size: 0.8rem; line-height: 1.55; margin-top: 0.65rem; max-width: 380px; }
-.venture-arrow { color: var(--accent); font-size: 1.25rem; position: relative; z-index: 1; }
-.venture-meta { grid-column: 2/4; color: #76766F; font-size: 0.5rem; letter-spacing: 1px; }
-
-@media (max-width: 900px) {
-  .ventures-inner { grid-template-columns: 1fr; gap: 2.5rem; }
-  .venture-stage { min-height: 540px; }
-}
-@media (max-width: 600px) {
-  nav { padding: 1rem 1.2rem; }
-  .nav-links { display: none; }
-  .slide { padding: 6rem 1.25rem 4rem; }
-  .venture-stage { min-height: auto; display: grid; gap: 0.8rem; }
-  .venture-glass { position: relative; width: 100%; min-height: 185px; transform: none; border-radius: 18px; }
-  .venture-glass:hover { transform: translateY(-4px); }
-}
-
-/* ── PUBLIC LAUNCH CONTENT ── */
-.hero-launch-line {
-  font-family: 'Bebas Neue', sans-serif;
-  font-size: clamp(2.4rem, 5vw, 5.2rem); line-height: 0.92;
-  margin-top: 1.4rem; letter-spacing: -1px;
-}
-.hero-places {
-  max-width: 720px; margin: 1.2rem 0 0;
-  color: var(--gray); font-size: clamp(0.9rem, 1.6vw, 1.05rem);
-  line-height: 1.75;
-}
-.conversation-prompt {
-  max-width: 720px; margin: 1.5rem 0 0; padding: 1.25rem 1.4rem;
-  border: 1px solid rgba(255,255,255,0.16); color: var(--white);
-  background: rgba(255,255,255,0.055); backdrop-filter: blur(18px);
-  text-align: left; font-size: clamp(1rem, 2vw, 1.25rem);
-  box-shadow: inset 0 1px 0 rgba(255,255,255,0.08), 0 18px 45px rgba(0,0,0,0.28);
+  padding: 1.25rem 1.5rem;
+  font-size: clamp(0.95rem, 2vw, 1.15rem);
+  color: var(--white);
+  border-radius: 12px;
   outline: none;
   font-family: inherit;
-  transition: border-color 0.3s, box-shadow 0.3s;
+  transition: all 0.3s;
+  box-shadow: 0 20px 45px rgba(0,0,0,0.4);
 }
-.conversation-prompt:focus {
-  border-color: rgba(255, 255, 255, 0.45);
-  box-shadow: 0 0 25px rgba(255, 255, 255, 0.15), inset 0 1px 0 rgba(255,255,255,0.08);
-}
-.launch-actions { display: flex; justify-content: flex-start; gap: 0.8rem; flex-wrap: wrap; margin-top: 1.2rem; }
-.launch-cta {
-  display: inline-flex; align-items: center; justify-content: center;
-  min-height: 48px; padding: 0.8rem 1.35rem; text-decoration: none;
-  font-family: 'Space Mono', monospace; font-size: 0.66rem;
-  letter-spacing: 1.2px; text-transform: uppercase; transition: all 0.25s;
-}
-.launch-cta.primary { background: var(--white); color: var(--black); }
-.launch-cta.secondary { border: 1px solid #343434; color: var(--white); background: rgba(255,255,255,0.03); }
-.launch-cta:hover { transform: translateY(-3px); }
-.launch-cta.primary:hover { background: var(--red); color: var(--white); }
-.launch-cta.secondary:hover { border-color: var(--green); }
-.launch-note { margin-top: 1.2rem; color: #55554F; font-family: 'Space Mono', monospace; font-size: 0.62rem; letter-spacing: 1.5px; }
-
-.miss-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5px; }
-.miss-card { min-height: 140px; display: flex; flex-direction: column; justify-content: space-between; }
-.miss-card .crisis-icon { font-family: 'Space Mono', monospace; font-size: 0.6rem; color: var(--red); }
-.problem-close { margin-top: 1.5rem; padding: 1.4rem; background: var(--red); font-size: clamp(1.15rem, 2.5vw, 1.8rem); line-height: 1.35; }
-
-.knowledge-graph {
-  position: relative; min-height: 560px; margin-top: 2rem;
-  border: 1px solid rgba(255,255,255,0.08); overflow: hidden;
-  background: radial-gradient(circle at 50% 50%, rgba(200,212,0,0.06), transparent 45%), rgba(255,255,255,0.018);
-}
-.graph-lines { position: absolute; inset: 0; width: 100%; height: 100%; }
-.graph-lines line { stroke: rgba(255,255,255,0.18); stroke-width: 1; stroke-dasharray: 8 10; animation: graphFlow 8s linear infinite; }
-.graph-lines line.accent { stroke: rgba(200,212,0,0.45); }
-@keyframes graphFlow { to { stroke-dashoffset: -180; } }
-.graph-node {
-  position: absolute; width: 156px; min-height: 96px; padding: 1rem;
-  transform: translate(-50%,-50%); border: 1px solid rgba(255,255,255,0.14);
-  background: rgba(18,18,18,0.76); backdrop-filter: blur(18px);
-  box-shadow: 0 18px 55px rgba(0,0,0,0.42); transition: transform 0.3s, border-color 0.3s;
-}
-.graph-node:hover { transform: translate(-50%,-50%) scale(1.05); border-color: var(--green); }
-.graph-node span { display: block; color: var(--green); font-family: 'Space Mono', monospace; font-size: 0.55rem; letter-spacing: 1px; margin-bottom: 0.55rem; }
-.graph-node strong { font-family: 'Bebas Neue', sans-serif; font-size: 1.25rem; letter-spacing: 1px; }
-
-.audience-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.5px; margin-top: 2.5rem; }
-.audience-grid .scenario { min-height: 180px; }
-.audience-question { color: var(--gray); font-size: 0.8rem; line-height: 1.5; margin-top: 1rem; }
-
-/* ── FLOATING GLASS CARDS ── */
-.floating-glass {
-  background: rgba(255, 255, 255, 0.02) !important;
-  border: 1px solid rgba(255, 255, 255, 0.05) !important;
-  backdrop-filter: blur(20px);
-  border-radius: 18px;
-  padding: 2.2rem 1.8rem;
-  box-shadow: 0 20px 40px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.05);
-  transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.3s, box-shadow 0.3s;
-  animation: floatCard 8s ease-in-out infinite alternate;
-  animation-delay: var(--delay, 0s);
-}
-.floating-glass:hover {
-  transform: translateY(-12px) scale(1.03) !important;
-  border-color: rgba(255, 255, 255, 0.18) !important;
-  box-shadow: 0 30px 60px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.1);
-}
-@keyframes floatCard {
-  0% { transform: translateY(0); }
-  100% { transform: translateY(-8px); }
+.hero-input:focus {
+  border-color: rgba(255,255,255,0.22);
+  box-shadow: 0 0 30px rgba(255, 255, 255, 0.08), 0 20px 45px rgba(0,0,0,0.4);
 }
 
-#s6 { background: radial-gradient(circle at 78% 32%, rgba(200,212,0,0.09), transparent 34%), #0B0B0B; }
-.coming-wrap { width: 100%; max-width: 1120px; margin: 0 auto; display: grid; grid-template-columns: 0.78fr 1.22fr; gap: 5rem; align-items: center; }
-.coming-label { color: var(--accent); font-family: 'Space Mono', monospace; font-size: 0.55rem; letter-spacing: 1.5px; text-transform: uppercase; }
+.hero-meta {
+  margin-top: 1rem;
+  font-size: 0.75rem;
+  color: var(--gray);
+  line-height: 1.5;
+}
 
-/* ── APPLE CAREERS STYLE GRID ── */
-.contributor-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.5rem; margin-top: 3rem; }
-.contributor-card {
-  background: rgba(255, 255, 255, 0.02);
-  border: 1px solid rgba(255, 255, 255, 0.05);
-  padding: 1.75rem 1.5rem;
-  border-radius: 12px;
-  min-height: 150px;
+/* ── IDENTITY TOGGLE SWITCH ── */
+.identity-toggle {
+  display: inline-flex;
+  gap: 4px;
+  background: rgba(255,255,255,0.03);
+  padding: 3px;
+  border-radius: 6px;
+  margin-bottom: 1.5rem;
+  border: 1px solid rgba(255,255,255,0.05);
+}
+.id-btn {
+  background: transparent;
+  border: none;
+  color: var(--gray);
+  font-size: 0.65rem;
+  font-family: 'Space Mono', monospace;
+  padding: 4px 10px;
+  cursor: pointer;
+  border-radius: 4px;
+  transition: all 0.2s;
+}
+.id-btn.active {
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--white);
+}
+
+/* ── FLOATING GLASS PANELS ── */
+.panel {
+  position: absolute;
+  width: 440px;
+  max-height: 80vh;
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  backdrop-filter: blur(35px) saturate(160%);
+  border-radius: 16px;
+  box-shadow: 0 35px 70px rgba(0,0,0,0.55), inset 0 1px 0 rgba(255,255,255,0.1);
+  pointer-events: auto;
   display: flex;
   flex-direction: column;
+  opacity: 0;
+  transform: scale(0.95);
+  transition: opacity 0.3s cubic-bezier(0.16, 1, 0.3, 1), transform 0.3s;
+  z-index: 100;
+}
+.panel.visible {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.panel-header {
+  padding: 1rem 1.25rem;
+  border-bottom: 1px solid rgba(255,255,255,0.05);
+  display: flex;
   justify-content: space-between;
+  align-items: center;
+  cursor: move;
+}
+
+.panel-title {
+  font-family: inherit;
+  font-weight: 600;
+  font-size: 0.9rem;
+  letter-spacing: -0.2px;
+}
+
+.panel-close {
+  background: transparent;
+  border: none;
+  color: var(--gray);
+  cursor: pointer;
+  font-size: 1.1rem;
+  transition: color 0.2s;
+}
+.panel-close:hover { color: var(--white); }
+
+.panel-content {
+  padding: 1.25rem;
+  overflow-y: auto;
+  flex: 1;
+  font-size: 0.85rem;
+  color: #c9c9c3;
+  line-height: 1.6;
+}
+
+/* ── WORKSPACE UNIVERSE STYLING ── */
+.workspace-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+  margin-top: 0.5rem;
+}
+
+.workspace-card {
+  background: rgba(255,255,255,0.02);
+  border: 1px solid rgba(255,255,255,0.05);
+  padding: 1.2rem;
+  border-radius: 12px;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
   transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 }
-.contributor-card:hover {
-  transform: translateY(-5px);
-  background: rgba(255, 255, 255, 0.06);
-  border-color: rgba(255, 255, 255, 0.15);
-  box-shadow: 0 15px 30px rgba(0,0,0,0.3);
+.workspace-card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at 10% 0%, var(--ws-color-soft), transparent 50%);
+  opacity: 0.5;
+  transition: opacity 0.3s;
 }
-.contributor-role {
-  font-family: 'DM Sans', sans-serif;
+.workspace-card:hover {
+  border-color: var(--ws-color);
+  background: rgba(255,255,255,0.05);
+  transform: translateY(-2px);
+}
+.workspace-card.active {
+  border-color: var(--ws-color);
+  box-shadow: 0 0 15px var(--ws-color-soft);
+  background: rgba(255,255,255,0.06);
+}
+
+.ws-title {
+  font-weight: 600;
+  font-size: 0.95rem;
+  color: var(--white);
+  margin-bottom: 4px;
+}
+.ws-desc {
+  font-size: 0.72rem;
+  color: var(--gray);
+}
+
+/* ── LIST VIEW ITEMS ── */
+.node-item {
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255,255,255,0.04);
+  padding: 10px 12px;
+  border-radius: 8px;
+  margin-bottom: 8px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.node-item:hover {
+  border-color: rgba(255,255,255,0.1);
+  background: rgba(255,255,255,0.04);
+}
+.node-item-title {
   font-weight: 500;
-  font-size: 1.25rem;
-  letter-spacing: -0.5px;
+  font-size: 0.85rem;
   color: var(--white);
 }
-.contributor-meta {
+.node-item-meta {
   font-family: 'Space Mono', monospace;
-  font-size: 0.65rem;
-  color: var(--gray);
+  font-size: 0.62rem;
+  margin-top: 4px;
+}
+
+/* ── FORM ELEMENTS ── */
+.form-group {
+  margin-bottom: 1rem;
+}
+.form-label {
+  display: block;
+  font-size: 0.75rem;
   text-transform: uppercase;
   letter-spacing: 1px;
-  margin-top: 1rem;
+  color: var(--gray);
+  margin-bottom: 6px;
 }
-.contributor-status {
-  font-family: 'Space Mono', monospace;
-  font-size: 0.6rem;
-  color: var(--green);
-  text-transform: uppercase;
-  letter-spacing: 2px;
-  margin-top: 0.25rem;
-}
-
-#s8 { background: var(--black); color: var(--white); text-align: center; }
-.manifesto { max-width: 900px; margin: 0 auto; }
-.manifesto-lines {
-  display: flex;
-  flex-direction: column;
-  gap: 1.5rem;
-  margin-top: 3rem;
-  align-items: center;
-}
-.manifesto-line {
-  font-family: 'Bebas Neue', sans-serif;
-  font-size: clamp(2rem, 5.2vw, 5.2rem);
-  line-height: 1.15;
-  color: rgba(60, 60, 56, 0.4);
-  transition: color 0.6s cubic-bezier(0.16, 1, 0.3, 1);
-  text-align: center;
-}
-.manifesto-line span {
-  color: var(--white);
-  opacity: 0.35;
-  transition: opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1), text-shadow 0.6s cubic-bezier(0.16, 1, 0.3, 1);
-}
-.manifesto-line.active {
-  color: rgba(255, 255, 255, 0.2);
-}
-.manifesto-line.active span {
-  opacity: 1;
-  text-shadow: 0 0 25px rgba(255, 255, 255, 0.5);
-}
-
-.final-launch { max-width: 900px; margin: 0 auto; text-align: center; position: relative; z-index: 2; }
-
-/* ── CTA ANONYMOUS INPUT ── */
-.cta-input-wrap {
-  display: flex;
-  max-width: 620px;
+.form-input {
   width: 100%;
-  margin: 2.5rem auto 0;
-  gap: 0.5rem;
-  align-items: center;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid var(--glass-border);
+  padding: 10px 12px;
+  border-radius: 8px;
+  outline: none;
+  color: var(--white);
+  font-family: inherit;
+  transition: border-color 0.2s;
 }
-.cta-prompt {
-  flex: 1;
-  border-radius: 8px 0 0 8px;
-  margin: 0;
-}
-.cta-btn {
-  border-radius: 0 8px 8px 0;
-  border: 1px solid rgba(255,255,255,0.16);
-  border-left: none;
-  cursor: pointer;
-  white-space: nowrap;
-  margin: 0;
-  height: 100%;
+.form-input:focus { border-color: rgba(255,255,255,0.2); }
+.form-btn {
   background: var(--white);
   color: var(--black);
+  border: none;
+  font-weight: 600;
+  padding: 10px 20px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-family: inherit;
+  width: 100%;
+  transition: background 0.2s;
 }
-.cta-btn:hover {
-  background: var(--green) !important;
-  color: var(--black) !important;
-  border-color: var(--green) !important;
-}
+.form-btn:hover { background: var(--accent); color: var(--white); }
 
-@media (max-width: 900px) {
-  .s1-inner {
-    grid-template-columns: 1fr;
-    text-align: center;
-    gap: 2.5rem;
-  }
-  .bro-giant {
-    justify-content: center;
-  }
-  .hero-places {
-    margin: 1.2rem auto 0;
-  }
-  .launch-actions {
-    justify-content: center;
-  }
-  .conversation-prompt {
-    margin: 1.5rem auto 0;
-  }
-  .hero-visual .graph3d-wrap {
-    height: 400px;
-    min-height: 350px;
-  }
-  .crisis-cards, .miss-grid { grid-template-columns: repeat(2, 1fr); }
-  .steps-row { grid-template-columns: repeat(2, 1fr); }
-  .audience-grid { grid-template-columns: repeat(2, 1fr); }
-  .coming-wrap { grid-template-columns: 1fr; gap: 2.2rem; }
-  .contributor-grid { grid-template-columns: repeat(2, 1fr); }
-  .scenario-grid { grid-template-columns: repeat(2, 1fr); }
-  .slide-nav { display: none; }
-}
+/* ── MOBILE OPTIMIZATIONS ── */
 @media (max-width: 600px) {
-  body { cursor: auto; }
-  .cursor, .cursor-ring { display: none; }
-  .bro-giant { font-size: clamp(5.5rem, 28vw, 11rem); }
-  .miss-grid, .crisis-cards, .audience-grid, .contributor-grid, .scenario-grid { grid-template-columns: 1fr; }
-  .steps-row { grid-template-columns: 1fr; }
-  .knowledge-graph { min-height: 680px; }
-  .graph-node { width: 132px; }
-  .graph-node:nth-of-type(1) { left: 50% !important; top: 12% !important; }
-  .graph-node:nth-of-type(2) { left: 24% !important; top: 34% !important; }
-  .graph-node:nth-of-type(3) { left: 74% !important; top: 49% !important; }
-  .graph-node:nth-of-type(4) { left: 28% !important; top: 69% !important; }
-  .graph-node:nth-of-type(5) { left: 68% !important; top: 88% !important; }
-  
-  .cta-input-wrap {
-    flex-direction: column;
-    gap: 0.8rem;
+  nav {
+    top: 1rem; left: 1rem; right: 1rem;
   }
-  .cta-prompt {
-    border-radius: 8px;
-    width: 100%;
-  }
-  .cta-btn {
-    border-radius: 8px;
-    width: 100%;
-    border-left: 1px solid rgba(255,255,255,0.16);
+  .nav-logo { font-size: 1rem; }
+  .tab-menu { display: none; } /* Hide floating tabs on micro screens */
+  .panel {
+    width: 90vw !important;
+    left: 5vw !important;
+    top: 15vh !important;
   }
 }
-
 </style>
 </head>
 <body>
 
-<canvas id="bg-canvas"></canvas>
-<div class="cursor" id="cursor"></div>
-<div class="cursor-ring" id="cursorRing"></div>
-<div class="progress" id="progress"></div>
+<canvas id="obsidian-graph"></canvas>
 
-<nav>
-  <a class="nav-logo" href="#s1">
-    <span class="nav-dot"></span>BRO
-  </a>
-  <div class="nav-links">
-    <a href="#s2">Why</a>
-    <a href="#s3">Vision</a>
-    <a href="#s6">Help Build This</a>
-    <a href="#s7">Contribute</a>
+<div id="ui-root">
+  <nav>
+    <a class="nav-logo" href="#" id="home-trigger">
+      <span class="logo-dot"></span>Bro
+    </a>
+    <div class="tab-menu" role="tablist">
+      <button class="tab-btn" data-target="panel-universe" role="tab">Universe</button>
+      <button class="tab-btn" data-target="panel-ask" role="tab">Ask</button>
+      <button class="tab-btn" data-target="panel-answer" role="tab">Answer</button>
+      <button class="tab-btn" data-target="panel-search" role="tab">Search</button>
+      <button class="tab-btn" data-target="panel-profile" role="tab">Profile</button>
+      <button class="tab-btn" data-target="panel-settings" role="tab">Settings</button>
+    </div>
+    <div class="nav-info" id="active-ws-name">Connect.Bro</div>
+  </nav>
+
+  <!-- ── CENTRAL SCREEN OVERLAY ── -->
+  <div class="center-hero" id="center-hero">
+    <div class="identity-toggle">
+      <button class="id-btn active" id="id-anon">Anonymous</button>
+      <button class="id-btn" id="id-vis">Visible</button>
+    </div>
+    <h1 class="hero-title">Stay Curious.</h1>
+    <div class="hero-prompt-wrap">
+      <input type="text" id="hero-input" class="hero-input" placeholder="What conversation do you wish had continued?" autofocus autocomplete="off" aria-label="What conversation do you wish had continued?">
+    </div>
+    <div class="hero-meta">
+      Press Enter to start a node. No login required.
+    </div>
   </div>
-  <div class="nav-badge">ALOKARA · 2026</div>
-</nav>
 
-<div class="slide-nav" id="slideNav"></div>
-
-<!-- ══ SLIDE 1: COVER ══ -->
-<section class="slide" id="s1">
-  <div class="float-el" style="font-size:20rem;top:10%;right:-5%;--dur:8s">?</div>
-  <div class="float-el" style="font-size:8rem;bottom:15%;left:5%;--dur:6s;--delay:1s">●</div>
-  <div class="s1-inner">
-    <div class="hero-content">
-      <div class="bro-giant"><span class="living-dot"></span><span class="bro-text">BRO</span></div>
-      <h1 class="hero-launch-line">Some conversations deserve another chance.</h1>
-      <p class="hero-places">Every lecture. Every hallway. Every café. Every campus.<br>Every question deserves a second chance.</p>
-      <div class="conversation-prompt-wrap">
-        <input type="text" id="hero-input" class="conversation-prompt" placeholder="What conversation do you wish you had?" aria-label="What conversation do you wish you had?">
+  <!-- ── FLOATING PANELS CONTAINER ── -->
+  <!-- UNIVERSE PANEL -->
+  <div class="panel" id="panel-universe" style="top: 15%; left: 10%;">
+    <div class="panel-header">
+      <span class="panel-title">Workspace Universe</span>
+      <button class="panel-close">&times;</button>
+    </div>
+    <div class="panel-content">
+      <p style="margin-bottom: 12px; font-size: 0.78rem; color: var(--gray);">Choose a workspace to filter nodes and focus curiosity.</p>
+      <div class="workspace-grid">
+        <div class="workspace-card" data-ws="learn" style="--ws-color: #0087FF; --ws-color-soft: rgba(0, 135, 255, 0.2)">
+          <div class="ws-title">Learn.Bro</div>
+          <div class="ws-desc">Learn together.</div>
+        </div>
+        <div class="workspace-card" data-ws="lawyer" style="--ws-color: #9B87FF; --ws-color-soft: rgba(155, 135, 255, 0.2)">
+          <div class="ws-title">Lawyer.Bro</div>
+          <div class="ws-desc">Understand law.</div>
+        </div>
+        <div class="workspace-card" data-ws="relax" style="--ws-color: #00FF80; --ws-color-soft: rgba(0, 255, 128, 0.2)">
+          <div class="ws-title">Relax.Bro</div>
+          <div class="ws-desc">Find support.</div>
+        </div>
+        <div class="workspace-card" data-ws="num" style="--ws-color: #FFD700; --ws-color-soft: rgba(255, 215, 0, 0.2)">
+          <div class="ws-title">Num.Bro</div>
+          <div class="ws-desc">Fix finances, bro.</div>
+        </div>
+        <div class="workspace-card" data-ws="shop" style="--ws-color: #FF8700; --ws-color-soft: rgba(255, 135, 0, 0.2)">
+          <div class="ws-title">Shop.Bro</div>
+          <div class="ws-desc">Discover products.</div>
+        </div>
+        <div class="workspace-card" data-ws="chill" style="--ws-color: #00E5FF; --ws-color-soft: rgba(0, 229, 255, 0.2)">
+          <div class="ws-title">Chill.Bro</div>
+          <div class="ws-desc">Meet communities.</div>
+        </div>
+        <div class="workspace-card" data-ws="connect" style="--ws-color: #FF007F; --ws-color-soft: rgba(255, 0, 127, 0.2)">
+          <div class="ws-title">Connect.Bro</div>
+          <div class="ws-desc">Meet people.</div>
+        </div>
+        <div class="workspace-card" data-ws="study" style="--ws-color: #4B0082; --ws-color-soft: rgba(75, 0, 130, 0.2)">
+          <div class="ws-title">Study.Bro</div>
+          <div class="ws-desc">Learn together.</div>
+        </div>
       </div>
-      <div class="launch-actions">
-        <a class="launch-cta primary" href="#s9">Ask Anonymously</a>
-        <a class="launch-cta secondary" href="#s7">Become Founding Contributor</a>
+    </div>
+  </div>
+
+  <!-- ASK PANEL -->
+  <div class="panel" id="panel-ask" style="top: 20%; left: 55%;">
+    <div class="panel-header">
+      <span class="panel-title">Start a Node</span>
+      <button class="panel-close">&times;</button>
+    </div>
+    <div class="panel-content">
+      <div class="form-group">
+        <label class="form-label">Query / Conversation Topic</label>
+        <input type="text" id="ask-input" class="form-input" placeholder="Type what you want to seed...">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Detailed Context</label>
+        <textarea id="ask-details" class="form-input" style="min-height: 100px; resize: vertical;" placeholder="Add some context..."></textarea>
+      </div>
+      <button id="ask-submit-btn" class="form-btn">Publish to Graph</button>
+    </div>
+  </div>
+
+  <!-- ANSWER PANEL -->
+  <div class="panel" id="panel-answer" style="top: 15%; left: 50%;">
+    <div class="panel-header">
+      <span class="panel-title">Unresolved Nodes</span>
+      <button class="panel-close">&times;</button>
+    </div>
+    <div class="panel-content">
+      <div id="unresolved-list">
+        <!-- populated by JS -->
       </div>
     </div>
-    <div class="hero-visual">
-      <div class="graph3d-wrap">
-        <canvas id="obsidian-graph"></canvas>
-        <div class="graph3d-hint">drag to rotate · scroll to zoom · hover a node</div>
-        <div class="graph3d-pulse">LIVE GRAPH</div>
+  </div>
+
+  <!-- SEARCH PANEL -->
+  <div class="panel" id="panel-search" style="top: 30%; left: 20%;">
+    <div class="panel-header">
+      <span class="panel-title">Explore Knowledge</span>
+      <button class="panel-close">&times;</button>
+    </div>
+    <div class="panel-content">
+      <input type="text" id="search-input-field" class="form-input" placeholder="Search questions, ideas, topics..." style="margin-bottom: 12px;">
+      <div id="search-results"></div>
+    </div>
+  </div>
+
+  <!-- PROFILE PANEL -->
+  <div class="panel" id="panel-profile" style="top: 25%; left: 40%;">
+    <div class="panel-header">
+      <span class="panel-title">Visible Identity</span>
+      <button class="panel-close">&times;</button>
+    </div>
+    <div class="panel-content" style="text-align: center;">
+      <div style="width: 80px; height: 80px; border-radius: 50%; background: var(--accent); margin: 0 auto 12px; box-shadow: 0 0 20px rgba(255,255,255,0.05);"></div>
+      <h3 style="color: var(--white); margin-bottom: 4px;">Curious Mind</h3>
+      <p style="color: var(--gray); font-size: 0.75rem; font-family: 'Space Mono', monospace; margin-bottom: 16px;">id_7e9af8b91a2d</p>
+      <div style="border-top: 1px solid rgba(255,255,255,0.05); padding-top: 16px; text-align: left;">
+        <div style="display:flex; justify-content:space-between; margin-bottom: 8px;">
+          <span>Nodes Created:</span><strong>4</strong>
+        </div>
+        <div style="display:flex; justify-content:space-between;">
+          <span>Bridges Connected:</span><strong>12</strong>
+        </div>
       </div>
     </div>
   </div>
-  <div class="scroll-hint">SCROLL</div>
-</section>
 
-<!-- ══ ALL VENTURES: GLASS STACK ══ -->
-<!-- ══ SLIDE 2: THE PROBLEM ══ -->
-<section class="slide" id="s2">
-  <div class="s2-inner">
-    <div class="section-label reveal">What gets missed</div>
-    <div class="s2-headline reveal reveal-delay-1">The people and ideas<br>were already there.</div>
-    <div class="s2-sub reveal reveal-delay-2">People miss what could have changed everything.</div>
-    <div class="miss-grid reveal reveal-delay-3">
-      <div class="crisis-card miss-card"><div class="crisis-icon">01</div><div class="crisis-head">“I left before asking.”</div></div>
-      <div class="crisis-card miss-card"><div class="crisis-icon">02</div><div class="crisis-head">“I overheard an amazing discussion.”</div></div>
-      <div class="crisis-card miss-card"><div class="crisis-icon">03</div><div class="crisis-head">“I never met that professor.”</div></div>
-      <div class="crisis-card miss-card"><div class="crisis-icon">04</div><div class="crisis-head">“I lost the opportunity.”</div></div>
-      <div class="crisis-card miss-card"><div class="crisis-icon">05</div><div class="crisis-head">“I wish I continued talking.”</div></div>
-      <div class="crisis-card miss-card"><div class="crisis-icon">06</div><div class="crisis-head">“I couldn’t find that person.”</div></div>
+  <!-- SETTINGS PANEL -->
+  <div class="panel" id="panel-settings" style="top: 35%; left: 30%;">
+    <div class="panel-header">
+      <span class="panel-title">System Settings</span>
+      <button class="panel-close">&times;</button>
     </div>
-    <div class="problem-close reveal reveal-delay-4">Not because they don’t exist.<br>Because conversations end.</div>
-  </div>
-</section>
-
-<!-- ══ SLIDE 3: THE VISION ══ -->
-<section class="slide" id="s3">
-  <div class="s4-inner">
-    <div class="section-label reveal">The Vision</div>
-    <div class="s2-headline reveal reveal-delay-1">A question should<br>be able to travel.</div>
-    <div class="steps-row reveal reveal-delay-2">
-      <div class="step-card"><div class="step-num-circle">1</div><div class="step-icon">?</div><div class="step-head">Question</div><div class="step-body">Curiosity creates the first opening.</div><div class="step-arrow">↓</div></div>
-      <div class="step-card"><div class="step-num-circle">2</div><div class="step-icon">✦</div><div class="step-head">Answer</div><div class="step-body">Someone adds context, experience, or direction.</div><div class="step-arrow">↓</div></div>
-      <div class="step-card"><div class="step-num-circle">3</div><div class="step-icon">○</div><div class="step-head">Meeting</div><div class="step-body">The right people continue the conversation.</div><div class="step-arrow">↓</div></div>
-      <div class="step-card"><div class="step-num-circle">4</div><div class="step-icon">↗</div><div class="step-head">Project</div><div class="step-body">Conversation becomes something real.</div><div class="step-arrow">↓</div></div>
-      <div class="step-card"><div class="step-num-circle">5</div><div class="step-icon">∞</div><div class="step-head">Knowledge</div><div class="step-body">Every outcome creates a new question.</div></div>
-    </div>
-    <div class="connector-bar reveal reveal-delay-3">Question → Answer → Meeting → Project → Knowledge → New Question</div>
-  </div>
-</section>
-
-
-
-<!-- ══ SLIDE 5: AUDIENCE ══ -->
-<section class="slide" id="s5">
-  <div class="s7-inner">
-    <div class="section-label reveal">Who is dotBro for?</div>
-    <div class="vision-headline reveal reveal-delay-1">Curious people.</div>
-    <div class="vision-sub reveal reveal-delay-2">Different perspectives. The same instinct to ask, learn, and build.</div>
-    <div class="audience-grid reveal reveal-delay-3">
-      <div class="scenario floating-glass" style="--delay:0s"><div class="scenario-top" style="background:var(--white)"></div><div class="scenario-prob">Student</div><p class="audience-question">“What could dotBro become for me?”</p></div>
-      <div class="scenario floating-glass" style="--delay:0.8s"><div class="scenario-top" style="background:#C8D400"></div><div class="scenario-prob">Professor</div><p class="audience-question">“What could dotBro become for me?”</p></div>
-      <div class="scenario floating-glass" style="--delay:1.6s"><div class="scenario-top" style="background:#FFD700"></div><div class="scenario-prob">Researcher</div><p class="audience-question">“What could dotBro become for me?”</p></div>
-      <div class="scenario floating-glass" style="--delay:2.4s"><div class="scenario-top" style="background:#0087FF"></div><div class="scenario-prob">Founder</div><p class="audience-question">“What could dotBro become for me?”</p></div>
-      <div class="scenario floating-glass" style="--delay:0.4s"><div class="scenario-top" style="background:#9B87FF"></div><div class="scenario-prob">Engineer</div><p class="audience-question">“What could dotBro become for me?”</p></div>
-      <div class="scenario floating-glass" style="--delay:1.2s"><div class="scenario-top" style="background:#D10000"></div><div class="scenario-prob">Designer</div><p class="audience-question">“What could dotBro become for me?”</p></div>
-      <div class="scenario floating-glass" style="--delay:2s"><div class="scenario-top" style="background:#00FF80"></div><div class="scenario-prob">Builder</div><p class="audience-question">“What could dotBro become for me?”</p></div>
+    <div class="panel-content">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem;">
+        <span>Reduced Motion</span>
+        <input type="checkbox" id="setting-motion" style="accent-color: var(--accent);">
+      </div>
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem;">
+        <span>High Contrast Nodes</span>
+        <input type="checkbox" id="setting-contrast" style="accent-color: var(--accent);">
+      </div>
+      <p style="font-size: 0.65rem; color: var(--gray); text-align: center; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 12px;">Curiosity OS V5.0.0 · Local Mode</p>
     </div>
   </div>
-</section>
-
-<!-- ══ SLIDE 6: HELP BUILD THIS ══ -->
-<section class="slide" id="s6">
-  <div class="coming-wrap">
-    <div>
-      <div class="section-label green reveal">Help Build This</div>
-      <div class="s6-headline reveal reveal-delay-1">The first paths<br>through dotBro.</div>
-      <p class="vision-sub reveal reveal-delay-2">Each project is an open invitation for co-creation.</p>
-    </div>
-    <div class="venture-stage reveal reveal-delay-2" aria-label="Help build this projects">
-      <article class="venture-glass" style="--i:0;--accent:#F5F5F0;--accent-soft:rgba(245,245,240,0.14)">
-        <span class="venture-no">01</span>
-        <div class="venture-body">
-          <div class="coming-label">Gyaan.Bro</div>
-          <div class="venture-name">Knowledge Hub</div>
-          <p class="venture-desc">An open graph for knowledge mapping.<br><strong>Looking for:</strong> Educators, Researchers, Writers, Students</p>
-        </div>
-        <span class="venture-arrow">→</span>
-        <div class="venture-meta">INVITATION</div>
-      </article>
-      <article class="venture-glass" style="--i:1;--accent:#FF1A1A;--accent-soft:rgba(209,0,0,0.23)">
-        <span class="venture-no">02</span>
-        <div class="venture-body">
-          <div class="coming-label">Relax.Bro</div>
-          <div class="venture-name">Mental Wellness</div>
-          <p class="venture-desc">A calmer route from asking for help to finding it.<br><strong>Looking for:</strong> Psychologists, Community Builders, Developers</p>
-        </div>
-        <span class="venture-arrow">→</span>
-        <div class="venture-meta">INVITATION</div>
-      </article>
-      <article class="venture-glass" style="--i:2;--accent:#E2EE00;--accent-soft:rgba(200,212,0,0.2)">
-        <span class="venture-no">03</span>
-        <div class="venture-body">
-          <div class="coming-label">Num.Bro</div>
-          <div class="venture-name">Financial Integrity</div>
-          <p class="venture-desc">Clearer records, shared understanding, fewer assumptions.<br><strong>Looking for:</strong> Finance, AI, Accounting, Builders</p>
-        </div>
-        <span class="venture-arrow">→</span>
-        <div class="venture-meta">INVITATION</div>
-      </article>
-      <article class="venture-glass" style="--i:3;--accent:#9B87FF;--accent-soft:rgba(155,135,255,0.2)">
-        <span class="venture-no">04</span>
-        <div class="venture-body">
-          <div class="coming-label">Varta</div>
-          <div class="venture-name">Secure Communication</div>
-          <p class="venture-desc">A place for conversations that deserve to continue.<br><strong>Looking for:</strong> Communication, Encryption, Networking, Builders</p>
-        </div>
-        <span class="venture-arrow">→</span>
-        <div class="venture-meta">INVITATION</div>
-      </article>
-    </div>
-  </div>
-</section>
-
-<!-- ══ SLIDE 7: FOUNDING CONTRIBUTORS ══ -->
-<section class="slide" id="s7">
-  <div class="s7-inner">
-    <div class="section-label reveal">Founding Contributors</div>
-    <div class="vision-headline reveal reveal-delay-1">We’re not hiring.<br>We’re building.</div>
-    <div class="contributor-grid reveal reveal-delay-2">
-      <div class="contributor-card"><div class="contributor-role">Frontend</div><div class="contributor-meta">Founding Contributor</div><div class="contributor-status">Open</div></div>
-      <div class="contributor-card"><div class="contributor-role">Backend</div><div class="contributor-meta">Founding Contributor</div><div class="contributor-status">Open</div></div>
-      <div class="contributor-card"><div class="contributor-role">AI</div><div class="contributor-meta">Founding Contributor</div><div class="contributor-status">Open</div></div>
-      <div class="contributor-card"><div class="contributor-role">ML</div><div class="contributor-meta">Founding Contributor</div><div class="contributor-status">Open</div></div>
-      <div class="contributor-card"><div class="contributor-role">Research</div><div class="contributor-meta">Founding Contributor</div><div class="contributor-status">Open</div></div>
-      <div class="contributor-card"><div class="contributor-role">Motion</div><div class="contributor-meta">Founding Contributor</div><div class="contributor-status">Open</div></div>
-      <div class="contributor-card"><div class="contributor-role">Design</div><div class="contributor-meta">Founding Contributor</div><div class="contributor-status">Open</div></div>
-      <div class="contributor-card"><div class="contributor-role">Systems</div><div class="contributor-meta">Founding Contributor</div><div class="contributor-status">Open</div></div>
-      <div class="contributor-card"><div class="contributor-role">Professor</div><div class="contributor-meta">Founding Contributor</div><div class="contributor-status">Open</div></div>
-      <div class="contributor-card"><div class="contributor-role">Student</div><div class="contributor-meta">Founding Contributor</div><div class="contributor-status">Open</div></div>
-      <div class="contributor-card"><div class="contributor-role">Builder</div><div class="contributor-meta">Founding Contributor</div><div class="contributor-status">Open</div></div>
-      <div class="contributor-card"><div class="contributor-role">Community</div><div class="contributor-meta">Founding Contributor</div><div class="contributor-status">Open</div></div>
-    </div>
-    <div class="launch-actions reveal reveal-delay-3"><a class="launch-cta secondary" href="mailto:alokara.teams@gmail.com?subject=Founding%20Contributor%20%E2%80%94%20dotBro">Become a Founding Contributor</a></div>
-  </div>
-</section>
-
-<!-- ══ SLIDE 8: MANIFESTO ══ -->
-<section class="slide" id="s8">
-  <div class="manifesto">
-    <div class="section-label reveal" style="display:flex;justify-content:center">Manifesto</div>
-    <div class="manifesto-lines">
-      <div class="manifesto-line reveal"><span>Curiosity</span> over popularity.</div>
-      <div class="manifesto-line reveal"><span>Questions</span> over algorithms.</div>
-      <div class="manifesto-line reveal"><span>Knowledge</span> over feeds.</div>
-      <div class="manifesto-line reveal"><span>Communities</span> over followers.</div>
-      <div class="manifesto-line reveal"><span>Builders</span> over spectators.</div>
-    </div>
-  </div>
-</section>
-
-<!-- ══ SLIDE 9: FINAL CTA ══ -->
-<section class="slide" id="s9">
-  <div class="float-el" style="font-size:25rem;left:-5%;top:10%;--dur:9s">●</div>
-  <div class="final-launch">
-    <div class="close-big reveal">What if every missed conversation could continue?</div>
-    <div class="cta-input-wrap reveal reveal-delay-1">
-      <input type="text" id="cta-input" class="conversation-prompt cta-prompt" placeholder="Ask anonymously..." aria-label="Ask anonymously">
-      <button id="cta-submit-btn" class="launch-cta primary cta-btn">Ask anonymously.</button>
-    </div>
-    <div class="launch-note reveal reveal-delay-2">No pressure. Launching with curious people.</div>
-  </div>
-</section>
+</div>
 
 <script>
-// ── CURSOR ──
-const cursor = document.getElementById('cursor');
-const ring = document.getElementById('cursorRing');
-let mx = 0, my = 0, rx = 0, ry = 0;
-document.addEventListener('mousemove', e => {
-  mx = e.clientX; my = e.clientY;
-  cursor.style.left = mx + 'px'; cursor.style.top = my + 'px';
-});
-function animRing() {
-  rx += (mx - rx) * 0.12; ry += (my - ry) *.12;
-  ring.style.left = rx + 'px'; ring.style.top = ry + 'px';
-  requestAnimationFrame(animRing);
-}
-animRing();
-document.querySelectorAll('a,button,.crisis-card,.scenario,.step-card,.venture-glass,.contributor-card,.graph3d-wrap').forEach(el => {
-  el.addEventListener('mouseenter', () => { cursor.style.width = '24px'; cursor.style.height = '24px'; ring.style.width = '60px'; ring.style.height = '60px'; });
-  el.addEventListener('mouseleave', () => { cursor.style.width = '12px'; cursor.style.height = '12px'; ring.style.width = '40px'; ring.style.height = '40px'; });
-});
-
-// ── 3D CANVAS ──
-const canvas = document.getElementById('bg-canvas');
-const ctx = canvas.getContext('2d');
-let W, H, particles = [], time = 0;
-
-function resize() {
-  W = canvas.width = window.innerWidth;
-  H = canvas.height = window.innerHeight;
-}
-resize();
-window.addEventListener('resize', resize);
-
-function makeParticles() {
-  particles = [];
-  const count = Math.floor(W * H / 15000);
-  for (let i = 0; i < count; i++) {
-    particles.push({
-      x: Math.random() * W, y: Math.random() * H,
-      z: Math.random() * 3 + 0.5,
-      vx: (Math.random() - 0.5) * 0.3,
-      vy: (Math.random() - 0.5) * 0.3,
-      r: Math.random() * 2 + 0.5,
-      hue: Math.random() > 0.7 ? 'red' : Math.random() > 0.5 ? 'green' : 'white'
-    });
-  }
-}
-makeParticles();
-window.addEventListener('resize', makeParticles);
-
-// Lines between nearby particles
-function drawParticles() {
-  ctx.clearRect(0, 0, W, H);
-  time += 0.005;
-
-  for (let i = 0; i < particles.length; i++) {
-    const p = particles[i];
-    p.x += p.vx; p.y += p.vy;
-    if (p.x < 0 || p.x > W) p.vx *= -1;
-    if (p.y < 0 || p.y > H) p.vy *= -1;
-
-    const alpha = 0.4 * (p.z / 3.5);
-    if (p.hue === 'red')   ctx.fillStyle = `rgba(209,0,0,${alpha})`;
-    else if (p.hue === 'green') ctx.fillStyle = `rgba(200,212,0,${alpha})`;
-    else ctx.fillStyle = `rgba(255,255,255,${alpha * 0.5})`;
-
-    ctx.beginPath();
-    ctx.arc(p.x, p.y, p.r * p.z * 0.6, 0, Math.PI * 2);
-    ctx.fill();
-
-    for (let j = i + 1; j < particles.length; j++) {
-      const q = particles[j];
-      const dx = p.x - q.x, dy = p.y - q.y;
-      const dist = Math.sqrt(dx*dx + dy*dy);
-      if (dist < 120) {
-        const lineAlpha = (1 - dist / 120) * 0.08;
-        ctx.strokeStyle = `rgba(255,255,255,${lineAlpha})`;
-        ctx.lineWidth = 0.5;
-        ctx.beginPath();
-        ctx.moveTo(p.x, p.y);
-        ctx.lineTo(q.x, q.y);
-        ctx.stroke();
-      }
-    }
-  }
-
-  // Floating 3D rings
-  for (let i = 0; i < 3; i++) {
-    const cx = W * (0.2 + i * 0.3);
-    const cy = H * 0.5 + Math.sin(time + i * 2) * 80;
-    const rad = 60 + i * 40 + Math.sin(time * 0.7 + i) * 15;
-    const rot = time * 0.3 + i * Math.PI / 3;
-    const a = Math.sin(rot) * 0.3;
-    const b = Math.cos(rot);
-    ctx.save();
-    ctx.translate(cx, cy);
-    ctx.scale(1, Math.abs(b) * 0.5 + 0.1);
-    ctx.rotate(a);
-    if (i === 0) ctx.strokeStyle = `rgba(209,0,0,0.08)`;
-    else if (i === 1) ctx.strokeStyle = `rgba(200,212,0,0.06)`;
-    else ctx.strokeStyle = `rgba(255,255,255,0.05)`;
-    ctx.lineWidth = 1.5;
-    ctx.beginPath();
-    ctx.arc(0, 0, rad, 0, Math.PI * 2);
-    ctx.stroke();
-    ctx.restore();
-  }
-
-  requestAnimationFrame(drawParticles);
-}
-drawParticles();
-
-// ── SLIDE NAV DOTS ──
-const slides = document.querySelectorAll('.slide');
-const navEl = document.getElementById('slideNav');
-slides.forEach((sl, i) => {
-  const d = document.createElement('div');
-  d.className = 'snav-dot' + (i === 0 ? ' active' : '');
-  d.addEventListener('click', () => sl.scrollIntoView({ behavior: 'smooth' }));
-  navEl.appendChild(d);
-});
-
-// ── PROGRESS + ACTIVE DOT ──
-window.addEventListener('scroll', () => {
-  const prog = document.getElementById('progress');
-  const scrollTop = window.scrollY;
-  const docH = document.documentElement.scrollHeight - window.innerHeight;
-  prog.style.width = (scrollTop / docH * 100) + '%';
-
-  const dots = document.querySelectorAll('.snav-dot');
-  slides.forEach((sl, i) => {
-    const rect = sl.getBoundingClientRect();
-    if (rect.top <= window.innerHeight / 2 && rect.bottom >= window.innerHeight / 2) {
-      dots.forEach(d => d.classList.remove('active'));
-      dots[i].classList.add('active');
-    }
-  });
-});
-
-// ── REVEAL ON SCROLL ──
-const revealEls = document.querySelectorAll('.reveal');
-const obs = new IntersectionObserver(entries => {
-  entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
-}, { threshold: 0.15 });
-revealEls.forEach(el => obs.observe(el));
-
-// ── 3D CARD TILT ──
-document.querySelectorAll('.card-3d').forEach(card => {
-  card.addEventListener('mousemove', e => {
-    const rect = card.getBoundingClientRect();
-    const cx = rect.left + rect.width / 2;
-    const cy = rect.top + rect.height / 2;
-    const dx = (e.clientX - cx) / rect.width * 20;
-    const dy = (e.clientY - cy) / rect.height * 20;
-    card.style.transform = `perspective(600px) rotateY(${dx}deg) rotateX(${-dy}deg) scale(1.03)`;
-  });
-  card.addEventListener('mouseleave', () => {
-    card.style.transform = '';
-  });
-});
-
-// ══════════════════════════════════════════════════
-// 3D OBSIDIAN KNOWLEDGE GRAPH (V2 Refactored)
-// Questions are nodes. Edges are curiosity.
-// Pure JS — no library. Manual perspective projection.
-// ══════════════════════════════════════════════════
+// ── INTERACTIVE CANVAS GRAPH ENGINE ──
 (function () {
   const el = document.getElementById('obsidian-graph');
   if (!el) return;
-  const ctx2 = el.getContext('2d');
+  const ctx = el.getContext('2d');
   let GW, GH, GDPR;
 
+  // Active Workspace and theme color mapping
+  let activeWS = 'connect';
+  const WS_DETAILS = {
+    learn: { color: 'rgba(0, 135, 255, ', name: 'Learn.Bro' },
+    lawyer: { color: 'rgba(155, 135, 255, ', name: 'Lawyer.Bro' },
+    relax: { color: 'rgba(0, 255, 128, ', name: 'Relax.Bro' },
+    num: { color: 'rgba(255, 215, 0, ', name: 'Num.Bro' },
+    shop: { color: 'rgba(255, 135, 0, ', name: 'Shop.Bro' },
+    chill: { color: 'rgba(0, 229, 255, ', name: 'Chill.Bro' },
+    connect: { color: 'rgba(255, 0, 127, ', name: 'Connect.Bro' },
+    study: { color: 'rgba(75, 0, 130, ', name: 'Study.Bro' }
+  };
+
+  function updateWorkspaceColor(ws) {
+    activeWS = ws;
+    const details = WS_DETAILS[ws] || WS_DETAILS.connect;
+    document.documentElement.style.setProperty('--accent', details.color + '1)');
+    document.getElementById('active-ws-name').innerText = details.name;
+  }
+
   function gResize() {
-    const wrap = el.parentElement;
     GDPR = Math.min(window.devicePixelRatio || 1, 2);
-    GW = wrap.clientWidth;
-    GH = wrap.clientHeight;
+    GW = window.innerWidth;
+    GH = window.innerHeight;
     el.width = GW * GDPR;
     el.height = GH * GDPR;
     el.style.width = GW + 'px';
     el.style.height = GH + 'px';
-    ctx2.setTransform(GDPR, 0, 0, GDPR, 0, 0);
+    ctx.setTransform(GDPR, 0, 0, GDPR, 0, 0);
   }
   window.addEventListener('resize', gResize);
   gResize();
 
-  // Color system for states
+  // Color systems for node states
   const STATE_COLORS = {
     question: 'rgba(255, 255, 255, ',
-    answer: 'rgba(200, 212, 0, ',    // Green
-    meeting: 'rgba(0, 135, 255, ',   // Blue
-    project: 'rgba(155, 135, 255, ', // Purple
-    knowledge: 'rgba(255, 215, 0, ', // Gold
-    anonymous: 'rgba(209, 0, 0, ',   // Red
-    waiting: 'rgba(120, 120, 120, ',  // Gray
-    resolved: 'rgba(0, 255, 128, '   // Green Glow
+    answer: 'rgba(0, 255, 128, ',
+    meeting: 'rgba(0, 135, 255, ',
+    project: 'rgba(155, 135, 255, ',
+    knowledge: 'rgba(255, 215, 0, ',
+    anonymous: 'rgba(255, 0, 127, ',
+    waiting: 'rgba(120, 120, 120, ',
+    resolved: 'rgba(0, 255, 200, '
   };
 
-  // Questions dataset
-  const QUESTIONS = [
-    { text: 'What is consciousness?', state: 'knowledge', hub: true },
-    { text: 'How do ideas connect?', state: 'meeting', hub: true },
-    { text: 'Who else is thinking this?', state: 'question', hub: true },
-    { text: 'What did I almost ask?', state: 'anonymous', hub: true },
-    { text: 'Can AI be curious?', state: 'question' },
-    { text: 'Why do conversations end?', state: 'waiting' },
-    { text: 'What got lost at graduation?', state: 'anonymous' },
-    { text: 'Where do collaborators hide?', state: 'meeting' },
-    { text: 'What should I have said?', state: 'question' },
-    { text: 'Which professor knows this?', state: 'knowledge' },
-    { text: 'How does learning happen?', state: 'resolved' },
-    { text: "What's worth building next?", state: 'project' },
-    { text: 'Is this idea already done?', state: 'waiting' },
-    { text: 'What if we build this together?', state: 'project' },
-    { text: 'Where does curiosity lead?', state: 'resolved' },
-    { text: 'What question changed your life?', state: 'question' },
-    { text: 'How do communities form?', state: 'meeting' },
-    { text: 'What did that lecture miss?', state: 'anonymous' },
-    { text: 'Who has the answer?', state: 'waiting' },
-    { text: 'What gets lost in feeds?', state: 'question' },
-    { text: 'How do ideas compound?', state: 'knowledge' },
-    { text: 'What if knowledge was a graph?', state: 'resolved' },
-    { text: 'When did you stop asking why?', state: 'anonymous' },
-    { text: 'What would you build with me?', state: 'project' }
+  // Build high-density initial nodes
+  const NODE_TYPES = ['question', 'answer', 'meeting', 'project', 'knowledge', 'anonymous', 'waiting', 'resolved'];
+  const QUESTIONS_POOL = [
+    'How do ideas connect?', 'What is consciousness?', 'Is this idea already done?',
+    'What would you build with me?', 'Why do conversations end?', 'Can AI be curious?',
+    'Which professor knows this?', 'How do communities form?', 'What did that lecture miss?',
+    'What gets lost in feeds?', 'What conversation changed your life?', 'Where does curiosity lead?'
   ];
 
-  // place nodes on a 3D sphere
-  const R3 = 200;
-  const golden = Math.PI * (3 - Math.sqrt(5));
-  let nodes3d = QUESTIONS.map((q, i) => {
-    const y = 1 - (i / (QUESTIONS.length - 1)) * 2;
-    const r = Math.sqrt(Math.max(0, 1 - y * y));
-    const theta = golden * i;
-    return {
-      x: Math.cos(theta) * r * R3,
-      y: y * R3,
-      z: Math.sin(theta) * r * R3,
-      text: q.text,
-      hub: q.hub || false,
-      state: q.state || 'question',
-      alpha: 0,
-      born: Date.now() + i * 120
-    };
-  });
+  let nodes3d = [];
+  const R3 = 240;
+  const numNodes = 280;
+  
+  for (let i = 0; i < numNodes; i++) {
+    const phi = Math.acos(-1 + (2 * i) / numNodes);
+    const theta = Math.sqrt(numNodes * Math.PI) * phi;
+    const wsKeys = Object.keys(WS_DETAILS);
+    const wsNode = wsKeys[i % wsKeys.length];
 
-  // build edges: hubs connect to everything; nodes connect to nearest 2–3
+    nodes3d.push({
+      x: Math.cos(theta) * Math.sin(phi) * R3,
+      y: Math.sin(theta) * Math.sin(phi) * R3 * 0.9,
+      z: Math.cos(phi) * R3,
+      text: QUESTIONS_POOL[i % QUESTIONS_POOL.length] + ' #' + i,
+      hub: i % 18 === 0,
+      state: NODE_TYPES[i % NODE_TYPES.length],
+      workspace: wsNode,
+      alpha: 0.1 + Math.random() * 0.9,
+      born: Date.now() + i * 5,
+      isUserNode: false
+    });
+  }
+
+  // Connect edges
   let edges3d = [];
   const hubIdx = nodes3d.map((n, i) => n.hub ? i : -1).filter(i => i >= 0);
   nodes3d.forEach((n, i) => {
     if (n.hub) {
       nodes3d.forEach((m, j) => {
-        if (j !== i && j % 3 === 0) edges3d.push({ a: i, b: j, accent: true });
+        if (j !== i && j % 15 === 0 && m.workspace === n.workspace) {
+          edges3d.push({ a: i, b: j, accent: Math.random() > 0.6 });
+        }
       });
     } else {
       const nearHub = hubIdx[i % hubIdx.length];
       edges3d.push({ a: i, b: nearHub, accent: false });
-      const nb = (i + 7) % nodes3d.length;
+      const nb = (i + 13) % nodes3d.length;
       if (nb !== i) edges3d.push({ a: i, b: nb, accent: false });
     }
   });
 
-  // ── rotation and zoom physics state ──
-  let gRotY = 0.3, gRotX = -0.15;
+  // Rotation and zoom physics
+  let gRotY = 0.5, gRotX = -0.2;
   let gDrag = false, gLX = 0, gLY = 0, gVX = 0.001, gVY = 0;
   let targetZoom = 1;
   let currentZoom = 1;
+  let targetRotY = 0.5, targetRotX = -0.2;
   let gHoverNode = null;
+  let reducedMotion = false;
 
   el.addEventListener('mousedown', e => {
     gDrag = true; gLX = e.clientX; gLY = e.clientY;
@@ -1292,16 +698,17 @@ document.querySelectorAll('.card-3d').forEach(card => {
   window.addEventListener('mousemove', e => {
     if (!gDrag) return;
     const dx = e.clientX - gLX, dy = e.clientY - gLY;
-    gRotY += dx * 0.003; gRotX += dy * 0.003;
-    gVX = dx * 0.0015; gVY = dy * 0.0015;
+    gRotY += dx * 0.0025; gRotX += dy * 0.0025;
+    targetRotY = gRotY; targetRotX = gRotX;
+    gVX = dx * 0.0012; gVY = dy * 0.0012;
     gLX = e.clientX; gLY = e.clientY;
   });
   el.addEventListener('wheel', e => {
     e.preventDefault();
-    targetZoom = Math.max(0.4, Math.min(2.5, targetZoom - e.deltaY * 0.001));
+    targetZoom = Math.max(0.3, Math.min(3.0, targetZoom - e.deltaY * 0.0008));
   }, { passive: false });
 
-  // hover detection via mouse position relative to canvas
+  // Hover tracking
   let gMX = -9999, gMY = -9999;
   el.addEventListener('mousemove', e => {
     const rect = el.getBoundingClientRect();
@@ -1310,7 +717,7 @@ document.querySelectorAll('.card-3d').forEach(card => {
   });
   el.addEventListener('mouseleave', () => { gMX = -9999; gMY = -9999; gHoverNode = null; });
 
-  // Touch controls: Drag & Pinch zoom
+  // Mobile pinch / zoom
   let initialTouchDist = null;
   el.addEventListener('touchstart', e => {
     gDrag = true;
@@ -1328,14 +735,15 @@ document.querySelectorAll('.card-3d').forEach(card => {
     if (e.touches.length === 1) {
       const dx = e.touches[0].clientX - gLX, dy = e.touches[0].clientY - gLY;
       gRotY += dx * 0.003; gRotX += dy * 0.003;
-      gVX = dx * 0.0015; gVY = dy * 0.0015;
+      targetRotY = gRotY; targetRotX = gRotX;
+      gVX = dx * 0.001; gVY = dy * 0.001;
       gLX = e.touches[0].clientX; gLY = e.touches[0].clientY;
     } else if (e.touches.length === 2 && initialTouchDist !== null) {
       const dx = e.touches[0].clientX - e.touches[1].clientX;
       const dy = e.touches[0].clientY - e.touches[1].clientY;
       const dist = Math.sqrt(dx * dx + dy * dy);
       const factor = dist / initialTouchDist;
-      targetZoom = Math.max(0.4, Math.min(2.5, targetZoom * factor));
+      targetZoom = Math.max(0.3, Math.min(3.0, targetZoom * factor));
       initialTouchDist = dist;
     }
   }, { passive: true });
@@ -1352,250 +760,207 @@ document.querySelectorAll('.card-3d').forEach(card => {
     z = p.y * Math.sin(gRotX) + z * Math.cos(gRotX);
     const fov = 520 * currentZoom;
     const scale = fov / (fov + z + R3 * 0.6);
-    return { sx: GW / 2 + x * scale, sy: GH / 2 + y * scale * 0.9, scale, z };
+    return { sx: GW / 2 + x * scale, sy: GH / 2 + y * scale * 0.95, scale, z };
   }
 
-  // Spawning logic
-  let lastSpawn = Date.now();
-  const EXTRA = [
-    'What did that lecture miss?',
-    'Who knows this?',
-    'What should I ask?',
-    'What if we build this?',
-    'What conversation changed your life?'
-  ];
-  let extraIdx = 0;
-
-  function maybeSpawn() {
-    if (Date.now() - lastSpawn < 5000) return;
-    if (nodes3d.length > 40) return;
-    lastSpawn = Date.now();
-    const phi = Math.random() * Math.PI * 2;
-    const cosTheta = Math.random() * 2 - 1;
-    const sinTheta = Math.sqrt(1 - cosTheta * cosTheta);
-    const radius = R3 * (0.8 + Math.random() * 0.4);
-    const newNode = {
-      x: sinTheta * Math.cos(phi) * radius,
-      y: cosTheta * radius,
-      z: sinTheta * Math.sin(phi) * radius,
-      text: EXTRA[extraIdx % EXTRA.length],
-      hub: false,
-      state: 'anonymous',
-      alpha: 0,
-      born: Date.now()
-    };
-    extraIdx++;
-    const nIdx = nodes3d.length;
-    nodes3d.push(newNode);
-    const nearHub = hubIdx[Math.floor(Math.random() * hubIdx.length)];
-    edges3d.push({ a: nIdx, b: nearHub, accent: false });
-    
-    let closestNodeIdx = -1;
-    let minD = 99999;
-    for (let i = 0; i < nIdx; i++) {
-      const d = Math.hypot(nodes3d[i].x - newNode.x, nodes3d[i].y - newNode.y, nodes3d[i].z - newNode.z);
-      if (d < minD) { minD = d; closestNodeIdx = i; }
-    }
-    if (closestNodeIdx !== -1) {
-      edges3d.push({ a: nIdx, b: closestNodeIdx, accent: false });
-    }
-  }
-
-  // Ripple system
+  // Spawning ripples
   let ripples = [];
   function addRipple(sx, sy, color) {
-    ripples.push({
-      sx, sy,
-      r: 4,
-      maxR: 90,
-      color: color || 'rgba(0, 255, 128, '
-    });
+    ripples.push({ sx, sy, r: 4, maxR: 120, color: color || 'rgba(255,255,255, ' });
   }
+
+  // Animation Loop pausing check (Offscreen Optimization)
+  let canvasActive = true;
+  const graphObserver = new IntersectionObserver(entries => {
+    canvasActive = entries[0].isIntersecting;
+  }, { threshold: 0.1 });
+  graphObserver.observe(el);
 
   function isConnected(a, b) {
     return edges3d.some(e => (e.a === a && e.b === b) || (e.a === b && e.b === a));
   }
 
   function gDraw() {
-    if (!gDrag) {
+    if (!canvasActive) {
+      requestAnimationFrame(gDraw);
+      return;
+    }
+
+    const now = Date.now();
+    
+    // Smoothly lerp towards target camera rotations and zoom
+    gRotY += (targetRotY - gRotY) * 0.1;
+    gRotX += (targetRotX - gRotX) * 0.1;
+    currentZoom += (targetZoom - currentZoom) * 0.1;
+
+    if (!gDrag && !reducedMotion) {
       gRotY += gVX; gRotX += gVY;
       gVX *= 0.95; gVY *= 0.95;
-      gRotY += 0.0008;
+      gRotY += 0.0004;
     }
-    currentZoom += (targetZoom - currentZoom) * 0.08;
 
-    ctx2.clearRect(0, 0, GW, GH);
-    const now = Date.now();
-    maybeSpawn();
-
-    nodes3d.forEach(n => {
-      if (now > n.born) {
-        n.alpha = Math.min(1, n.alpha + 0.015);
-      }
-    });
-
+    ctx.clearRect(0, 0, GW, GH);
     const proj = nodes3d.map(project3);
 
-    // Hover index identification
     let hoverIdx = -1;
     if (gHoverNode) {
       hoverIdx = nodes3d.indexOf(gHoverNode.n);
     }
 
-    // draw edges back→front
-    const sortedEdges = edges3d
-      .filter(e => e.a < proj.length && e.b < proj.length)
-      .sort((a, b) => {
-        const za = (proj[a.a].z + proj[a.b].z) / 2;
-        const zb = (proj[b.a].z + proj[b.b].z) / 2;
-        return zb - za;
-      });
+    // Filter nodes by current workspace state
+    const filteredEdges = edges3d.filter(e => {
+      const na = nodes3d[e.a], nb = nodes3d[e.b];
+      return na.workspace === activeWS && nb.workspace === activeWS;
+    });
 
-    sortedEdges.forEach(e => {
+    // Draw edges
+    filteredEdges.forEach(e => {
       const pa = proj[e.a], pb = proj[e.b];
       const na = nodes3d[e.a], nb = nodes3d[e.b];
-      const baseEdgeAlpha = Math.min(na.alpha, nb.alpha) * Math.max(0.04, Math.min(0.55, (pa.scale + pb.scale) / 2 - 0.3));
       
+      const baseEdgeAlpha = Math.max(0.04, Math.min(0.5, (pa.scale + pb.scale) / 2 - 0.25));
       let currentEdgeAlpha = baseEdgeAlpha;
+
       if (hoverIdx !== -1) {
         if (e.a === hoverIdx || e.b === hoverIdx) {
           currentEdgeAlpha = baseEdgeAlpha * 1.5;
         } else {
-          currentEdgeAlpha = baseEdgeAlpha * 0.15;
+          currentEdgeAlpha = baseEdgeAlpha * 0.08;
         }
       }
 
-      if (e.accent || e.pulse) {
-        const flowOffset = (now * 0.015) % 8;
-        ctx2.strokeStyle = `rgba(200,212,0,${currentEdgeAlpha * 0.65})`;
-        ctx2.lineWidth = 1.2 * pa.scale;
-        ctx2.setLineDash([4, 4]);
-        ctx2.lineDashOffset = -flowOffset;
+      if (e.accent) {
+        const flowOffset = (now * 0.01) % 8;
+        ctx.strokeStyle = `rgba(255,255,255,${currentEdgeAlpha * 0.55})`;
+        ctx.lineWidth = 1.1 * pa.scale;
+        ctx.setLineDash([4, 4]);
+        ctx.lineDashOffset = -flowOffset;
       } else {
-        ctx2.strokeStyle = `rgba(255,255,255,${currentEdgeAlpha * 0.22})`;
-        ctx2.lineWidth = 0.6 * pa.scale;
-        ctx2.setLineDash([]);
+        ctx.strokeStyle = `rgba(255,255,255,${currentEdgeAlpha * 0.18})`;
+        ctx.lineWidth = 0.55 * pa.scale;
+        ctx.setLineDash([]);
       }
-      ctx2.beginPath();
-      ctx2.moveTo(pa.sx, pa.sy);
-      ctx2.lineTo(pb.sx, pb.sy);
-      ctx2.stroke();
-      ctx2.setLineDash([]);
+      ctx.beginPath();
+      ctx.moveTo(pa.sx, pa.sy);
+      ctx.lineTo(pb.sx, pb.sy);
+      ctx.stroke();
     });
+    ctx.setLineDash([]);
 
-    // draw nodes back→front
+    // Draw nodes
     let closestDist = 999, closestNode = null;
     const sortedIdx = nodes3d.map((_, i) => i).sort((a, b) => proj[b].z - proj[a].z);
 
     sortedIdx.forEach(i => {
       const n = nodes3d[i];
-      const p = proj[i];
-      if (n.alpha === 0) return;
+      // Only render nodes of the active workspace, or user nodes
+      if (n.workspace !== activeWS && !n.isUserNode) return;
 
-      const baseR = n.hub ? 6.5 : 3.5;
-      const breathe = Math.sin(now * 0.0025 + i) * 0.12 + 1.0;
+      const p = proj[i];
+      const baseR = n.hub ? 7.5 : 3.8;
+      const breathe = reducedMotion ? 1.0 : Math.sin(now * 0.002 + i) * 0.12 + 1.0;
       let rad = Math.max(1.5, baseR * p.scale * currentZoom * breathe);
-      
+
       if (hoverIdx !== -1 && (i === hoverIdx || isConnected(i, hoverIdx))) {
-        rad *= 1.25;
+        rad *= 1.35;
       }
 
-      const depthAlpha = Math.max(0.1, Math.min(1, (p.scale - 0.3) * 1.4));
-      const baseAlpha = n.alpha * depthAlpha;
+      const depthAlpha = Math.max(0.12, Math.min(1.0, (p.scale - 0.2) * 1.35));
+      let currentAlpha = depthAlpha * n.alpha;
 
-      let currentAlpha = baseAlpha;
       if (hoverIdx !== -1) {
         if (i === hoverIdx || isConnected(i, hoverIdx)) {
-          currentAlpha = baseAlpha * 1.0;
+          currentAlpha = depthAlpha * 1.0;
         } else {
-          currentAlpha = baseAlpha * 0.15;
+          currentAlpha = depthAlpha * 0.08;
         }
       }
 
       let sx = p.sx;
       let sy = p.sy;
 
-      // Magnetic hover screen-space pull
+      // Magnetic hover
       const mDx = gMX - sx;
       const mDy = gMY - sy;
       const mDist = Math.sqrt(mDx * mDx + mDy * mDy);
-      if (mDist < 120) {
-        const pull = (1 - mDist / 120) * 12;
+      if (mDist < 130) {
+        const pull = (1 - mDist / 130) * 12;
         sx += (mDx / mDist) * pull;
         sy += (mDy / mDist) * pull;
       }
 
       const stateColor = STATE_COLORS[n.state] || STATE_COLORS.question;
 
-      // glow ring for hubs / resolved / anonymous state
-      if (n.hub || n.state === 'resolved' || n.state === 'anonymous') {
-        const glowRad = rad * (n.state === 'resolved' ? 2.5 : n.state === 'anonymous' ? 3 : 4);
-        const grd = ctx2.createRadialGradient(sx, sy, 0, sx, sy, glowRad);
-        grd.addColorStop(0, stateColor + (currentAlpha * 0.35) + ')');
+      // Glow backing
+      if (n.hub || n.state === 'resolved' || n.isUserNode) {
+        const glowRad = rad * 3.5;
+        const grd = ctx.createRadialGradient(sx, sy, 0, sx, sy, glowRad);
+        grd.addColorStop(0, stateColor + (currentAlpha * 0.3) + ')');
         grd.addColorStop(1, stateColor + '0)');
-        ctx2.beginPath();
-        ctx2.arc(sx, sy, glowRad, 0, Math.PI * 2);
-        ctx2.fillStyle = grd;
-        ctx2.fill();
+        ctx.beginPath();
+        ctx.arc(sx, sy, glowRad, 0, Math.PI * 2);
+        ctx.fillStyle = grd;
+        ctx.fill();
       }
 
-      ctx2.beginPath();
-      ctx2.arc(sx, sy, rad, 0, Math.PI * 2);
-      ctx2.fillStyle = stateColor + currentAlpha + ')';
-      ctx2.fill();
+      ctx.beginPath();
+      ctx.arc(sx, sy, rad, 0, Math.PI * 2);
+      ctx.fillStyle = stateColor + currentAlpha + ')';
+      ctx.fill();
 
-      // hover check
-      if (mDist < closestDist && mDist < 32) {
-        closestDist = mDist; closestNode = { n, p: { sx, sy, scale: p.scale, z: p.z } };
+      // Hover check
+      if (mDist < closestDist && mDist < 30) {
+        closestDist = mDist;
+        closestNode = { n, p: { sx, sy, scale: p.scale, z: p.z } };
       }
     });
 
-    // draw hovered label
+    // Draw hover labels
     gHoverNode = closestNode;
     if (gHoverNode) {
       const { n, p } = gHoverNode;
       const text = n.text;
-      ctx2.font = `500 11.5px 'Space Mono', monospace`;
-      const tw = ctx2.measureText(text).width;
+      ctx.font = `500 11.5px 'Space Mono', monospace`;
+      const tw = ctx.measureText(text).width;
       const px = Math.min(GW - tw / 2 - 14, Math.max(tw / 2 + 14, p.sx));
       const py = p.sy - 20 < 30 ? p.sy + 40 : p.sy - 20;
 
-      ctx2.fillStyle = 'rgba(9,9,9,0.92)';
-      const pad = 10;
-      roundRect(ctx2, px - tw / 2 - pad, py - 18, tw + pad * 2, 28, 6);
-      ctx2.fill();
+      ctx.fillStyle = 'rgba(5,5,5,0.95)';
+      const pad = 12;
+      roundRect(ctx, px - tw / 2 - pad, py - 18, tw + pad * 2, 28, 6);
+      ctx.fill();
 
       const nodeColor = STATE_COLORS[n.state] || STATE_COLORS.question;
-      ctx2.strokeStyle = nodeColor + '0.5)';
-      ctx2.lineWidth = 1.2;
-      roundRect(ctx2, px - tw / 2 - pad, py - 18, tw + pad * 2, 28, 6);
-      ctx2.stroke();
+      ctx.strokeStyle = nodeColor + '0.4)';
+      ctx.lineWidth = 1;
+      roundRect(ctx, px - tw / 2 - pad, py - 18, tw + pad * 2, 28, 6);
+      ctx.stroke();
 
-      ctx2.fillStyle = nodeColor + '1.0)';
-      ctx2.textAlign = 'center';
-      ctx2.textBaseline = 'middle';
-      ctx2.fillText(text, px, py - 4);
+      ctx.fillStyle = nodeColor + '1.0)';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText(text, px, py - 4);
     }
 
-    // draw ripples
+    // Ripples
     ripples.forEach(rp => {
-      rp.r += 2.2;
+      rp.r += 2.5;
       const alpha = 1 - (rp.r / rp.maxR);
-      ctx2.strokeStyle = rp.color + alpha + ')';
-      ctx2.lineWidth = 1.5;
-      ctx2.beginPath();
-      ctx2.arc(rp.sx, rp.sy, rp.r, 0, Math.PI * 2);
-      ctx2.stroke();
+      ctx.strokeStyle = rp.color + alpha + ')';
+      ctx.lineWidth = 1.5;
+      ctx.beginPath();
+      ctx.arc(rp.sx, rp.sy, rp.r, 0, Math.PI * 2);
+      ctx.stroke();
     });
     ripples = ripples.filter(rp => rp.r < rp.maxR);
 
-    // vignette
-    const vgrd = ctx2.createRadialGradient(GW / 2, GH / 2, 0, GW / 2, GH / 2, Math.max(GW, GH) * 0.6);
-    vgrd.addColorStop(0, 'rgba(9,9,9,0)');
-    vgrd.addColorStop(0.65, 'rgba(9,9,9,0.15)');
-    vgrd.addColorStop(1, 'rgba(9,9,9,0.82)');
-    ctx2.fillStyle = vgrd;
-    ctx2.fillRect(0, 0, GW, GH);
+    // Dark edges vignette
+    const vgrd = ctx.createRadialGradient(GW / 2, GH / 2, 0, GW / 2, GH / 2, Math.max(GW, GH) * 0.75);
+    vgrd.addColorStop(0, 'rgba(5,5,5,0)');
+    vgrd.addColorStop(0.5, 'rgba(5,5,5,0.15)');
+    vgrd.addColorStop(1, 'rgba(5,5,5,0.9)');
+    ctx.fillStyle = vgrd;
+    ctx.fillRect(0, 0, GW, GH);
 
     requestAnimationFrame(gDraw);
   }
@@ -1616,117 +981,239 @@ document.querySelectorAll('.card-3d').forEach(card => {
 
   gDraw();
 
-  // ── HERO AND CTA INPUT INTEGRATION ──
-  const heroInput = document.getElementById('hero-input');
-  const ctaInput = document.getElementById('cta-input');
-  const ctaSubmitBtn = document.getElementById('cta-submit-btn');
-  let activeUserNode = null;
-
-  function handleUserInput(inputElement) {
-    if (!inputElement) return;
-    
-    inputElement.addEventListener('input', e => {
-      const val = e.target.value;
-      if (!val) {
-        if (activeUserNode) {
-          const idx = nodes3d.indexOf(activeUserNode);
-          if (idx !== -1) nodes3d.splice(idx, 1);
-          activeUserNode = null;
-        }
-        return;
-      }
+  // Click centering mechanics
+  el.addEventListener('click', () => {
+    if (gHoverNode) {
+      const targetNode = gHoverNode.n;
+      // Calculate target Y & X angles
+      const phi = Math.atan2(targetNode.y, targetNode.x);
+      const theta = Math.acos(targetNode.z / Math.hypot(targetNode.x, targetNode.y, targetNode.z));
       
-      if (!activeUserNode) {
-        activeUserNode = {
-          x: (Math.random() - 0.5) * 50,
-          y: (Math.random() - 0.5) * 50,
+      targetRotY = -phi;
+      targetRotX = -theta + Math.PI / 2;
+      targetZoom = 1.35; // zoom in on target
+    }
+  });
+
+  // ── DYNAMIC NODE CREATION (Hero Input) ──
+  const heroInput = document.getElementById('hero-input');
+  const heroSection = document.getElementById('center-hero');
+  
+  heroInput.addEventListener('keydown', e => {
+    if (e.key === 'Enter') {
+      const val = heroInput.value.trim();
+      if (val) {
+        // Create user node
+        const newUserNode = {
+          x: (Math.random() - 0.5) * 60,
+          y: (Math.random() - 0.5) * 60,
           z: -120,
           text: val,
           hub: false,
-          state: 'anonymous',
+          state: 'resolved',
+          workspace: activeWS,
           alpha: 1,
           born: Date.now(),
           isUserNode: true
         };
-        nodes3d.push(activeUserNode);
-      } else {
-        activeUserNode.text = val;
-      }
-    });
+        nodes3d.push(newUserNode);
+        const uIdx = nodes3d.length - 1;
 
-    inputElement.addEventListener('keydown', e => {
-      if (e.key === 'Enter') {
-        submitUserNode(inputElement);
-      }
-    });
-  }
+        // Connect user node to nearest workspace nodes
+        const wsIndices = nodes3d
+          .map((n, idx) => ({ idx, n }))
+          .filter(item => item.idx !== uIdx && item.n.workspace === activeWS);
 
-  function submitUserNode(inputElement) {
-    const val = inputElement.value.trim();
-    if (val && activeUserNode) {
-      const uIdx = nodes3d.indexOf(activeUserNode);
-      if (uIdx !== -1) {
-        const distances = nodes3d
-          .map((n, i) => ({ i, dist: Math.hypot(n.x - activeUserNode.x, n.y - activeUserNode.y, n.z - activeUserNode.z) }))
-          .filter(item => item.i !== uIdx && !nodes3d[item.i].isUserNode)
-          .sort((a, b) => a.dist - b.dist);
-          
-        for (let k = 0; k < Math.min(2, distances.length); k++) {
-          edges3d.push({ a: uIdx, b: distances[k].i, accent: true, pulse: true });
+        if (wsIndices.length > 0) {
+          // Connect to nearest 3
+          wsIndices.sort((a, b) => {
+            const da = Math.hypot(a.n.x - newUserNode.x, a.n.y - newUserNode.y, a.n.z - newUserNode.z);
+            const db = Math.hypot(b.n.x - newUserNode.x, b.n.y - newUserNode.y, b.n.z - newUserNode.z);
+            return da - db;
+          });
+          for (let k = 0; k < Math.min(3, wsIndices.length); k++) {
+            edges3d.push({ a: uIdx, b: wsIndices[k].idx, accent: true });
+          }
         }
-        
-        const p = project3(activeUserNode);
-        addRipple(p.sx, p.sy, STATE_COLORS.resolved);
-        
-        activeUserNode.state = 'resolved';
-        activeUserNode.isUserNode = false;
-      }
-      
-      inputElement.value = '';
-      inputElement.blur();
-      activeUserNode = null;
-    }
-  }
 
-  handleUserInput(heroInput);
-  handleUserInput(ctaInput);
-  if (ctaSubmitBtn && ctaInput) {
-    ctaSubmitBtn.addEventListener('click', () => submitUserNode(ctaInput));
-  }
+        // Trigger visual feedback ripple
+        const p = project3(newUserNode);
+        addRipple(p.sx, p.sy, 'rgba(0, 255, 128, ');
+
+        heroInput.value = '';
+        heroInput.blur();
+        
+        // Transition focus away from hero input overlay, reveal graph
+        heroSection.classList.add('minimized');
+      }
+    }
+  });
+
+  // Reset center hero focus when clicking navigation home
+  document.getElementById('home-trigger').addEventListener('click', e => {
+    e.preventDefault();
+    heroSection.classList.remove('minimized');
+    heroInput.focus();
+    targetZoom = 1.0;
+  });
+
+  // Settings panels configurations
+  document.getElementById('setting-motion').addEventListener('change', e => {
+    reducedMotion = e.target.checked;
+  });
+
+  // Workspace / Universe transitions
+  window.CuriosityOS = {
+    setWorkspace: function (ws) {
+      updateWorkspaceColor(ws);
+      // Spawn ripple centered in graph
+      addRipple(GW / 2, GH / 2, WS_DETAILS[ws].color);
+    }
+  };
 })();
 
-// ── KEYBOARD NAV ──
+// ── FLOATING DRAGGABLE PANEL IMPLEMENTATION ──
+(function () {
+  const tabButtons = document.querySelectorAll('.tab-btn');
+  const panels = document.querySelectorAll('.panel');
+  const closes = document.querySelectorAll('.panel-close');
+  
+  // Track active focus of panels using highest z-index mapping
+  let topZIndex = 200;
+
+  function focusPanel(panel) {
+    topZIndex++;
+    panel.style.zIndex = topZIndex;
+  }
+
+  tabButtons.forEach(btn => {
+    btn.addEventListener('click', () => {
+      const targetId = btn.getAttribute('data-target');
+      const targetPanel = document.getElementById(targetId);
+      
+      if (btn.classList.contains('active')) {
+        // Toggle off
+        btn.classList.remove('active');
+        targetPanel.classList.remove('visible');
+      } else {
+        // Open panel
+        btn.classList.add('active');
+        targetPanel.classList.add('visible');
+        focusPanel(targetPanel);
+      }
+    });
+  });
+
+  closes.forEach(c => {
+    c.addEventListener('click', () => {
+      const panel = c.closest('.panel');
+      panel.classList.remove('visible');
+      
+      // Deactivate matching header tab button
+      const targetTab = Array.from(tabButtons).find(btn => btn.getAttribute('data-target') === panel.id);
+      if (targetTab) targetTab.classList.remove('active');
+    });
+  });
+
+  // Make panels draggable via header grip
+  panels.forEach(panel => {
+    const header = panel.querySelector('.panel-header');
+    
+    panel.addEventListener('mousedown', () => focusPanel(panel));
+    panel.addEventListener('touchstart', () => focusPanel(panel), { passive: true });
+
+    let isDragging = false;
+    let startX, startY, initialLeft, initialTop;
+
+    header.addEventListener('mousedown', e => {
+      isDragging = true;
+      startX = e.clientX;
+      startY = e.clientY;
+      initialLeft = panel.offsetLeft;
+      initialTop = panel.offsetTop;
+      document.body.style.cursor = 'move';
+    });
+
+    header.addEventListener('touchstart', e => {
+      isDragging = true;
+      startX = e.touches[0].clientX;
+      startY = e.touches[0].clientY;
+      initialLeft = panel.offsetLeft;
+      initialTop = panel.offsetTop;
+    }, { passive: true });
+
+    window.addEventListener('mousemove', e => {
+      if (!isDragging) return;
+      const dx = e.clientX - startX;
+      const dy = e.clientY - startY;
+      panel.style.left = (initialLeft + dx) + 'px';
+      panel.style.top = (initialTop + dy) + 'px';
+    });
+
+    window.addEventListener('touchmove', e => {
+      if (!isDragging) return;
+      const dx = e.touches[0].clientX - startX;
+      const dy = e.touches[0].clientY - startY;
+      panel.style.left = (initialLeft + dx) + 'px';
+      panel.style.top = (initialTop + dy) + 'px';
+    }, { passive: false });
+
+    window.addEventListener('mouseup', () => {
+      isDragging = false;
+      document.body.style.cursor = 'default';
+    });
+    window.addEventListener('touchend', () => {
+      isDragging = false;
+    });
+  });
+})();
+
+// ── UNIVERSE WORKSPACE SELECTION ──
+(function () {
+  const wsCards = document.querySelectorAll('.workspace-card');
+  wsCards.forEach(card => {
+    card.addEventListener('click', () => {
+      wsCards.forEach(c => c.classList.remove('active'));
+      card.classList.add('active');
+      
+      const wsName = card.getAttribute('data-ws');
+      if (window.CuriosityOS) {
+        window.CuriosityOS.setWorkspace(wsName);
+      }
+    });
+  });
+})();
+
+// ── IDENTITY SWITCHER ──
+(function () {
+  const anonBtn = document.getElementById('id-anon');
+  const visBtn = document.getElementById('id-vis');
+  
+  anonBtn.addEventListener('click', () => {
+    anonBtn.classList.add('active');
+    visBtn.classList.remove('active');
+  });
+
+  visBtn.addEventListener('click', () => {
+    visBtn.classList.add('active');
+    anonBtn.classList.remove('active');
+  });
+})();
+
+// ── KEYBOARD NAV OVERRIDES ──
 document.addEventListener('keydown', e => {
+  // If typing inside an input or textarea, bypass camera keyboard control
   if (document.activeElement && (document.activeElement.tagName === 'INPUT' || document.activeElement.tagName === 'TEXTAREA')) {
     return;
   }
-  const cur = Array.from(slides).findIndex(s => {
-    const r = s.getBoundingClientRect();
-    return r.top <= window.innerHeight / 2 && r.bottom >= window.innerHeight / 2;
-  });
-  if (e.key === 'ArrowDown' || e.key === 'PageDown') {
-    slides[Math.min(cur + 1, slides.length - 1)]?.scrollIntoView({ behavior: 'smooth' });
+  // Optional accessibility arrow navigation triggers to rotate graph
+  if (e.key === 'ArrowLeft') {
+    window.dispatchEvent(new CustomEvent('nav-rotate', { detail: { y: 0.05 } }));
   }
-  if (e.key === 'ArrowUp' || e.key === 'PageUp') {
-    slides[Math.max(cur - 1, 0)]?.scrollIntoView({ behavior: 'smooth' });
+  if (e.key === 'ArrowRight') {
+    window.dispatchEvent(new CustomEvent('nav-rotate', { detail: { y: -0.05 } }));
   }
 });
-
-// ── MANIFESTO SCROLL HIGHLIGHT ──
-const manifestoLines = document.querySelectorAll('.manifesto-line');
-const manifestoObs = new IntersectionObserver(entries => {
-  entries.forEach(e => {
-    if (e.isIntersecting) {
-      e.target.classList.add('active');
-    } else {
-      e.target.classList.remove('active');
-    }
-  });
-}, {
-  rootMargin: '-30% 0px -30% 0px',
-  threshold: 0.5
-});
-manifestoLines.forEach(line => manifestoObs.observe(line));
 </script>
 </body>
 </html>
