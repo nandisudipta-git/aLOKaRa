@@ -633,7 +633,7 @@ nav {
 <div class="progress" id="progress"></div>
 
 <nav>
-  <a class="nav-logo" href="#s1" style="text-transform: none; font-family: 'DM Sans', sans-serif; font-weight: 700;">
+  <a class="nav-logo glitch" data-text="dotBro" href="#s1" style="text-transform: none; font-family: 'DM Sans', sans-serif; font-weight: 700;">
     <span class="nav-dot"></span>dotBro
   </a>
   <div class="nav-links">
@@ -1157,13 +1157,17 @@ document.querySelectorAll('.card-3d').forEach(card => {
       if(nearHub !== undefined) edges3d.push({ a: idx, b: nearHub, pulse: 0 });
       
       // smooth scroll to graph if not visible
-      document.getElementById('s4').scrollIntoView({ behavior: 'smooth' });
+      document.getElementById('s1').scrollIntoView({ behavior: 'smooth' });
     }
   }
   if(heroInput) heroInput.addEventListener('keydown', handleInputNode);
   if(finalInput) finalInput.addEventListener('keydown', handleInputNode);
 
   function gDraw() {
+    if (GW === 0 || GH === 0) {
+      requestAnimationFrame(gDraw);
+      return;
+    }
     if (!gDrag) {
       // Soft momentum
       const targetVX = (GW / 2 - gMX) * 0.00002;
@@ -1320,7 +1324,7 @@ document.querySelectorAll('.card-3d').forEach(card => {
       ctx2.fillText(text, px, py - 4);
     }
 
-    const vgrd = ctx2.createRadialGradient(GW / 2, GH / 2, 0, GW / 2, GH / 2, Math.max(GW, GH) * 0.65);
+    const vgrd = ctx2.createRadialGradient(GW / 2, GH / 2, 0, GW / 2, GH / 2, Math.max(GW, GH, 100) * 0.65);
     vgrd.addColorStop(0, 'rgba(9,9,9,0)');
     vgrd.addColorStop(0.65, 'rgba(9,9,9,0.15)');
     vgrd.addColorStop(1, 'rgba(9,9,9,0.82)');
