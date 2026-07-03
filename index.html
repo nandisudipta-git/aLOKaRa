@@ -3,22 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>dotBro — Continuation of Every Missed Conversation</title>
-<meta name="description" content="dotBro connects missed questions, thoughts, and campus moments. A physical network of curiosity and answers.">
-<!-- Open Graph / Facebook -->
-<meta property="og:type" content="website">
-<meta property="og:url" content="https://dotbro.in/">
-<meta property="og:title" content="dotBro — Continuation of Every Missed Conversation">
-<meta property="og:description" content="dotBro connects missed questions, thoughts, and campus moments. A physical network of curiosity and answers.">
-<meta property="og:image" content="https://dotbro.in/og-image.png">
-<!-- Twitter -->
-<meta property="twitter:card" content="summary_large_image">
-<meta property="twitter:url" content="https://dotbro.in/">
-<meta property="twitter:title" content="dotBro — Continuation of Every Missed Conversation">
-<meta property="twitter:description" content="dotBro connects missed questions, thoughts, and campus moments. A physical network of curiosity and answers.">
-<meta property="twitter:image" content="https://dotbro.in/og-image.png">
-<!-- Favicon -->
-<link rel="icon" type="image/png" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>⚫</text></svg>">
+<title>dotBro — Some conversations deserve another chance</title>
+<meta name="description" content="dotBro gives missed conversations, questions, and collaborations another chance.">
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Space+Mono:ital,wght@0,400;0,700;1,400&family=DM+Sans:wght@300;400;500;700&display=swap" rel="stylesheet">
 <style>
 :root {
@@ -32,16 +18,6 @@
   --olive2: #252A10;
   --gray: #666660;
   --mgray: #333330;
-
-  /* State Colors */
-  --c-question: #ffffff;
-  --c-answer: #E2EE00;
-  --c-meeting: #00D1FF;
-  --c-project: #9B87FF;
-  --c-knowledge: #FFD700;
-  --c-anonymous: #FF1A1A;
-  --c-waiting: #8E8E93;
-  --c-resolved: #00FF66;
 }
 
 * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -58,7 +34,7 @@ body {
 
 /* ── CUSTOM CURSOR ── */
 .cursor {
-  position: fixed; width: 8px; height: 8px;
+  position: fixed; width: 12px; height: 12px;
   background: var(--white); border-radius: 50%;
   pointer-events: none; z-index: 9999;
   transform: translate(-50%,-50%);
@@ -66,23 +42,13 @@ body {
   mix-blend-mode: difference;
 }
 .cursor-ring {
-  position: fixed; width: 32px; height: 32px;
-  border: 1px solid rgba(255,255,255,0.3); border-radius: 50%;
+  position: fixed; width: 40px; height: 40px;
+  border: 1px solid rgba(255,255,255,0.4); border-radius: 50%;
   pointer-events: none; z-index: 9998;
   transform: translate(-50%,-50%);
-  transition: transform 0.15s ease-out, width 0.3s, height 0.3s, border-color 0.3s;
+  transition: transform 0.15s ease-out, width 0.3s, height 0.3s;
 }
 body:hover .cursor { opacity: 1; }
-body.typing-mode .cursor,
-body.typing-mode .cursor-ring {
-  opacity: 0 !important;
-}
-
-/* Focus Outline Style for Accessibility */
-input:focus-visible, button:focus-visible, a:focus-visible {
-  outline: 2px solid var(--c-project);
-  outline-offset: 4px;
-}
 
 /* ── NAV ── */
 nav {
@@ -99,13 +65,9 @@ nav {
   letter-spacing: 2px; color: var(--white);
   text-decoration: none;
 }
-.nav-logo:hover .nav-dot {
-  animation: dotCycle 8s ease-in-out infinite;
-}
 .nav-dot {
   width: 10px; height: 10px; border-radius: 50%;
   background: var(--white); display: inline-block;
-  transition: background 0.3s;
 }
 .nav-links {
   display: flex; gap: 2rem;
@@ -148,62 +110,12 @@ nav {
   font-size: clamp(8rem, 22vw, 22rem);
   line-height: 0.85;
   letter-spacing: -4px;
+  background: linear-gradient(180deg, #fff 30%, rgba(255,255,255,0.15) 100%);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  background-clip: text;
   transform: perspective(800px) rotateX(8deg);
   transform-origin: center bottom;
   animation: titleRise 1.2s cubic-bezier(0.16,1,0.3,1) both;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-.hero-dot {
-  display: inline-block;
-  color: #ffffff;
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: currentcolor;
-  background-clip: text;
-  animation: dotCycle 20s ease-in-out infinite, dotBreathe 6s ease-in-out infinite alternate;
-  will-change: filter, transform;
-  margin-right: -0.05em;
-}
-.hero-text {
-  background: linear-gradient(180deg, #fff 30%, rgba(255,255,255,0.7) 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-}
-@keyframes dotCycle {
-  0%, 100% {
-    color: #ffffff;
-    filter: drop-shadow(0 0 15px rgba(255, 255, 255, 0.7));
-  }
-  16% {
-    color: #E2EE00;
-    filter: drop-shadow(0 0 25px rgba(226, 238, 0, 0.8));
-  }
-  33% {
-    color: #FF1A1A;
-    filter: drop-shadow(0 0 25px rgba(255, 26, 26, 0.8));
-  }
-  50% {
-    color: #9B87FF;
-    filter: drop-shadow(0 0 25px rgba(155, 135, 255, 0.8));
-  }
-  66% {
-    color: #00D1FF;
-    filter: drop-shadow(0 0 25px rgba(0, 209, 255, 0.8));
-  }
-  83% {
-    color: #FFD700;
-    filter: drop-shadow(0 0 25px rgba(255, 215, 0, 0.8));
-  }
-}
-@keyframes dotBreathe {
-  0% {
-    transform: scale(0.98);
-  }
-  100% {
-    transform: scale(1.04);
-  }
 }
 @keyframes titleRise {
   from { opacity:0; transform: perspective(800px) rotateX(28deg) translateY(60px); }
@@ -257,52 +169,6 @@ nav {
 }
 @keyframes bounce { 0%,100%{transform:translateX(-50%) translateY(0)} 50%{transform:translateX(-50%) translateY(6px)} }
 
-/* ── INTERACTIVE INPUT ── */
-.conversation-prompt-container {
-  max-width: 720px;
-  margin: 2rem auto 0;
-  display: flex;
-  align-items: center;
-  border: 1px solid rgba(255,255,255,0.12);
-  background: rgba(255,255,255,0.03);
-  backdrop-filter: blur(20px);
-  border-radius: 12px;
-  box-shadow: inset 0 1px 0 rgba(255,255,255,0.08), 0 20px 50px rgba(0,0,0,0.4);
-  transition: border-color 0.3s, box-shadow 0.3s;
-  padding: 0 1.25rem;
-}
-.conversation-prompt-container:focus-within {
-  border-color: rgba(255,255,255,0.35);
-  box-shadow: inset 0 1px 0 rgba(255,255,255,0.12), 0 20px 50px rgba(255,255,255,0.05);
-}
-.conversation-input {
-  flex: 1;
-  background: transparent;
-  border: none;
-  outline: none;
-  color: var(--white);
-  font-family: 'DM Sans', sans-serif;
-  font-size: clamp(1rem, 2vw, 1.25rem);
-  padding: 1.25rem 0.5rem;
-  letter-spacing: 0.5px;
-}
-.conversation-input::placeholder {
-  color: rgba(255,255,255,0.35);
-}
-.conversation-input-btn {
-  background: transparent;
-  border: none;
-  color: rgba(255,255,255,0.4);
-  font-size: 1.5rem;
-  cursor: pointer;
-  padding: 0.5rem;
-  transition: color 0.2s, transform 0.2s;
-}
-.conversation-input-btn:hover {
-  color: var(--white);
-  transform: translateX(3px);
-}
-
 /* ── SECTION LABELS ── */
 .section-label {
   font-family: 'Space Mono', monospace; font-size: 0.65rem;
@@ -322,46 +188,25 @@ nav {
 }
 .s2-sub { font-size: 1.1rem; color: var(--gray); max-width: 600px; margin-bottom: 3rem; line-height: 1.7; }
 .crisis-cards {
-  display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px;
+  display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5px;
 }
 .crisis-card {
-  background: rgba(255, 255, 255, 0.02);
-  border: 1px solid rgba(255, 255, 255, 0.05);
-  padding: 2.5rem 2rem;
-  position: relative;
-  overflow: hidden;
-  border-radius: 16px;
-  backdrop-filter: blur(12px);
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), background 0.4s, border-color 0.4s, box-shadow 0.4s;
+  background: var(--mgray); padding: 2rem 1.5rem;
+  position: relative; overflow: hidden;
+  transition: transform 0.3s, background 0.3s;
 }
 .crisis-card::before {
   content: ''; position: absolute; top: 0; left: 0; right: 0;
-  height: 3px; background: linear-gradient(to right, var(--c-anonymous), var(--c-project));
+  height: 2px; background: var(--red);
   transform: scaleX(0); transform-origin: left;
-  transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: transform 0.4s;
 }
 .crisis-card:hover::before { transform: scaleX(1); }
-.crisis-card:hover {
-  transform: translateY(-8px) scale(1.01);
-  background: rgba(255, 255, 255, 0.05);
-  border-color: rgba(255, 255, 255, 0.15);
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
-}
-.crisis-icon {
-  font-family: 'Space Mono', monospace;
-  font-size: 0.75rem;
-  color: var(--c-anonymous);
-  letter-spacing: 2px;
-  margin-bottom: 1.5rem;
-}
+.crisis-card:hover { transform: translateY(-4px); background: #1A1A1A; }
+.crisis-icon { font-size: 2.5rem; margin-bottom: 1rem; }
 .crisis-head {
-  font-family: 'DM Sans', sans-serif;
-  font-size: 1.25rem;
-  font-weight: 400;
-  line-height: 1.4;
-  letter-spacing: -0.2px;
-  color: rgba(255, 255, 255, 0.9);
+  font-family: 'Bebas Neue', sans-serif; font-size: 1.4rem;
+  letter-spacing: 1px; margin-bottom: 0.8rem; color: var(--white);
 }
 .crisis-body { font-size: 0.88rem; color: var(--gray); line-height: 1.6; }
 .red-bar {
@@ -690,51 +535,7 @@ nav {
 .graph-node span { display: block; color: var(--green); font-family: 'Space Mono', monospace; font-size: 0.55rem; letter-spacing: 1px; margin-bottom: 0.55rem; }
 .graph-node strong { font-family: 'Bebas Neue', sans-serif; font-size: 1.25rem; letter-spacing: 1px; }
 
-/* ── GLASS CARD STYLING FOR FLOATING SCENARIOS ── */
-.glass-card {
-  background: rgba(255, 255, 255, 0.02) !important;
-  border: 1px solid rgba(255, 255, 255, 0.06) !important;
-  border-radius: 16px !important;
-  backdrop-filter: blur(12px) !important;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2) !important;
-  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), background 0.4s, border-color 0.4s, box-shadow 0.4s !important;
-  animation: floatCard 6s ease-in-out infinite alternate;
-  animation-delay: calc(var(--i, 0) * 0.4s);
-}
-.glass-card:hover {
-  transform: translateY(-10px) scale(1.02) !important;
-  background: rgba(255, 255, 255, 0.06) !important;
-  border-color: rgba(255, 255, 255, 0.15) !important;
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3) !important;
-}
-@keyframes floatCard {
-  0% { transform: translateY(0px) rotate(0deg); }
-  100% { transform: translateY(-6px) rotate(0.5deg); }
-}
-
-.looking-for-pills {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-  margin-top: 1rem;
-}
-.looking-for-pills span {
-  font-family: 'Space Mono', monospace;
-  font-size: 0.58rem;
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  padding: 4px 10px;
-  border-radius: 99px;
-  color: rgba(255, 255, 255, 0.7);
-  transition: background 0.2s, border-color 0.2s, color 0.2s;
-}
-.venture-glass:hover .looking-for-pills span {
-  background: rgba(255, 255, 255, 0.09);
-  border-color: var(--accent);
-  color: var(--white);
-}
-
-.audience-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-top: 2.5rem; }
+.audience-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.5px; margin-top: 2.5rem; }
 .audience-grid .scenario { min-height: 180px; }
 .audience-question { color: var(--gray); font-size: 0.8rem; line-height: 1.5; margin-top: 1rem; }
 
@@ -742,74 +543,22 @@ nav {
 .coming-wrap { width: 100%; max-width: 1120px; margin: 0 auto; display: grid; grid-template-columns: 0.78fr 1.22fr; gap: 5rem; align-items: center; }
 .coming-label { color: var(--accent); font-family: 'Space Mono', monospace; font-size: 0.55rem; letter-spacing: 1.5px; text-transform: uppercase; }
 
-/* ── FOUNDING CONTRIBUTORS GRID ── */
-.contributor-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-top: 2.2rem; }
+.contributor-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 1.5px; margin-top: 2.2rem; }
 .contributor-card {
-  background: rgba(255, 255, 255, 0.015);
-  border: 1px solid rgba(255, 255, 255, 0.05);
-  border-radius: 12px;
-  padding: 1.8rem 1.5rem;
-  min-height: 150px;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), background 0.4s, border-color 0.4s, box-shadow 0.4s;
+  background: rgba(255,255,255,0.045); border: 1px solid rgba(255,255,255,0.06);
+  padding: 1.35rem 1.15rem; min-height: 140px; display: flex; flex-direction: column;
+  transition: transform 0.3s, background 0.3s, border-color 0.3s;
 }
-.contributor-card:hover {
-  transform: translateY(-6px);
-  background: rgba(255, 255, 255, 0.045);
-  border-color: rgba(255, 255, 255, 0.15);
-  box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3);
-}
-.contributor-role {
-  font-family: 'DM Sans', sans-serif;
-  font-weight: 500;
-  font-size: 1.25rem;
-  letter-spacing: -0.2px;
-  color: var(--white);
-}
-.contributor-status-text {
-  font-family: 'Space Mono', monospace;
-  font-size: 0.58rem;
-  color: var(--gray);
-  letter-spacing: 1px;
-  text-transform: uppercase;
-  margin-top: auto;
-  margin-bottom: 0.25rem;
-}
-.contributor-state {
-  color: var(--c-answer);
-  font-family: 'Space Mono', monospace;
-  font-size: 0.58rem;
-  letter-spacing: 1.5px;
-  text-transform: uppercase;
-  font-weight: bold;
-}
+.contributor-card:hover { transform: translateY(-5px); background: rgba(255,255,255,0.075); border-color: rgba(200,212,0,0.35); }
+.contributor-role { font-family: 'Bebas Neue', sans-serif; font-size: 1.3rem; letter-spacing: 1px; }
+.contributor-state { margin-top: auto; color: var(--green); font-family: 'Space Mono', monospace; font-size: 0.5rem; letter-spacing: 1px; text-transform: uppercase; }
 
 #s8 { background: var(--black); color: var(--white); text-align: center; }
 .manifesto { max-width: 900px; margin: 0 auto; }
-
-/* ── MANIFESTO SCROLL HIGHLIGHT ── */
-.manifesto-line {
-  font-family: 'Bebas Neue', sans-serif;
-  font-size: clamp(2rem, 5.5vw, 5rem);
-  line-height: 1.25;
-  color: rgba(255, 255, 255, 0.15);
-  transition: color 0.6s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1);
-  text-align: center;
-  margin-bottom: 0.8rem;
-}
-.manifesto-line b {
-  color: rgba(255, 255, 255, 0.55);
-  transition: color 0.6s cubic-bezier(0.16, 1, 0.3, 1), text-shadow 0.6s cubic-bezier(0.16, 1, 0.3, 1);
-}
-.manifesto-line.highlighted {
-  color: rgba(255, 255, 255, 0.85);
-}
-.manifesto-line.highlighted b {
-  color: var(--white);
-  text-shadow: 0 0 20px rgba(255, 255, 255, 0.6);
-}
+.manifesto-line { font-family: 'Bebas Neue', sans-serif; font-size: clamp(1.9rem, 4.8vw, 4.4rem); line-height: 1.25; color: #3C3C38; transition: color 0.3s; }
+.manifesto-line b { color: var(--white); font-weight: 400; }
+.manifesto-line:hover { color: var(--gray); }
+.manifesto-line:hover b { color: var(--red); }
 
 .final-launch { max-width: 900px; margin: 0 auto; text-align: center; position: relative; z-index: 2; }
 
@@ -853,7 +602,7 @@ nav {
   <div class="nav-links">
     <a href="#s2">Why</a>
     <a href="#s3">Vision</a>
-    <a href="#s6">Help Build This</a>
+    <a href="#s6">Coming Soon</a>
     <a href="#s7">Contribute</a>
   </div>
   <div class="nav-badge">ALOKARA · 2026</div>
@@ -866,16 +615,13 @@ nav {
   <div class="float-el" style="font-size:20rem;top:10%;right:-5%;--dur:8s">?</div>
   <div class="float-el" style="font-size:8rem;bottom:15%;left:5%;--dur:6s;--delay:1s">●</div>
   <div class="s1-inner">
-    <div class="bro-giant"><span class="hero-dot">.</span><span class="hero-text">BRO</span></div>
+    <div class="bro-giant glitch" data-text=".BRO">.BRO</div>
     <h1 class="hero-launch-line">Some conversations deserve another chance.</h1>
     <p class="hero-places">Every lecture. Every hallway. Every café. Every campus.<br>Every question deserves a second chance.</p>
-    <div class="conversation-prompt-container" aria-label="Conversation prompt">
-      <input type="text" id="hero-input" class="conversation-input" placeholder="What conversation do you wish you had?" aria-label="Conversation input">
-      <button id="hero-input-btn" class="conversation-input-btn" aria-label="Submit question">→</button>
-    </div>
+    <div class="conversation-prompt" aria-label="Conversation prompt">“What conversation do you wish you had?”</div>
     <div class="launch-actions">
-      <a class="launch-cta primary" href="#s9">Ask Anonymously</a>
-      <a class="launch-cta secondary" href="#s7">Become Founding Contributor</a>
+      <a class="launch-cta primary" href="#s7">I’m In</a>
+      <a class="launch-cta secondary" href="#s7">Become a Founding Contributor</a>
     </div>
   </div>
   <div class="scroll-hint">SCROLL</div>
@@ -889,12 +635,12 @@ nav {
     <div class="s2-headline reveal reveal-delay-1">The people and ideas<br>were already there.</div>
     <div class="s2-sub reveal reveal-delay-2">People miss what could have changed everything.</div>
     <div class="miss-grid reveal reveal-delay-3">
-      <div class="crisis-card miss-card"><div class="crisis-icon">01</div><div class="crisis-head">“I left before asking.”</div></div>
-      <div class="crisis-card miss-card"><div class="crisis-icon">02</div><div class="crisis-head">“I overheard an amazing discussion.”</div></div>
-      <div class="crisis-card miss-card"><div class="crisis-icon">03</div><div class="crisis-head">“I never met that professor.”</div></div>
-      <div class="crisis-card miss-card"><div class="crisis-icon">04</div><div class="crisis-head">“I lost the opportunity.”</div></div>
-      <div class="crisis-card miss-card"><div class="crisis-icon">05</div><div class="crisis-head">“I wish I continued talking.”</div></div>
-      <div class="crisis-card miss-card"><div class="crisis-icon">06</div><div class="crisis-head">“I couldn’t find that person.”</div></div>
+      <div class="crisis-card miss-card"><div class="crisis-icon">01</div><div class="crisis-head">Questions</div></div>
+      <div class="crisis-card miss-card"><div class="crisis-icon">02</div><div class="crisis-head">Mentors</div></div>
+      <div class="crisis-card miss-card"><div class="crisis-icon">03</div><div class="crisis-head">Collaborators</div></div>
+      <div class="crisis-card miss-card"><div class="crisis-icon">04</div><div class="crisis-head">Professors</div></div>
+      <div class="crisis-card miss-card"><div class="crisis-icon">05</div><div class="crisis-head">Opportunities</div></div>
+      <div class="crisis-card miss-card"><div class="crisis-icon">06</div><div class="crisis-head">Ideas</div></div>
     </div>
     <div class="problem-close reveal reveal-delay-4">Not because they don’t exist.<br>Because conversations end.</div>
   </div>
@@ -937,92 +683,30 @@ nav {
     <div class="vision-headline reveal reveal-delay-1">Curious people.</div>
     <div class="vision-sub reveal reveal-delay-2">Different perspectives. The same instinct to ask, learn, and build.</div>
     <div class="audience-grid reveal reveal-delay-3">
-      <div class="scenario glass-card" style="--i:0"><div class="scenario-top" style="background:var(--c-anonymous)"></div><div class="scenario-prob">Student</div><p class="audience-question">“What could dotBro become for me?”</p></div>
-      <div class="scenario glass-card" style="--i:1"><div class="scenario-top" style="background:var(--c-answer)"></div><div class="scenario-prob">Professor</div><p class="audience-question">“What could dotBro become for me?”</p></div>
-      <div class="scenario glass-card" style="--i:2"><div class="scenario-top" style="background:var(--c-anonymous)"></div><div class="scenario-prob">Researcher</div><p class="audience-question">“What could dotBro become for me?”</p></div>
-      <div class="scenario glass-card" style="--i:3"><div class="scenario-top" style="background:var(--c-answer)"></div><div class="scenario-prob">Founder</div><p class="audience-question">“What could dotBro become for me?”</p></div>
-      <div class="scenario glass-card" style="--i:4"><div class="scenario-top" style="background:var(--c-anonymous)"></div><div class="scenario-prob">Engineer</div><p class="audience-question">“What could dotBro become for me?”</p></div>
-      <div class="scenario glass-card" style="--i:5"><div class="scenario-top" style="background:var(--c-answer)"></div><div class="scenario-prob">Designer</div><p class="audience-question">“What could dotBro become for me?”</p></div>
-      <div class="scenario glass-card" style="--i:6"><div class="scenario-top" style="background:var(--c-project)"></div><div class="scenario-prob">Builder</div><p class="audience-question">“What could dotBro become for me?”</p></div>
+      <div class="scenario"><div class="scenario-top" style="background:var(--red)"></div><div class="scenario-prob">Student</div><p class="audience-question">What could dotBro become for their next unanswered question?</p></div>
+      <div class="scenario"><div class="scenario-top" style="background:var(--green)"></div><div class="scenario-prob">Professor</div><p class="audience-question">What could dotBro become beyond the lecture hall?</p></div>
+      <div class="scenario"><div class="scenario-top" style="background:var(--red)"></div><div class="scenario-prob">Researcher</div><p class="audience-question">What could dotBro become for an idea seeking evidence?</p></div>
+      <div class="scenario"><div class="scenario-top" style="background:var(--green)"></div><div class="scenario-prob">Founder</div><p class="audience-question">What could dotBro become for a problem seeking a co-founder?</p></div>
+      <div class="scenario"><div class="scenario-top" style="background:var(--red)"></div><div class="scenario-prob">Engineer</div><p class="audience-question">What could dotBro become for something worth building?</p></div>
+      <div class="scenario"><div class="scenario-top" style="background:var(--green)"></div><div class="scenario-prob">Designer</div><p class="audience-question">What could dotBro become for a better way to connect?</p></div>
+      <div class="scenario"><div class="scenario-top" style="background:#9B87FF"></div><div class="scenario-prob">Builder</div><p class="audience-question">What could dotBro become when curiosity turns into action?</p></div>
     </div>
   </div>
 </section>
 
-<!-- ══ SLIDE 6: HELP BUILD THIS ══ -->
+<!-- ══ SLIDE 6: COMING SOON ══ -->
 <section class="slide" id="s6">
   <div class="coming-wrap">
     <div>
-      <div class="section-label green reveal">Help Build This</div>
-      <div class="s2-headline reveal reveal-delay-1">The first paths<br>through dotBro.</div>
-      <p class="vision-sub reveal reveal-delay-2">Each project is an invitation to collaborate. Find where you belong.</p>
+      <div class="section-label green reveal">Coming Soon</div>
+      <div class="s6-headline reveal reveal-delay-1">The first paths<br>through dotBro.</div>
+      <p class="vision-sub reveal reveal-delay-2">Placeholders for what the community may build together.</p>
     </div>
-    <div class="venture-stage reveal reveal-delay-2" aria-label="Projects seek builders">
-      <article class="venture-glass" style="--i:0;--accent:var(--c-question);--accent-soft:rgba(255,255,255,0.08)">
-        <span class="venture-no">01</span>
-        <div class="venture-body">
-          <div class="coming-label">Gyaan.Bro</div>
-          <div class="venture-name">Gyaan.Bro</div>
-          <p class="venture-desc">Questions, context, and knowledge that keep moving.</p>
-          <div class="looking-for-pills">
-            <span>Educators</span>
-            <span>Researchers</span>
-            <span>Writers</span>
-            <span>Students</span>
-          </div>
-        </div>
-        <span class="venture-arrow">→</span>
-        <div class="venture-meta">Join Project</div>
-      </article>
-      
-      <article class="venture-glass" style="--i:1;--accent:var(--c-anonymous);--accent-soft:rgba(255,26,26,0.1)">
-        <span class="venture-no">02</span>
-        <div class="venture-body">
-          <div class="coming-label">Relax.Bro</div>
-          <div class="venture-name">Relax.Bro</div>
-          <p class="venture-desc">A calmer route from asking for help to finding it.</p>
-          <div class="looking-for-pills">
-            <span>Psychologists</span>
-            <span>Community Builders</span>
-            <span>Developers</span>
-          </div>
-        </div>
-        <span class="venture-arrow">→</span>
-        <div class="venture-meta">Join Project</div>
-      </article>
-
-      <article class="venture-glass" style="--i:2;--accent:var(--c-answer);--accent-soft:rgba(200,212,0,0.1)">
-        <span class="venture-no">03</span>
-        <div class="venture-body">
-          <div class="coming-label">Num.Bro</div>
-          <div class="venture-name">Num.Bro</div>
-          <p class="venture-desc">Clearer records, shared understanding, fewer assumptions.</p>
-          <div class="looking-for-pills">
-            <span>Finance</span>
-            <span>AI</span>
-            <span>Accounting</span>
-            <span>Builders</span>
-          </div>
-        </div>
-        <span class="venture-arrow">→</span>
-        <div class="venture-meta">Join Project</div>
-      </article>
-
-      <article class="venture-glass" style="--i:3;--accent:var(--c-project);--accent-soft:rgba(155,135,255,0.1)">
-        <span class="venture-no">04</span>
-        <div class="venture-body">
-          <div class="coming-label">Varta</div>
-          <div class="venture-name">Varta</div>
-          <p class="venture-desc">A place for conversations that deserve to continue.</p>
-          <div class="looking-for-pills">
-            <span>Communication</span>
-            <span>Encryption</span>
-            <span>Networking</span>
-            <span>Builders</span>
-          </div>
-        </div>
-        <span class="venture-arrow">→</span>
-        <div class="venture-meta">Join Project</div>
-      </article>
+    <div class="venture-stage reveal reveal-delay-2" aria-label="Coming soon ventures">
+      <article class="venture-glass" style="--i:0;--accent:#F5F5F0;--accent-soft:rgba(245,245,240,0.14)"><span class="venture-no">01</span><div class="venture-body"><div class="coming-label">Coming Soon</div><div class="venture-name">Gyaan.Bro</div><p class="venture-desc">Questions, context, and knowledge that keep moving.</p></div><span class="venture-arrow">→</span><div class="venture-meta">Placeholder</div></article>
+      <article class="venture-glass" style="--i:1;--accent:#FF1A1A;--accent-soft:rgba(209,0,0,0.23)"><span class="venture-no">02</span><div class="venture-body"><div class="coming-label">Coming Soon</div><div class="venture-name">Relax.Bro</div><p class="venture-desc">A calmer route from asking for help to finding it.</p></div><span class="venture-arrow">→</span><div class="venture-meta">Placeholder</div></article>
+      <article class="venture-glass" style="--i:2;--accent:#E2EE00;--accent-soft:rgba(200,212,0,0.2)"><span class="venture-no">03</span><div class="venture-body"><div class="coming-label">Coming Soon</div><div class="venture-name">Num.Bro</div><p class="venture-desc">Clearer records, shared understanding, fewer assumptions.</p></div><span class="venture-arrow">→</span><div class="venture-meta">Placeholder</div></article>
+      <article class="venture-glass" style="--i:3;--accent:#9B87FF;--accent-soft:rgba(155,135,255,0.2)"><span class="venture-no">04</span><div class="venture-body"><div class="coming-label">Coming Soon</div><div class="venture-name">Varta</div><p class="venture-desc">A place for conversations that deserve to continue.</p></div><span class="venture-arrow">→</span><div class="venture-meta">Placeholder</div></article>
     </div>
   </div>
 </section>
@@ -1033,20 +717,18 @@ nav {
     <div class="section-label reveal">Founding Contributors</div>
     <div class="vision-headline reveal reveal-delay-1">We’re not hiring.<br>We’re building.</div>
     <div class="contributor-grid reveal reveal-delay-2">
-      <div class="contributor-card"><div class="contributor-role">Frontend</div><div class="contributor-status-text">Founding Contributor</div><div class="contributor-state">Open</div></div>
-      <div class="contributor-card"><div class="contributor-role">Backend</div><div class="contributor-status-text">Founding Contributor</div><div class="contributor-state">Open</div></div>
-      <div class="contributor-card"><div class="contributor-role">AI</div><div class="contributor-status-text">Founding Contributor</div><div class="contributor-state">Open</div></div>
-      <div class="contributor-card"><div class="contributor-role">ML</div><div class="contributor-status-text">Founding Contributor</div><div class="contributor-state">Open</div></div>
-      <div class="contributor-card"><div class="contributor-role">Research</div><div class="contributor-status-text">Founding Contributor</div><div class="contributor-state">Open</div></div>
-      <div class="contributor-card"><div class="contributor-role">Motion</div><div class="contributor-status-text">Founding Contributor</div><div class="contributor-state">Open</div></div>
-      <div class="contributor-card"><div class="contributor-role">Design</div><div class="contributor-status-text">Founding Contributor</div><div class="contributor-state">Open</div></div>
-      <div class="contributor-card"><div class="contributor-role">Systems</div><div class="contributor-status-text">Founding Contributor</div><div class="contributor-state">Open</div></div>
-      <div class="contributor-card"><div class="contributor-role">Professor</div><div class="contributor-status-text">Founding Contributor</div><div class="contributor-state">Open</div></div>
-      <div class="contributor-card"><div class="contributor-role">Student</div><div class="contributor-status-text">Founding Contributor</div><div class="contributor-state">Open</div></div>
-      <div class="contributor-card"><div class="contributor-role">Builder</div><div class="contributor-status-text">Founding Contributor</div><div class="contributor-state">Open</div></div>
-      <div class="contributor-card"><div class="contributor-role">Community</div><div class="contributor-status-text">Founding Contributor</div><div class="contributor-state">Open</div></div>
+      <div class="contributor-card"><div class="contributor-role">Frontend</div><div class="contributor-state">Founding Contributor</div></div>
+      <div class="contributor-card"><div class="contributor-role">Backend</div><div class="contributor-state">Founding Contributor</div></div>
+      <div class="contributor-card"><div class="contributor-role">AI</div><div class="contributor-state">Founding Contributor</div></div>
+      <div class="contributor-card"><div class="contributor-role">ML</div><div class="contributor-state">Founding Contributor</div></div>
+      <div class="contributor-card"><div class="contributor-role">Design</div><div class="contributor-state">Founding Contributor</div></div>
+      <div class="contributor-card"><div class="contributor-role">Motion</div><div class="contributor-state">Founding Contributor</div></div>
+      <div class="contributor-card"><div class="contributor-role">Research</div><div class="contributor-state">Founding Contributor</div></div>
+      <div class="contributor-card"><div class="contributor-role">Professor</div><div class="contributor-state">Founding Contributor</div></div>
+      <div class="contributor-card"><div class="contributor-role">Student</div><div class="contributor-state">Founding Contributor</div></div>
+      <div class="contributor-card"><div class="contributor-role">Community</div><div class="contributor-state">Founding Contributor</div></div>
     </div>
-    <div class="launch-actions reveal reveal-delay-3" style="margin-top: 3rem;"><a class="launch-cta secondary" href="mailto:alokara.teams@gmail.com?subject=Founding%20Contributor%20%E2%80%94%20dotBro">Become a Founding Contributor</a></div>
+    <div class="launch-actions reveal reveal-delay-3"><a class="launch-cta secondary" href="mailto:alokara.teams@gmail.com?subject=Founding%20Contributor%20%E2%80%94%20dotBro">Become a Founding Contributor</a></div>
   </div>
 </section>
 
@@ -1066,12 +748,9 @@ nav {
 <section class="slide" id="s9">
   <div class="float-el" style="font-size:25rem;left:-5%;top:10%;--dur:9s">●</div>
   <div class="final-launch">
-    <div class="close-big reveal" style="font-family:'Bebas Neue', sans-serif; font-size: clamp(3.5rem, 8vw, 7.5rem); line-height: 0.95; margin-bottom: 2.5rem;">What if every missed conversation could continue?</div>
-    <div class="conversation-prompt-container reveal reveal-delay-1" style="max-width: 680px; margin-bottom: 1.5rem;">
-      <input type="text" id="final-cta-input" class="conversation-input" placeholder="Ask anonymously..." aria-label="Final anonymous question input">
-      <button id="final-cta-btn" class="conversation-input-btn" aria-label="Submit final question">→</button>
-    </div>
-    <div class="launch-note reveal reveal-delay-2" style="font-family:'Space Mono', monospace; font-size: 0.62rem; color: var(--gray); letter-spacing: 2px;">No pressure. Local only.</div>
+    <div class="close-big reveal">Are you in?</div>
+    <div class="launch-actions reveal reveal-delay-1"><a class="launch-cta primary" href="mailto:alokara.teams@gmail.com?subject=Let%27s%20Build%20dotBro">Let’s Build dotBro</a></div>
+    <div class="launch-note reveal reveal-delay-2">Launching with curious people.</div>
   </div>
 </section>
 
@@ -1260,49 +939,32 @@ document.querySelectorAll('.card-3d').forEach(card => {
   window.addEventListener('resize', gResize);
   gResize();
 
-  // Color system
-  const STATE_COLORS = {
-    question: [255, 255, 255],     // White
-    answer: [200, 212, 0],         // Green
-    meeting: [0, 209, 255],        // Blue
-    project: [155, 135, 255],      // Purple
-    knowledge: [255, 215, 0],      // Gold
-    anonymous: [255, 26, 26],      // Red
-    waiting: [142, 142, 147],      // Gray
-    resolved: [0, 255, 102]        // Green Glow
-  };
-
-  function getStateColor(state, alpha) {
-    const rgb = STATE_COLORS[state] || [255, 255, 255];
-    return `rgba(${rgb[0]},${rgb[1]},${rgb[2]},${alpha})`;
-  }
-
-  // Initial nodes with states
+  // ── questions are the nodes ──
   const QUESTIONS = [
-    { text: 'What is consciousness?',          state: 'knowledge' },
-    { text: 'How do ideas connect?',           state: 'project' },
-    { text: 'Who else is thinking this?',      state: 'question' },
-    { text: 'What did I almost ask?',          state: 'anonymous' },
-    { text: 'Can AI be curious?',              state: 'question' },
-    { text: 'Why do conversations end?',       state: 'waiting' },
-    { text: 'What got lost at graduation?',    state: 'anonymous' },
-    { text: 'Where do collaborators hide?',    state: 'waiting' },
-    { text: 'What should I have said?',        state: 'resolved' },
-    { text: 'Which professor knows this?',     state: 'meeting' },
-    { text: 'How does learning happen?',       state: 'knowledge' },
-    { text: "What's worth building next?",     state: 'project' },
-    { text: 'Is this idea already done?',      state: 'waiting' },
-    { text: 'What if we build this together?', state: 'resolved' },
-    { text: 'Where does curiosity lead?',      state: 'knowledge' },
-    { text: 'What question changed your life?',state: 'anonymous' },
-    { text: 'How do communities form?',        state: 'meeting' },
-    { text: 'What did that lecture miss?',     state: 'question' },
-    { text: 'Who has the answer?',             state: 'waiting' },
-    { text: 'What gets lost in feeds?',        state: 'anonymous' },
-    { text: 'How do ideas compound?',          state: 'knowledge' },
-    { text: 'What if knowledge was a graph?',  state: 'project' },
-    { text: 'When did you stop asking why?',   state: 'question' },
-    { text: 'What would you build with me?',   state: 'resolved' },
+    { text: 'What is consciousness?',          type: 'hub' },
+    { text: 'How do ideas connect?',           type: 'hub' },
+    { text: 'Who else is thinking this?',      type: 'hub' },
+    { text: 'What did I almost ask?',          type: 'hub' },
+    { text: 'Can AI be curious?',              type: 'node' },
+    { text: 'Why do conversations end?',       type: 'node' },
+    { text: 'What got lost at graduation?',    type: 'node' },
+    { text: 'Where do collaborators hide?',    type: 'node' },
+    { text: 'What should I have said?',        type: 'node' },
+    { text: 'Which professor knows this?',     type: 'node' },
+    { text: 'How does learning happen?',       type: 'node' },
+    { text: "What's worth building next?",     type: 'node' },
+    { text: 'Is this idea already done?',      type: 'node' },
+    { text: 'What if we build this together?', type: 'node' },
+    { text: 'Where does curiosity lead?',      type: 'node' },
+    { text: 'What question changed your life?',type: 'node' },
+    { text: 'How do communities form?',        type: 'node' },
+    { text: 'What did that lecture miss?',     type: 'node' },
+    { text: 'Who has the answer?',             type: 'node' },
+    { text: 'What gets lost in feeds?',        type: 'node' },
+    { text: 'How do ideas compound?',          type: 'node' },
+    { text: 'What if knowledge was a graph?',  type: 'node' },
+    { text: 'When did you stop asking why?',   type: 'node' },
+    { text: 'What would you build with me?',   type: 'node' },
   ];
 
   // place nodes on a 3D sphere
@@ -1317,9 +979,8 @@ document.querySelectorAll('.card-3d').forEach(card => {
       y: y * R3,
       z: Math.sin(theta) * r * R3,
       text: q.text,
-      state: q.state,
-      hub: i < 4, // First 4 act as hubs
-      alpha: 0,
+      hub: q.type === 'hub',
+      alpha: 0,         // fade in
       born: Date.now() + i * 120,
     };
   });
@@ -1329,31 +990,24 @@ document.querySelectorAll('.card-3d').forEach(card => {
   const hubIdx = nodes3d.map((n, i) => n.hub ? i : -1).filter(i => i >= 0);
   nodes3d.forEach((n, i) => {
     if (n.hub) {
+      // hub → all other nodes (sparse: every 3rd)
       nodes3d.forEach((m, j) => {
         if (j !== i && j % 3 === 0) edges3d.push({ a: i, b: j, accent: true });
       });
     } else {
+      // node → nearest hub
       const nearHub = hubIdx[i % hubIdx.length];
       edges3d.push({ a: i, b: nearHub, accent: false });
+      // node → one neighbour
       const nb = (i + 7) % nodes3d.length;
       if (nb !== i) edges3d.push({ a: i, b: nb, accent: false });
     }
   });
 
-  function isConnected(nodeA_idx, nodeB_idx) {
-    if (nodeA_idx === nodeB_idx) return true;
-    return edges3d.some(e => 
-      (e.a === nodeA_idx && e.b === nodeB_idx) || 
-      (e.b === nodeA_idx && e.a === nodeB_idx)
-    );
-  }
-
-  // ── rotation and zoom state with target momentum ──
+  // ── rotation state ──
   let gRotY = 0.3, gRotX = -0.15;
-  let gTargetRotY = 0.3, gTargetRotX = -0.15;
   let gDrag = false, gLX = 0, gLY = 0, gVX = 0, gVY = 0;
   let gZoom = 1;
-  let gTargetZoom = 1;
   let gHoverNode = null;
 
   el.addEventListener('mousedown', e => {
@@ -1363,14 +1017,13 @@ document.querySelectorAll('.card-3d').forEach(card => {
   window.addEventListener('mousemove', e => {
     if (!gDrag) return;
     const dx = e.clientX - gLX, dy = e.clientY - gLY;
-    gTargetRotY += dx * 0.005;
-    gTargetRotX += dy * 0.005;
+    gRotY += dx * 0.006; gRotX += dy * 0.006;
     gVX = dx * 0.0007; gVY = dy * 0.0007;
     gLX = e.clientX; gLY = e.clientY;
   });
   el.addEventListener('wheel', e => {
     e.preventDefault();
-    gTargetZoom = Math.max(0.5, Math.min(2.2, gTargetZoom - e.deltaY * 0.0015));
+    gZoom = Math.max(0.5, Math.min(2.2, gZoom - e.deltaY * 0.001));
   }, { passive: false });
 
   // hover detection via mouse position relative to canvas
@@ -1382,176 +1035,68 @@ document.querySelectorAll('.card-3d').forEach(card => {
   });
   el.addEventListener('mouseleave', () => { gMX = -9999; gMY = -9999; gHoverNode = null; });
 
-  // Touch gesture support (pinch & drag)
-  let tpDist = 0;
   el.addEventListener('touchstart', e => {
     gDrag = true;
-    if (e.touches.length === 1) {
-      gLX = e.touches[0].clientX; gLY = e.touches[0].clientY;
-    } else if (e.touches.length === 2) {
-      const dx = e.touches[0].clientX - e.touches[1].clientX;
-      const dy = e.touches[0].clientY - e.touches[1].clientY;
-      tpDist = Math.sqrt(dx*dx + dy*dy);
-    }
+    gLX = e.touches[0].clientX; gLY = e.touches[0].clientY;
   }, { passive: true });
-
   el.addEventListener('touchmove', e => {
-    if (e.touches.length === 2) {
-      const dx = e.touches[0].clientX - e.touches[1].clientX;
-      const dy = e.touches[0].clientY - e.touches[1].clientY;
-      const dist = Math.sqrt(dx*dx + dy*dy);
-      if (tpDist > 0) {
-        const diff = dist - tpDist;
-        gTargetZoom = Math.max(0.5, Math.min(2.2, gTargetZoom + diff * 0.005));
-      }
-      tpDist = dist;
-    } else if (gDrag && e.touches.length === 1) {
-      const dx = e.touches[0].clientX - gLX, dy = e.touches[0].clientY - gLY;
-      gTargetRotY += dx * 0.005;
-      gTargetRotX += dy * 0.005;
-      gLX = e.touches[0].clientX; gLY = e.touches[0].clientY;
-    }
+    if (!gDrag) return;
+    const dx = e.touches[0].clientX - gLX, dy = e.touches[0].clientY - gLY;
+    gRotY += dx * 0.006; gRotX += dy * 0.006;
+    gLX = e.touches[0].clientX; gLY = e.touches[0].clientY;
   }, { passive: true });
-
-  el.addEventListener('touchend', e => {
-    if (e.touches.length < 2) tpDist = 0;
-    if (e.touches.length === 0) gDrag = false;
-  }, { passive: true });
+  el.addEventListener('touchend', () => { gDrag = false; });
 
   function project3(p) {
+    // rotate Y
     let x = p.x * Math.cos(gRotY) - p.z * Math.sin(gRotY);
     let z = p.x * Math.sin(gRotY) + p.z * Math.cos(gRotY);
+    // rotate X
     let y = p.y * Math.cos(gRotX) - z * Math.sin(gRotX);
     z = p.y * Math.sin(gRotX) + z * Math.cos(gRotX);
     const fov = 520 * gZoom;
     const scale = fov / (fov + z + R3 * 0.6);
-    let sx = GW / 2 + x * scale;
-    let sy = GH / 2 + y * scale * 0.9;
-    
-    // Magnetic hover: pull node slightly towards cursor
-    if (gMX !== -9999 && gMY !== -9999) {
-      const dx = gMX - sx;
-      const dy = gMY - sy;
-      const dist = Math.sqrt(dx*dx + dy*dy);
-      if (dist < 100) {
-        const force = (1 - dist / 100) * 8; // Pull intensity
-        sx += (dx / dist) * force;
-        sy += (dy / dist) * force;
-      }
-    }
-    
-    return { sx, sy, scale, z };
+    return { sx: GW / 2 + x * scale, sy: GH / 2 + y * scale * 0.9, scale, z };
   }
 
-  // Spawn new anonymous questions
+  // introspective: add a new question node periodically
   let lastSpawn = Date.now();
   const EXTRA = [
-    'What did that lecture miss?',
-    'Who knows this?',
-    'What should I ask?',
-    'What if we build this?',
-    'What conversation changed your life?'
+    'What are you building for?',
+    'Who needs to hear this?',
+    'What question scares you?',
+    'What did you unlearn today?',
+    'Which idea keeps returning?',
+    'What would a 10x answer look like?',
+    'Who is already working on this?',
   ];
   let extraIdx = 0;
 
   function maybeSpawn() {
-    if (Date.now() - lastSpawn < 5000) return;
-    if (nodes3d.length > 50) return;
+    if (Date.now() - lastSpawn < 6000) return;
+    if (nodes3d.length > 32) return;
     lastSpawn = Date.now();
     const phi = Math.random() * Math.PI * 2;
     const cosTheta = Math.random() * 2 - 1;
     const sinTheta = Math.sqrt(1 - cosTheta * cosTheta);
     const newNode = {
-      x: sinTheta * Math.cos(phi) * R3 * 0.9,
-      y: cosTheta * R3 * 0.9,
-      z: sinTheta * Math.sin(phi) * R3 * 0.9,
+      x: sinTheta * Math.cos(phi) * R3 * 0.85,
+      y: cosTheta * R3 * 0.85,
+      z: sinTheta * Math.sin(phi) * R3 * 0.85,
       text: EXTRA[extraIdx % EXTRA.length],
-      state: 'anonymous',
       hub: false, alpha: 0, born: Date.now()
     };
     extraIdx++;
     const nearHub = hubIdx[Math.floor(Math.random() * hubIdx.length)];
     edges3d.push({ a: nodes3d.length, b: nearHub, accent: false });
-    const randNodeIdx = Math.floor(Math.random() * nodes3d.length);
-    if (randNodeIdx !== nearHub && randNodeIdx !== nodes3d.length) {
-      edges3d.push({ a: nodes3d.length, b: randNodeIdx, accent: false });
-    }
     nodes3d.push(newNode);
   }
 
-  // Typing node logic (connected to inputs)
-  let activeTypingNode = null;
-  
-  window.handleTyping = function(text) {
-    if (!text.trim()) {
-      if (activeTypingNode) {
-        const idx = nodes3d.indexOf(activeTypingNode);
-        if (idx !== -1) {
-          nodes3d.splice(idx, 1);
-          edges3d = edges3d.filter(e => e.a !== idx && e.b !== idx);
-          edges3d.forEach(e => {
-            if (e.a > idx) e.a--;
-            if (e.b > idx) e.b--;
-          });
-        }
-        activeTypingNode = null;
-      }
-      return;
-    }
-    
-    if (!activeTypingNode) {
-      const distFromCam = 80;
-      const x = -Math.sin(gRotY) * distFromCam;
-      const y = Math.sin(gRotX) * distFromCam;
-      const z = -Math.cos(gRotY) * distFromCam;
-      
-      activeTypingNode = {
-        x: x, y: y, z: z,
-        text: text,
-        state: 'resolved', // green glow resolved state color
-        hub: false, alpha: 1, born: Date.now(),
-        rippleActive: true
-      };
-      
-      const newIdx = nodes3d.length;
-      nodes3d.push(activeTypingNode);
-      
-      let closestIdx = 0, closestD = 999999;
-      for (let i = 0; i < newIdx; i++) {
-        const dx = nodes3d[i].x - x;
-        const dy = nodes3d[i].y - y;
-        const dz = nodes3d[i].z - z;
-        const d = dx*dx + dy*dy + dz*dz;
-        if (d < closestD) {
-          closestD = d; closestIdx = i;
-        }
-      }
-      edges3d.push({ a: newIdx, b: closestIdx, accent: true });
-    } else {
-      activeTypingNode.text = text;
-    }
-  };
-  
-  window.finalizeTyping = function() {
-    if (activeTypingNode) {
-      activeTypingNode.rippleActive = true;
-      activeTypingNode.born = Date.now();
-      activeTypingNode = null;
-    }
-  };
-
   function gDraw() {
-    if (gDrag) {
-      gRotY += (gTargetRotY - gRotY) * 0.15;
-      gRotX += (gTargetRotX - gRotX) * 0.15;
-    } else {
-      gTargetRotY += 0.0008 + gVX;
-      gTargetRotX += gVY;
+    if (!gDrag) {
+      gRotY += 0.0008 + gVX; gRotX += gVY;
       gVX *= 0.93; gVY *= 0.93;
-      gRotY += (gTargetRotY - gRotY) * 0.1;
-      gRotX += (gTargetRotX - gRotX) * 0.1;
     }
-    gZoom += (gTargetZoom - gZoom) * 0.1;
 
     ctx2.clearRect(0, 0, GW, GH);
     const now = Date.now();
@@ -1566,24 +1111,6 @@ document.querySelectorAll('.card-3d').forEach(card => {
 
     const proj = nodes3d.map(project3);
 
-    // detect hover
-    let closestDist = 999, closestIdx = -1;
-    const sortedIdx = nodes3d.map((_, i) => i).sort((a, b) => proj[b].z - proj[a].z);
-
-    sortedIdx.forEach(i => {
-      const n = nodes3d[i];
-      const p = proj[i];
-      if (n.alpha === 0) return;
-      const dx = gMX - p.sx, dy = gMY - p.sy;
-      const dist = Math.sqrt(dx*dx + dy*dy);
-      if (dist < closestDist && dist < 35) {
-        closestDist = dist; closestIdx = i;
-      }
-    });
-
-    const hoverIdx = closestIdx;
-    gHoverNode = hoverIdx !== -1 ? { n: nodes3d[hoverIdx], p: proj[hoverIdx], idx: hoverIdx } : null;
-
     // draw edges back→front
     const sortedEdges = edges3d
       .filter(e => e.a < proj.length && e.b < proj.length)
@@ -1596,107 +1123,66 @@ document.querySelectorAll('.card-3d').forEach(card => {
     sortedEdges.forEach(e => {
       const pa = proj[e.a], pb = proj[e.b];
       const na = nodes3d[e.a], nb = nodes3d[e.b];
-      let alpha = Math.min(na.alpha, nb.alpha) * Math.max(0.04, Math.min(0.55, (pa.scale + pb.scale) / 2 - 0.3));
-      
-      let isEdgeHighlighted = false;
-      if (hoverIdx !== -1) {
-        if (e.a === hoverIdx || e.b === hoverIdx) {
-          isEdgeHighlighted = true;
-          alpha *= 1.5;
-        } else {
-          alpha *= 0.1;
-        }
-      }
-
-      if (isEdgeHighlighted) {
-        ctx2.strokeStyle = `rgba(255,255,255,${alpha * 0.8})`;
-        ctx2.lineWidth = 1.6 * pa.scale;
-      } else if (e.accent) {
+      const alpha = Math.min(na.alpha, nb.alpha) * Math.max(0.04, Math.min(0.55, (pa.scale + pb.scale) / 2 - 0.3));
+      if (e.accent) {
         ctx2.strokeStyle = `rgba(200,212,0,${alpha * 0.65})`;
         ctx2.lineWidth = 1.1 * pa.scale;
       } else {
         ctx2.strokeStyle = `rgba(255,255,255,${alpha * 0.22})`;
         ctx2.lineWidth = 0.6 * pa.scale;
       }
-      
-      ctx2.setLineDash(e.accent || isEdgeHighlighted ? [] : [3, 8]);
+      ctx2.setLineDash(e.accent ? [] : [3, 8]);
       ctx2.beginPath();
       ctx2.moveTo(pa.sx, pa.sy);
       ctx2.lineTo(pb.sx, pb.sy);
       ctx2.stroke();
       ctx2.setLineDash([]);
-
-      // Connection pulsing edge flows
-      if (hoverIdx === -1 || e.a === hoverIdx || e.b === hoverIdx) {
-        const pulseSpeed = 0.0015;
-        const t = (now * pulseSpeed + e.a * 0.2) % 1;
-        const pulseX = pa.sx + (pb.sx - pa.sx) * t;
-        const pulseY = pa.sy + (pb.sy - pa.sy) * t;
-        const pulseScale = (pa.scale + pb.scale) / 2;
-        const pulseRad = (isEdgeHighlighted ? 3.5 : 2) * pulseScale;
-        
-        ctx2.beginPath();
-        ctx2.arc(pulseX, pulseY, pulseRad, 0, Math.PI * 2);
-        ctx2.fillStyle = getStateColor(na.state, alpha * 2.5);
-        ctx2.fill();
-      }
     });
 
     // draw nodes back→front
+    let closestDist = 999, closestNode = null;
+    const sortedIdx = nodes3d.map((_, i) => i).sort((a, b) => proj[b].z - proj[a].z);
+
     sortedIdx.forEach(i => {
       const n = nodes3d[i];
       const p = proj[i];
       if (n.alpha === 0) return;
 
-      const baseR = n.hub ? 6.5 : 4;
-      const breatheScale = 1 + 0.08 * Math.sin(now * 0.0025 + i);
-      const rad = Math.max(1.5, baseR * p.scale * gZoom * breatheScale);
+      const baseR = n.hub ? 5.5 : 2.8;
+      const rad = Math.max(1, baseR * p.scale * gZoom);
       const depthAlpha = Math.max(0.1, Math.min(1, (p.scale - 0.3) * 1.4));
-      let nodeAlpha = n.alpha * depthAlpha;
+      const nodeAlpha = n.alpha * depthAlpha;
 
-      if (hoverIdx !== -1) {
-        if (i !== hoverIdx && !isConnected(hoverIdx, i)) {
-          nodeAlpha *= 0.15;
-        } else {
-          nodeAlpha = Math.min(1.0, nodeAlpha * 1.3);
-        }
-      }
-
-      // glow ring for hubs/resolved/hovered
-      const isResolved = n.state === 'resolved';
-      if (n.hub || isResolved || i === hoverIdx) {
-        const glowRad = rad * (isResolved ? 5 : i === hoverIdx ? 6 : 4.5);
-        const grd = ctx2.createRadialGradient(p.sx, p.sy, 0, p.sx, p.sy, glowRad);
-        grd.addColorStop(0, getStateColor(n.state, nodeAlpha * (i === hoverIdx ? 0.45 : 0.25)));
-        grd.addColorStop(1, getStateColor(n.state, 0));
+      // glow ring for hubs
+      if (n.hub) {
+        const grd = ctx2.createRadialGradient(p.sx, p.sy, 0, p.sx, p.sy, rad * 4);
+        grd.addColorStop(0, `rgba(200,212,0,${nodeAlpha * 0.25})`);
+        grd.addColorStop(1, `rgba(200,212,0,0)`);
         ctx2.beginPath();
-        ctx2.arc(p.sx, p.sy, glowRad, 0, Math.PI * 2);
+        ctx2.arc(p.sx, p.sy, rad * 4, 0, Math.PI * 2);
         ctx2.fillStyle = grd;
+        ctx2.fill();
+        ctx2.beginPath();
+        ctx2.arc(p.sx, p.sy, rad, 0, Math.PI * 2);
+        ctx2.fillStyle = `rgba(200,212,0,${nodeAlpha})`;
+        ctx2.fill();
+      } else {
+        ctx2.beginPath();
+        ctx2.arc(p.sx, p.sy, rad, 0, Math.PI * 2);
+        ctx2.fillStyle = `rgba(245,245,240,${nodeAlpha * 0.75})`;
         ctx2.fill();
       }
 
-      ctx2.beginPath();
-      ctx2.arc(p.sx, p.sy, rad, 0, Math.PI * 2);
-      ctx2.fillStyle = getStateColor(n.state, nodeAlpha);
-      ctx2.fill();
-
-      // Custom node ripple effect on add
-      if (n.rippleActive) {
-        const rippleElapsed = now - n.born;
-        if (rippleElapsed < 1200) {
-          const rippleProgress = rippleElapsed / 1200;
-          ctx2.beginPath();
-          ctx2.arc(p.sx, p.sy, rad * (1 + rippleProgress * 8), 0, Math.PI * 2);
-          ctx2.strokeStyle = `rgba(0, 255, 102, ${1 - rippleProgress})`;
-          ctx2.lineWidth = 2 * (1 - rippleProgress);
-          ctx2.stroke();
-        } else {
-          n.rippleActive = false;
-        }
+      // hover detection
+      const dx = gMX - p.sx, dy = gMY - p.sy;
+      const dist = Math.sqrt(dx * dx + dy * dy);
+      if (dist < closestDist && dist < 28) {
+        closestDist = dist; closestNode = { n, p };
       }
     });
 
     // draw hovered label
+    gHoverNode = closestNode;
     if (gHoverNode) {
       const { n, p } = gHoverNode;
       const text = n.text;
@@ -1705,6 +1191,7 @@ document.querySelectorAll('.card-3d').forEach(card => {
       const px = Math.min(GW - tw / 2 - 14, Math.max(tw / 2 + 14, p.sx));
       const py = p.sy - 20 < 30 ? p.sy + 40 : p.sy - 20;
 
+      // pill bg
       ctx2.fillStyle = 'rgba(9,9,9,0.88)';
       const pad = 10;
       roundRect(ctx2, px - tw / 2 - pad, py - 18, tw + pad * 2, 28, 6);
@@ -1749,234 +1236,8 @@ document.querySelectorAll('.card-3d').forEach(card => {
   gDraw();
 })();
 
-// ── CURSOR ──
-const cursor = document.getElementById('cursor');
-const ring = document.getElementById('cursorRing');
-let mx = 0, my = 0, rx = 0, ry = 0;
-document.addEventListener('mousemove', e => {
-  mx = e.clientX; my = e.clientY;
-  cursor.style.left = mx + 'px'; cursor.style.top = my + 'px';
-});
-function animRing() {
-  rx += (mx - rx) * 0.12; ry += (my - ry) *.12;
-  ring.style.left = rx + 'px'; ring.style.top = ry + 'px';
-  requestAnimationFrame(animRing);
-}
-animRing();
-document.querySelectorAll('a,button,.crisis-card,.scenario,.step-card,.venture-glass,.contributor-card,.graph3d-wrap').forEach(el => {
-  el.addEventListener('mouseenter', () => { cursor.style.width = '24px'; cursor.style.height = '24px'; ring.style.width = '60px'; ring.style.height = '60px'; });
-  el.addEventListener('mouseleave', () => { cursor.style.width = '12px'; cursor.style.height = '12px'; ring.style.width = '40px'; ring.style.height = '40px'; });
-});
-
-// ── 3D CANVAS ──
-const canvas = document.getElementById('bg-canvas');
-const ctx = canvas.getContext('2d');
-let W, H, particles = [], time = 0;
-
-function resize() {
-  W = canvas.width = window.innerWidth;
-  H = canvas.height = window.innerHeight;
-}
-resize();
-window.addEventListener('resize', resize);
-
-function makeParticles() {
-  particles = [];
-  const count = Math.floor(W * H / 15000);
-  for (let i = 0; i < count; i++) {
-    particles.push({
-      x: Math.random() * W, y: Math.random() * H,
-      z: Math.random() * 3 + 0.5,
-      vx: (Math.random() - 0.5) * 0.3,
-      vy: (Math.random() - 0.5) * 0.3,
-      r: Math.random() * 2 + 0.5,
-      hue: Math.random() > 0.7 ? 'red' : Math.random() > 0.5 ? 'green' : 'white'
-    });
-  }
-}
-makeParticles();
-window.addEventListener('resize', makeParticles);
-
-function drawParticles() {
-  ctx.clearRect(0, 0, W, H);
-  time += 0.005;
-
-  for (let i = 0; i < particles.length; i++) {
-    const p = particles[i];
-    p.x += p.vx; p.y += p.vy;
-    if (p.x < 0 || p.x > W) p.vx *= -1;
-    if (p.y < 0 || p.y > H) p.vy *= -1;
-
-    const alpha = 0.4 * (p.z / 3.5);
-    if (p.hue === 'red')   ctx.fillStyle = `rgba(209,0,0,${alpha})`;
-    else if (p.hue === 'green') ctx.fillStyle = `rgba(200,212,0,${alpha})`;
-    else ctx.fillStyle = `rgba(255,255,255,${alpha * 0.5})`;
-
-    ctx.beginPath();
-    ctx.arc(p.x, p.y, p.r * p.z * 0.6, 0, Math.PI * 2);
-    ctx.fill();
-
-    for (let j = i + 1; j < particles.length; j++) {
-      const q = particles[j];
-      const dx = p.x - q.x, dy = p.y - q.y;
-      const dist = Math.sqrt(dx*dx + dy*dy);
-      if (dist < 120) {
-        const lineAlpha = (1 - dist / 120) * 0.08;
-        ctx.strokeStyle = `rgba(255,255,255,${lineAlpha})`;
-        ctx.lineWidth = 0.5;
-        ctx.beginPath();
-        ctx.moveTo(p.x, p.y);
-        ctx.lineTo(q.x, q.y);
-        ctx.stroke();
-      }
-    }
-  }
-
-  for (let i = 0; i < 3; i++) {
-    const cx = W * (0.2 + i * 0.3);
-    const cy = H * 0.5 + Math.sin(time + i * 2) * 80;
-    const rad = 60 + i * 40 + Math.sin(time * 0.7 + i) * 15;
-    const rot = time * 0.3 + i * Math.PI / 3;
-    const a = Math.sin(rot) * 0.3;
-    const b = Math.cos(rot);
-    ctx.save();
-    ctx.translate(cx, cy);
-    ctx.scale(1, Math.abs(b) * 0.5 + 0.1);
-    ctx.rotate(a);
-    if (i === 0) ctx.strokeStyle = `rgba(209,0,0,0.08)`;
-    else if (i === 1) ctx.strokeStyle = `rgba(200,212,0,0.06)`;
-    else ctx.strokeStyle = `rgba(255,255,255,0.05)`;
-    ctx.lineWidth = 1.5;
-    ctx.beginPath();
-    ctx.arc(0, 0, rad, 0, Math.PI * 2);
-    ctx.stroke();
-    ctx.restore();
-  }
-
-  requestAnimationFrame(drawParticles);
-}
-drawParticles();
-
-// ── SLIDE NAV DOTS ──
-const slides = document.querySelectorAll('.slide');
-const navEl = document.getElementById('slideNav');
-slides.forEach((sl, i) => {
-  const d = document.createElement('div');
-  d.className = 'snav-dot' + (i === 0 ? ' active' : '');
-  d.addEventListener('click', () => sl.scrollIntoView({ behavior: 'smooth' }));
-  navEl.appendChild(d);
-});
-
-// ── PROGRESS + ACTIVE DOT ──
-window.addEventListener('scroll', () => {
-  const prog = document.getElementById('progress');
-  const scrollTop = window.scrollY;
-  const docH = document.documentElement.scrollHeight - window.innerHeight;
-  prog.style.width = (scrollTop / docH * 100) + '%';
-
-  const dots = document.querySelectorAll('.snav-dot');
-  slides.forEach((sl, i) => {
-    const rect = sl.getBoundingClientRect();
-    if (rect.top <= window.innerHeight / 2 && rect.bottom >= window.innerHeight / 2) {
-      dots.forEach(d => d.classList.remove('active'));
-      dots[i].classList.add('active');
-    }
-  });
-});
-
-// ── REVEAL ON SCROLL ──
-const revealEls = document.querySelectorAll('.reveal');
-const obs = new IntersectionObserver(entries => {
-  entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
-}, { threshold: 0.15 });
-revealEls.forEach(el => obs.observe(el));
-
-// ── 3D CARD TILT ──
-document.querySelectorAll('.card-3d').forEach(card => {
-  card.addEventListener('mousemove', e => {
-    const rect = card.getBoundingClientRect();
-    const cx = rect.left + rect.width / 2;
-    const cy = rect.top + rect.height / 2;
-    const dx = (e.clientX - cx) / rect.width * 20;
-    const dy = (e.clientY - cy) / rect.height * 20;
-    card.style.transform = `perspective(600px) rotateY(${dx}deg) rotateX(${-dy}deg) scale(1.03)`;
-  });
-  card.addEventListener('mouseleave', () => {
-    card.style.transform = '';
-  });
-});
-
-// ── MANIFESTO SCROLL HIGHLIGHT OBSERVER ──
-const manifestoLines = document.querySelectorAll('.manifesto-line');
-const manifestoObs = new IntersectionObserver(entries => {
-  entries.forEach(e => {
-    if (e.isIntersecting) {
-      e.target.classList.add('highlighted');
-    } else {
-      e.target.classList.remove('highlighted');
-    }
-  });
-}, {
-  rootMargin: '-30% 0px -30% 0px',
-  threshold: 0.5
-});
-manifestoLines.forEach(line => manifestoObs.observe(line));
-
-// ── INPUT FOCUS TYPING MODE ──
-document.querySelectorAll('.conversation-input').forEach(input => {
-  input.addEventListener('focus', () => {
-    document.body.classList.add('typing-mode');
-  });
-  input.addEventListener('blur', () => {
-    document.body.classList.remove('typing-mode');
-  });
-});
-
-// ── HERO INPUT WIRING ──
-const heroInput = document.getElementById('hero-input');
-if (heroInput) {
-  heroInput.addEventListener('input', e => {
-    window.handleTyping(e.target.value);
-  });
-  heroInput.addEventListener('keydown', e => {
-    if (e.key === 'Enter') {
-      window.finalizeTyping();
-      heroInput.value = '';
-    }
-  });
-  const heroBtn = document.getElementById('hero-input-btn');
-  if (heroBtn) {
-    heroBtn.addEventListener('click', () => {
-      window.finalizeTyping();
-      heroInput.value = '';
-    });
-  }
-}
-
-// ── FINAL CTA INPUT WIRING ──
-const finalInput = document.getElementById('final-cta-input');
-if (finalInput) {
-  finalInput.addEventListener('input', e => {
-    window.handleTyping(e.target.value);
-  });
-  finalInput.addEventListener('keydown', e => {
-    if (e.key === 'Enter') {
-      window.finalizeTyping();
-      finalInput.value = '';
-    }
-  });
-  const finalBtn = document.getElementById('final-cta-btn');
-  if (finalBtn) {
-    finalBtn.addEventListener('click', () => {
-      window.finalizeTyping();
-      finalInput.value = '';
-    });
-  }
-}
-
 // ── KEYBOARD NAV ──
 document.addEventListener('keydown', e => {
-  if (document.body.classList.contains('typing-mode')) return; // Disable scroll key nav while typing
   const cur = Array.from(slides).findIndex(s => {
     const r = s.getBoundingClientRect();
     return r.top <= window.innerHeight / 2 && r.bottom >= window.innerHeight / 2;
