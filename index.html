@@ -114,6 +114,21 @@ body {
   line-height: 1.45;
   text-wrap: balance;
 }
+/* ══ CTA — the one action on the page: float your question ══ */
+.cta {
+  font-family: 'Space Mono', monospace;
+  font-size: 0.78rem;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: var(--white);
+  text-decoration: none;
+  border: 1px solid var(--red);
+  border-radius: 999px;
+  padding: 0.85rem 1.8rem;
+  transition: background 0.25s ease, transform 0.15s ease;
+}
+.cta:hover { background: var(--red); }
+.cta:active { transform: scale(0.97); }
 .substatement {
   max-width: 46ch;
   font-size: clamp(0.95rem, 1.5vw, 1.1rem);
@@ -364,6 +379,7 @@ footer .fdot {
   </div>
   <h1 class="statement">.Bro is a family of specialized companions that help people turn curiosity into meaningful action.</h1>
   <p class="substatement">A Human Needs Framework where every companion is built around a human need — sharing one intelligence and one evolving knowledge foundation.</p>
+  <a class="cta" href="/feed.html">float your question →</a>
 </header>
 
 <!-- ══ 2 · WHY ══ -->
