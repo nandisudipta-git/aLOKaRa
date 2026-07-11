@@ -72,6 +72,8 @@ body {
 .why        { --si: 1; }
 .how        { --si: 2; }
 .principles { --si: 3; }
+.family     { --si: 4; }
+.ronvey     { --si: 5; }
 body {
   background: #050505;                  /* the void behind the cards */
 }
@@ -248,6 +250,77 @@ body {
   font-size: clamp(0.95rem, 1.4vw, 1.05rem);
   line-height: 1.65;
   max-width: 52ch;
+}
+
+/* ══ FAMILY — the companions, each a door into its cluster on the feed ══ */
+.family { padding: 8vh 6vw; align-items: center; }
+.family-inner { width: 100%; max-width: 760px; }
+.family .eyebrow { text-align: center; display: block; margin-bottom: 3.5rem; }
+.frow {
+  display: grid;
+  grid-template-columns: 14px 1fr auto;
+  gap: 1.6rem;
+  align-items: baseline;
+  padding: 1.8rem 0;
+  border-top: 1px solid var(--hairline);
+  text-decoration: none;
+  color: var(--white);
+}
+.frow:last-of-type { border-bottom: 1px solid var(--hairline); }
+.frow .pdot {
+  width: 10px; height: 10px;
+  background: var(--red);
+  border-radius: 50%;
+  transform: translateY(1px);
+}
+.frow h3 {
+  font-family: 'Bebas Neue', sans-serif;
+  font-weight: 400;
+  font-size: clamp(1.6rem, 3.6vw, 2.6rem);
+  line-height: 1;
+  letter-spacing: 0.01em;
+}
+.frow p {
+  grid-column: 2;
+  margin-top: 0.7rem;
+  color: var(--whisper);
+  font-size: clamp(0.95rem, 1.4vw, 1.05rem);
+  line-height: 1.65;
+  max-width: 52ch;
+}
+.frow .farrow { color: var(--red); font-size: 1.2rem; transition: transform 0.2s ease; }
+.frow:hover .farrow, .frow:focus-visible .farrow { transform: translateX(5px); }
+.family-note {
+  margin-top: 2.4rem;
+  text-align: center;
+  color: var(--whisper);
+  font-family: 'Space Mono', monospace;
+  font-size: 0.68rem;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+}
+
+/* ══ RONVEY — one mind behind every companion ══ */
+.ronvey {
+  padding: 8vh 6vw;
+  align-items: center;
+  gap: 2.4rem;
+  text-align: center;
+}
+.ronvey h2 {
+  font-family: 'Bebas Neue', sans-serif;
+  font-weight: 400;
+  font-size: clamp(2.4rem, 6.5vw, 5.5rem);
+  line-height: 1.08;
+  letter-spacing: 0.005em;
+}
+.ronvey h2 em { font-style: normal; color: var(--red); }
+.ronvey p {
+  max-width: 52ch;
+  color: var(--whisper);
+  font-size: clamp(0.95rem, 1.5vw, 1.1rem);
+  line-height: 1.7;
+  text-wrap: balance;
 }
 
 /* ══ FOOTER — the last card to rise. No slogan, no CTA. ══ */
@@ -429,10 +502,49 @@ footer .fdot {
   </div>
 </section>
 
+<!-- ══ 5 · THE FAMILY ══ -->
+<section class="family panel" aria-label="The .Bro family">
+  <div class="family-inner">
+  <span class="eyebrow reveal">The Family</span>
+  <a class="frow reveal" href="/feed.html#study-gyaan">
+    <span class="pdot" aria-hidden="true"></span>
+    <h3>Gyaan.Bro</h3>
+    <p>Questions, context, and knowledge that keep moving.</p>
+    <span class="farrow" aria-hidden="true">→</span>
+  </a>
+  <a class="frow reveal" href="/feed.html#life">
+    <span class="pdot" aria-hidden="true"></span>
+    <h3>Relax.Bro</h3>
+    <p>A calmer route from asking for help to finding it.</p>
+    <span class="farrow" aria-hidden="true">→</span>
+  </a>
+  <a class="frow reveal" href="/feed.html#build-startup">
+    <span class="pdot" aria-hidden="true"></span>
+    <h3>Num.Bro</h3>
+    <p>Clearer records, shared understanding, fewer assumptions.</p>
+    <span class="farrow" aria-hidden="true">→</span>
+  </a>
+  <a class="frow reveal" href="/feed.html#meet-people">
+    <span class="pdot" aria-hidden="true"></span>
+    <h3>con.BRO</h3>
+    <p>A place for conversations that deserve to continue.</p>
+    <span class="farrow" aria-hidden="true">→</span>
+  </a>
+  <p class="family-note reveal">Coming soon — today, each door opens its corner of the feed.</p>
+  </div>
+</section>
+
+<!-- ══ 6 · RONVEY ══ -->
+<section class="ronvey panel" aria-label="RonVey — the intelligence">
+  <span class="eyebrow reveal">The Intelligence</span>
+  <h2 class="reveal">One mind behind<br>every companion. <em>RonVey.</em></h2>
+  <p class="reveal">RonVey is the reasoning architecture the whole framework thinks with. It learns you once, remembers what matters, and keeps it yours — private by design. It advises. You decide.</p>
+</section>
+
 <footer>
   <span>dotbro.in</span>
   <span class="fdot" aria-hidden="true"></span>
-  <span>Alokara</span>
+  <span style="text-transform:none">aLOKaRa</span>
 </footer>
 
 <script>
@@ -477,6 +589,8 @@ if ('IntersectionObserver' in window) {
     [principles[1], "every companion shares one brain — you never repeat yourself."],
     [principles[2], "what one companion learns is never forgotten."],
     [principles[3], "many companions. each one does exactly one job."],
+    [document.querySelector('.family .eyebrow'), "meet the family — each door opens its corner of the feed."],
+    [document.querySelector('.ronvey h2'), "and behind us all, one brain: ronvey. it advises — you decide."],
     [document.querySelector('footer'), "that's .bro. simple, right?"],
   ].map(([el, msg]) => ({ el, msg }))
    .filter(s => s.el);

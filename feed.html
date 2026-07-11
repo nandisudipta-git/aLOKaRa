@@ -289,6 +289,14 @@ CATKEYS.forEach(k=>{const [r,g,b]=CATS[k].col;
     if(S.filter)el.classList.add('on')};
   legend.appendChild(el);});
 
+/* deep link: /feed.html#study-gyaan → arrive with that cluster filtered */
+const slug=k=>k.replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');
+function applyHash(){const k=CATKEYS.find(c=>slug(c)===location.hash.slice(1));
+  if(!k)return;S.filter=k;
+  [...legend.children].forEach(c=>c.classList.remove('on'));
+  legend.children[CATKEYS.indexOf(k)].classList.add('on')}
+applyHash();addEventListener('hashchange',applyHash);
+
 /* ─── sheets ─── */
 const scrim=$('#scrim');
 function open(id){$(id).classList.add('open');scrim.classList.add('open')}
