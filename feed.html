@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>dotBro · float your question</title>
+<meta name="description" content="The question you never got to ask — float it here. Someone curious will answer.">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Space+Mono:ital,wght@0,400;0,700;1,400&family=DM+Sans:wght@300;400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --black:#090909; --white:#F5F5F0; --red:#D10000; --red2:#FF1A1A;
+  --green:#C8D400; --green2:#E2EE00; --olive:#1A1C0F; --olive2:#252A10;
+  --gray:#666660; --mgray:#333330;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{background:var(--black);color:var(--white);font-family:'DM Sans',sans-serif;
+  overflow-x:hidden;line-height:1.5;-webkit-font-smoothing:antialiased}
+a{color:inherit;text-decoration:none}
+.wrap{max-width:720px;margin:0 auto;padding:0 20px}
+
+/* header */
+header{border-bottom:1px solid var(--mgray);position:sticky;top:0;z-index:50;
+  background:rgba(9,9,9,0.82);backdrop-filter:blur(14px)}
+.bar{display:flex;align-items:center;justify-content:space-between;height:60px}
+.logo{font-family:'Bebas Neue',sans-serif;font-size:1.6rem;letter-spacing:.5px}
+.logo .dot{color:var(--green)}
+.back{font-family:'Space Mono',monospace;font-size:.68rem;color:var(--gray);
+  text-transform:uppercase;letter-spacing:1px}
+.back:hover{color:var(--green)}
+
+/* hero */
+.hero{padding:54px 0 26px;text-align:center}
+.hero h1{font-family:'Bebas Neue',sans-serif;font-size:clamp(2.4rem,7vw,4rem);
+  line-height:.98;letter-spacing:.5px}
+.hero h1 em{color:var(--green);font-style:normal}
+.hero p{font-family:'Space Mono',monospace;font-size:.78rem;color:var(--gray);
+  margin-top:14px;text-transform:uppercase;letter-spacing:1.5px}
+
+/* compose */
+.compose{background:var(--olive);border:1px solid var(--mgray);border-radius:16px;
+  padding:18px;margin:10px 0 34px}
+.compose input,.compose textarea{width:100%;background:var(--black);color:var(--white);
+  border:1px solid var(--mgray);border-radius:10px;padding:12px 14px;font-family:'DM Sans',sans-serif;
+  font-size:.95rem;resize:none;transition:border-color .2s}
+.compose input:focus,.compose textarea:focus{outline:none;border-color:var(--green)}
+.compose textarea{margin-top:10px;min-height:88px}
+.row{display:flex;align-items:center;justify-content:space-between;margin-top:12px;gap:12px}
+.count{font-family:'Space Mono',monospace;font-size:.65rem;color:var(--gray)}
+.btn{font-family:'Bebas Neue',sans-serif;letter-spacing:1px;font-size:1.05rem;
+  background:var(--green);color:var(--black);border:none;border-radius:10px;
+  padding:9px 22px;cursor:pointer;transition:transform .12s,background .2s}
+.btn:hover{background:var(--green2)}
+.btn:active{transform:scale(.97)}
+.btn:disabled{opacity:.4;cursor:not-allowed}
+
+/* feed */
+.feedhead{font-family:'Space Mono',monospace;font-size:.68rem;color:var(--gray);
+  text-transform:uppercase;letter-spacing:2px;margin-bottom:14px;
+  display:flex;align-items:center;gap:8px}
+.live{width:7px;height:7px;border-radius:50%;background:var(--green);
+  box-shadow:0 0 0 0 var(--green);animation:pulse 2s infinite}
+@keyframes pulse{0%{box-shadow:0 0 0 0 rgba(200,212,0,.6)}70%{box-shadow:0 0 0 7px rgba(200,212,0,0)}100%{box-shadow:0 0 0 0 rgba(200,212,0,0)}}
+
+.q{border:1px solid var(--mgray);border-radius:14px;padding:16px 18px;margin-bottom:16px;
+  background:linear-gradient(180deg,rgba(37,42,16,.25),transparent)}
+.q.new{animation:slidein .5s ease}
+@keyframes slidein{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:none}}
+.qmeta{display:flex;align-items:baseline;gap:10px;margin-bottom:8px}
+.qname{font-family:'Bebas Neue',sans-serif;font-size:1.15rem;letter-spacing:.4px}
+.qtime{font-family:'Space Mono',monospace;font-size:.6rem;color:var(--gray)}
+.qbody{font-size:1.02rem;white-space:pre-wrap;word-wrap:break-word}
+
+.replies{margin-top:14px;padding-left:14px;border-left:2px solid var(--olive2)}
+.r{padding:8px 0}
+.rmeta{font-family:'Space Mono',monospace;font-size:.6rem;color:var(--gray);margin-bottom:2px}
+.rmeta b{color:var(--green);font-weight:700}
+.rbody{font-size:.92rem;white-space:pre-wrap;word-wrap:break-word;color:#d8d8d0}
+
+.replybox{display:flex;gap:8px;margin-top:10px}
+.replybox input{flex:1;background:var(--black);color:var(--white);border:1px solid var(--mgray);
+  border-radius:9px;padding:8px 12px;font-family:'DM Sans',sans-serif;font-size:.88rem}
+.replybox input:focus{outline:none;border-color:var(--green)}
+.rbtn{font-family:'Space Mono',monospace;font-size:.68rem;background:transparent;
+  color:var(--green);border:1px solid var(--green);border-radius:9px;padding:0 14px;cursor:pointer}
+.rbtn:hover{background:var(--green);color:var(--black)}
+
+.empty,.loading{text-align:center;color:var(--gray);font-family:'Space Mono',monospace;
+  font-size:.75rem;padding:40px 0}
+footer{text-align:center;padding:40px 0 60px;color:var(--gray);
+  font-family:'Space Mono',monospace;font-size:.6rem;letter-spacing:1px}
+</style>
+</head>
+<body>
+<header><div class="wrap bar">
+  <a href="/" class="logo">dot<span class="dot">Bro</span></a>
+  <a href="/" class="back">← home</a>
+</div></header>
+
+<main class="wrap">
+  <section class="hero">
+    <h1>The question<br>you <em>never asked</em>.</h1>
+    <p>float it here · someone curious will answer</p>
+  </section>
+
+  <section class="compose">
+    <input id="name" type="text" placeholder="your name" maxlength="40" autocomplete="off">
+    <textarea id="body" placeholder="the question you never got to ask…" maxlength="500"></textarea>
+    <div class="row">
+      <span class="count" id="count">0 / 500</span>
+      <button class="btn" id="post">Float it →</button>
+    </div>
+  </section>
+
+  <div class="feedhead"><span class="live"></span> live · floating questions</div>
+  <section id="feed"><div class="loading">loading the space…</div></section>
+</main>
+<footer>dotBro · some conversations deserve another chance</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+/* ─── config (only this block + `db` change when we migrate to Cloudflare D1) ─── */
+const SUPABASE_URL = 'https://fliheqjbwmcoggajovln.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_qaGLnY9bUZ3nhveVw-64xg_kDuJLfHt';
+const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+/* ─── data layer (portable seam) ─── */
+const db = {
+  listQuestions: () => sb.from('questions').select('*').order('created_at',{ascending:false}).limit(200),
+  listReplies:   () => sb.from('replies').select('*').order('created_at',{ascending:true}),
+  addQuestion:  (name,body) => sb.from('questions').insert({name,body}).select().single(),
+  addReply: (question_id,name,body) => sb.from('replies').insert({question_id,name,body}).select().single(),
+  onQuestion:(cb)=>sb.channel('q').on('postgres_changes',{event:'INSERT',schema:'public',table:'questions'},p=>cb(p.new)).subscribe(),
+  onReply:(cb)=>sb.channel('r').on('postgres_changes',{event:'INSERT',schema:'public',table:'replies'},p=>cb(p.new)).subscribe(),
+};
+
+/* ─── helpers ─── */
+const $ = s => document.querySelector(s);
+const esc = s => { const d=document.createElement('div'); d.textContent=s; return d.innerHTML; };
+function ago(ts){
+  const s=Math.floor((Date.now()-new Date(ts).getTime())/1000);
+  if(s<60)return'just now'; const m=Math.floor(s/60); if(m<60)return m+'m ago';
+  const h=Math.floor(m/60); if(h<24)return h+'h ago'; return Math.floor(h/24)+'d ago';
+}
+const state = { questions:new Map(), repliesByQ:new Map() };
+
+/* ─── render ─── */
+function replyHtml(r){
+  return `<div class="r"><div class="rmeta"><b>${esc(r.name)}</b> · ${ago(r.created_at)}</div>`+
+         `<div class="rbody">${esc(r.body)}</div></div>`;
+}
+function questionHtml(q){
+  const rs=(state.repliesByQ.get(q.id)||[]).map(replyHtml).join('');
+  return `<article class="q" data-q="${q.id}">
+    <div class="qmeta"><span class="qname">${esc(q.name)}</span><span class="qtime">${ago(q.created_at)}</span></div>
+    <div class="qbody">${esc(q.body)}</div>
+    <div class="replies" data-replies="${q.id}">${rs}</div>
+    <div class="replybox">
+      <input type="text" placeholder="answer / discuss…" maxlength="500" data-input="${q.id}">
+      <button class="rbtn" data-reply="${q.id}">send</button>
+    </div>
+  </article>`;
+}
+function renderFeed(){
+  const feed=$('#feed');
+  const qs=[...state.questions.values()].sort((a,b)=>new Date(b.created_at)-new Date(a.created_at));
+  if(!qs.length){feed.innerHTML='<div class="empty">no questions yet — float the first one ↑</div>';return;}
+  feed.innerHTML=qs.map(questionHtml).join('');
+}
+
+/* ─── actions ─── */
+async function postQuestion(){
+  const name=$('#name').value.trim(), body=$('#body').value.trim();
+  if(name.length<1||body.length<3){alert('add your name and a real question (3+ chars).');return;}
+  const btn=$('#post'); btn.disabled=true;
+  localStorage.setItem('dotbro_name',name);
+  const {data,error}=await db.addQuestion(name,body);
+  btn.disabled=false;
+  if(error){alert('could not float that — try again.');return;}
+  $('#body').value=''; $('#count').textContent='0 / 500';
+  if(data && !state.questions.has(data.id)){state.questions.set(data.id,data);renderFeed();}
+}
+async function postReply(qid,input){
+  const name=($('#name').value.trim())||localStorage.getItem('dotbro_name')||'anon';
+  const body=input.value.trim(); if(body.length<1)return;
+  localStorage.setItem('dotbro_name',name); input.disabled=true;
+  const {data,error}=await db.addReply(qid,name,body);
+  input.disabled=false;
+  if(error){alert('reply failed — try again.');return;}
+  input.value='';
+  if(data){addReplyToState(data);}
+}
+function addReplyToState(r){
+  const arr=state.repliesByQ.get(r.question_id)||[];
+  if(arr.some(x=>x.id===r.id))return;
+  arr.push(r); arr.sort((a,b)=>new Date(a.created_at)-new Date(b.created_at));
+  state.repliesByQ.set(r.question_id,arr);
+  const box=document.querySelector(`[data-replies="${r.question_id}"]`);
+  if(box)box.innerHTML=arr.map(replyHtml).join('');
+}
+
+/* ─── boot ─── */
+async function boot(){
+  const saved=localStorage.getItem('dotbro_name'); if(saved)$('#name').value=saved;
+  $('#body').addEventListener('input',e=>$('#count').textContent=`${e.target.value.length} / 500`);
+  $('#post').addEventListener('click',postQuestion);
+  $('#feed').addEventListener('click',e=>{
+    const b=e.target.closest('[data-reply]'); if(!b)return;
+    const qid=b.getAttribute('data-reply');
+    postReply(qid,document.querySelector(`[data-input="${qid}"]`));
+  });
+  $('#feed').addEventListener('keydown',e=>{
+    if(e.key==='Enter'&&e.target.matches('[data-input]')){e.preventDefault();
+      const qid=e.target.getAttribute('data-input');postReply(qid,e.target);}
+  });
+
+  const [{data:qs},{data:rs}]=await Promise.all([db.listQuestions(),db.listReplies()]);
+  (qs||[]).forEach(q=>state.questions.set(q.id,q));
+  (rs||[]).forEach(addReplyToStateSilent);
+  renderFeed();
+
+  db.onQuestion(q=>{ if(!state.questions.has(q.id)){state.questions.set(q.id,q);renderFeed();
+    const el=document.querySelector(`[data-q="${q.id}"]`); if(el)el.classList.add('new');}});
+  db.onReply(addReplyToState);
+  setInterval(()=>document.querySelectorAll('.qtime').forEach(()=>{}),60000);
+}
+function addReplyToStateSilent(r){
+  const arr=state.repliesByQ.get(r.question_id)||[]; arr.push(r);
+  state.repliesByQ.set(r.question_id,arr);
+}
+boot();
+</script>
+</body>
+</html>
