@@ -2,233 +2,360 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>dotBro · float your question</title>
-<meta name="description" content="The question you never got to ask — float it here. Someone curious will answer.">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>dotBro · the space</title>
+<meta name="description" content="Float the question you never got to ask into the space. Watch it find its people.">
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Space+Mono:ital,wght@0,400;0,700;1,400&family=DM+Sans:wght@300;400;500;700&display=swap" rel="stylesheet">
 <style>
 :root{
-  --black:#090909; --white:#F5F5F0; --red:#D10000; --red2:#FF1A1A;
-  --green:#C8D400; --green2:#E2EE00; --olive:#1A1C0F; --olive2:#252A10;
+  --black:#090909; --white:#F5F5F0; --red:#D10000;
+  --green:#C8D400; --green2:#E2EE00; --olive:#1A1C0F;
   --gray:#666660; --mgray:#333330;
 }
 *{margin:0;padding:0;box-sizing:border-box}
-html{scroll-behavior:smooth}
-body{background:var(--black);color:var(--white);font-family:'DM Sans',sans-serif;
-  overflow-x:hidden;line-height:1.5;-webkit-font-smoothing:antialiased}
+html,body{height:100%;overscroll-behavior:none}
+body{background:var(--black);color:var(--white);font-family:'DM Sans',sans-serif;overflow:hidden;
+  -webkit-font-smoothing:antialiased}
 a{color:inherit;text-decoration:none}
-.wrap{max-width:720px;margin:0 auto;padding:0 20px}
+canvas{display:block;position:fixed;inset:0;cursor:crosshair}
 
-/* header */
-header{border-bottom:1px solid var(--mgray);position:sticky;top:0;z-index:50;
-  background:rgba(9,9,9,0.82);backdrop-filter:blur(14px)}
-.bar{display:flex;align-items:center;justify-content:space-between;height:60px}
-.logo{font-family:'Bebas Neue',sans-serif;font-size:1.6rem;letter-spacing:.5px}
+/* top bar */
+.bar{position:fixed;top:0;left:0;right:0;z-index:40;display:flex;align-items:center;
+  justify-content:space-between;padding:14px 20px;pointer-events:none}
+.bar>*{pointer-events:auto}
+.logo{font-family:'Bebas Neue',sans-serif;font-size:1.5rem;letter-spacing:.5px}
 .logo .dot{color:var(--green)}
-.back{font-family:'Space Mono',monospace;font-size:.68rem;color:var(--gray);
-  text-transform:uppercase;letter-spacing:1px}
-.back:hover{color:var(--green)}
-
-/* hero */
-.hero{padding:54px 0 26px;text-align:center}
-.hero h1{font-family:'Bebas Neue',sans-serif;font-size:clamp(2.4rem,7vw,4rem);
-  line-height:.98;letter-spacing:.5px}
-.hero h1 em{color:var(--green);font-style:normal}
-.hero p{font-family:'Space Mono',monospace;font-size:.78rem;color:var(--gray);
-  margin-top:14px;text-transform:uppercase;letter-spacing:1.5px}
-
-/* compose */
-.compose{background:var(--olive);border:1px solid var(--mgray);border-radius:16px;
-  padding:18px;margin:10px 0 34px}
-.compose input,.compose textarea{width:100%;background:var(--black);color:var(--white);
-  border:1px solid var(--mgray);border-radius:10px;padding:12px 14px;font-family:'DM Sans',sans-serif;
-  font-size:.95rem;resize:none;transition:border-color .2s}
-.compose input:focus,.compose textarea:focus{outline:none;border-color:var(--green)}
-.compose textarea{margin-top:10px;min-height:88px}
-.row{display:flex;align-items:center;justify-content:space-between;margin-top:12px;gap:12px}
-.count{font-family:'Space Mono',monospace;font-size:.65rem;color:var(--gray)}
-.btn{font-family:'Bebas Neue',sans-serif;letter-spacing:1px;font-size:1.05rem;
-  background:var(--green);color:var(--black);border:none;border-radius:10px;
-  padding:9px 22px;cursor:pointer;transition:transform .12s,background .2s}
-.btn:hover{background:var(--green2)}
-.btn:active{transform:scale(.97)}
-.btn:disabled{opacity:.4;cursor:not-allowed}
-
-/* feed */
-.feedhead{font-family:'Space Mono',monospace;font-size:.68rem;color:var(--gray);
-  text-transform:uppercase;letter-spacing:2px;margin-bottom:14px;
-  display:flex;align-items:center;gap:8px}
-.live{width:7px;height:7px;border-radius:50%;background:var(--green);
-  box-shadow:0 0 0 0 var(--green);animation:pulse 2s infinite}
+.live-count{font-family:'Space Mono',monospace;font-size:.62rem;color:var(--gray);
+  text-transform:uppercase;letter-spacing:1.5px;display:flex;align-items:center;gap:7px}
+.pulse{width:7px;height:7px;border-radius:50%;background:var(--green);
+  animation:pulse 2s infinite}
 @keyframes pulse{0%{box-shadow:0 0 0 0 rgba(200,212,0,.6)}70%{box-shadow:0 0 0 7px rgba(200,212,0,0)}100%{box-shadow:0 0 0 0 rgba(200,212,0,0)}}
 
-.q{border:1px solid var(--mgray);border-radius:14px;padding:16px 18px;margin-bottom:16px;
-  background:linear-gradient(180deg,rgba(37,42,16,.25),transparent)}
-.q.new{animation:slidein .5s ease}
-@keyframes slidein{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:none}}
-.qmeta{display:flex;align-items:baseline;gap:10px;margin-bottom:8px}
-.qname{font-family:'Bebas Neue',sans-serif;font-size:1.15rem;letter-spacing:.4px}
-.qtime{font-family:'Space Mono',monospace;font-size:.6rem;color:var(--gray)}
-.qbody{font-size:1.02rem;white-space:pre-wrap;word-wrap:break-word}
+/* float button */
+.fab{position:fixed;bottom:26px;left:50%;transform:translateX(-50%);z-index:40;
+  font-family:'Bebas Neue',sans-serif;font-size:1.15rem;letter-spacing:1.2px;
+  background:var(--green);color:var(--black);border:none;border-radius:999px;
+  padding:13px 30px;cursor:pointer;box-shadow:0 8px 30px rgba(200,212,0,.25);
+  transition:transform .15s,background .2s}
+.fab:hover{background:var(--green2);transform:translateX(-50%) scale(1.04)}
+.fab:active{transform:translateX(-50%) scale(.97)}
 
-.replies{margin-top:14px;padding-left:14px;border-left:2px solid var(--olive2)}
-.r{padding:8px 0}
-.rmeta{font-family:'Space Mono',monospace;font-size:.6rem;color:var(--gray);margin-bottom:2px}
-.rmeta b{color:var(--green);font-weight:700}
-.rbody{font-size:.92rem;white-space:pre-wrap;word-wrap:break-word;color:#d8d8d0}
+/* legend */
+.legend{position:fixed;bottom:24px;left:18px;z-index:30;display:flex;flex-direction:column;gap:5px;
+  font-family:'Space Mono',monospace;font-size:.56rem;letter-spacing:1px;text-transform:uppercase;
+  color:rgba(245,245,240,.38)}
+.legend .li{display:flex;align-items:center;gap:7px;cursor:pointer;transition:color .2s}
+.legend .li:hover,.legend .li.on{color:rgba(245,245,240,.9)}
+.legend .ld{width:8px;height:8px;border-radius:50%}
+@media(max-width:640px){.legend{display:none}}
 
-.replybox{display:flex;gap:8px;margin-top:10px}
-.replybox input{flex:1;background:var(--black);color:var(--white);border:1px solid var(--mgray);
-  border-radius:9px;padding:8px 12px;font-family:'DM Sans',sans-serif;font-size:.88rem}
-.replybox input:focus{outline:none;border-color:var(--green)}
-.rbtn{font-family:'Space Mono',monospace;font-size:.68rem;background:transparent;
-  color:var(--green);border:1px solid var(--green);border-radius:9px;padding:0 14px;cursor:pointer}
+/* hover tooltip (desktop) */
+#tip{position:fixed;pointer-events:none;z-index:45;background:rgba(9,9,9,.96);
+  border:1px solid var(--mgray);border-radius:10px;padding:10px 13px;max-width:240px;
+  font-size:.8rem;line-height:1.45;opacity:0;transition:opacity .15s}
+#tip .c{font-family:'Space Mono',monospace;font-size:.55rem;letter-spacing:1.5px;
+  text-transform:uppercase;margin-bottom:4px}
+#tip .n{color:var(--gray);font-family:'Space Mono',monospace;font-size:.58rem;margin-top:5px}
+
+/* panels (compose + question) */
+.sheet{position:fixed;z-index:60;background:#101008;border:1px solid var(--mgray);
+  display:none;flex-direction:column;overflow:hidden}
+.sheet.open{display:flex}
+@media(min-width:641px){
+  .sheet{top:0;right:0;bottom:0;width:min(430px,92vw);border-width:0 0 0 1px;
+    animation:slideL .25s ease}
+  @keyframes slideL{from{transform:translateX(30px);opacity:0}to{transform:none;opacity:1}}
+}
+@media(max-width:640px){
+  .sheet{left:0;right:0;bottom:0;max-height:82vh;border-radius:20px 20px 0 0;
+    border-width:1px 0 0 0;animation:slideU .25s ease}
+  @keyframes slideU{from{transform:translateY(40px);opacity:0}to{transform:none;opacity:1}}
+}
+.sh-head{display:flex;align-items:center;justify-content:space-between;
+  padding:16px 20px;border-bottom:1px solid var(--mgray)}
+.sh-title{font-family:'Bebas Neue',sans-serif;font-size:1.3rem;letter-spacing:.6px}
+.x{background:none;border:none;color:var(--gray);font-size:1.5rem;cursor:pointer;line-height:1}
+.x:hover{color:var(--white)}
+.sh-body{padding:18px 20px;overflow-y:auto;flex:1}
+
+/* compose */
+.sh-body input[type=text],.sh-body textarea{width:100%;background:var(--black);color:var(--white);
+  border:1px solid var(--mgray);border-radius:10px;padding:12px 14px;
+  font-family:'DM Sans',sans-serif;font-size:.95rem;resize:none;transition:border-color .2s}
+.sh-body input:focus,.sh-body textarea:focus{outline:none;border-color:var(--green)}
+.sh-body textarea{margin-top:10px;min-height:96px}
+.cats{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
+.chip{font-family:'Space Mono',monospace;font-size:.62rem;letter-spacing:1px;text-transform:uppercase;
+  border:1px solid var(--mgray);background:none;color:var(--gray);border-radius:999px;
+  padding:7px 13px;cursor:pointer;transition:all .15s}
+.chip.on{color:var(--black);font-weight:700}
+.crow{display:flex;align-items:center;justify-content:space-between;margin-top:16px}
+.count{font-family:'Space Mono',monospace;font-size:.62rem;color:var(--gray)}
+.btn{font-family:'Bebas Neue',sans-serif;letter-spacing:1px;font-size:1.05rem;
+  background:var(--green);color:var(--black);border:none;border-radius:10px;
+  padding:10px 24px;cursor:pointer;transition:transform .12s,background .2s}
+.btn:hover{background:var(--green2)}.btn:active{transform:scale(.97)}
+.btn:disabled{opacity:.4;cursor:not-allowed}
+
+/* question view */
+.qcat{font-family:'Space Mono',monospace;font-size:.58rem;letter-spacing:1.5px;text-transform:uppercase}
+.qbody{font-size:1.15rem;line-height:1.5;margin:10px 0 6px;white-space:pre-wrap;word-wrap:break-word}
+.qmeta{font-family:'Space Mono',monospace;font-size:.6rem;color:var(--gray)}
+.replies{margin-top:18px;border-top:1px solid var(--mgray);padding-top:6px}
+.r{padding:11px 0;border-bottom:1px solid rgba(51,51,48,.5)}
+.rmeta{font-family:'Space Mono',monospace;font-size:.58rem;color:var(--gray);margin-bottom:3px}
+.rmeta b{color:var(--green)}
+.rbody{font-size:.92rem;line-height:1.5;color:#ddddd5;white-space:pre-wrap;word-wrap:break-word}
+.replybar{display:flex;gap:8px;padding:14px 20px;border-top:1px solid var(--mgray)}
+.replybar input{flex:1;background:var(--black);color:var(--white);border:1px solid var(--mgray);
+  border-radius:9px;padding:10px 13px;font-family:'DM Sans',sans-serif;font-size:.9rem}
+.replybar input:focus{outline:none;border-color:var(--green)}
+.rbtn{font-family:'Space Mono',monospace;font-size:.68rem;background:transparent;color:var(--green);
+  border:1px solid var(--green);border-radius:9px;padding:0 16px;cursor:pointer}
 .rbtn:hover{background:var(--green);color:var(--black)}
-
-.empty,.loading{text-align:center;color:var(--gray);font-family:'Space Mono',monospace;
-  font-size:.75rem;padding:40px 0}
-footer{text-align:center;padding:40px 0 60px;color:var(--gray);
-  font-family:'Space Mono',monospace;font-size:.6rem;letter-spacing:1px}
+.hint{position:fixed;bottom:26px;right:20px;z-index:30;text-align:right;
+  font-family:'Space Mono',monospace;font-size:.55rem;letter-spacing:1.5px;text-transform:uppercase;
+  color:rgba(245,245,240,.22);line-height:1.9}
+@media(max-width:640px){.hint{display:none}}
+.scrim{position:fixed;inset:0;z-index:50;background:rgba(0,0,0,.5);display:none}
+.scrim.open{display:block}
 </style>
 </head>
 <body>
-<header><div class="wrap bar">
+<canvas id="c"></canvas>
+
+<div class="bar">
   <a href="/" class="logo">dot<span class="dot">Bro</span></a>
-  <a href="/" class="back">← home</a>
-</div></header>
+  <div class="live-count"><span class="pulse"></span><span id="nq">0</span> questions floating</div>
+</div>
 
-<main class="wrap">
-  <section class="hero">
-    <h1>The question<br>you <em>never asked</em>.</h1>
-    <p>float it here · someone curious will answer</p>
-  </section>
+<div class="legend" id="legend"></div>
+<div class="hint">hover — read it<br>click — open it<br>move — feel the pull</div>
+<div id="tip"><div class="c" id="tipc"></div><div id="tipq"></div><div class="n" id="tipn"></div></div>
 
-  <section class="compose">
+<button class="fab" id="fab">Float a question →</button>
+<div class="scrim" id="scrim"></div>
+
+<!-- compose sheet -->
+<div class="sheet" id="compose">
+  <div class="sh-head"><span class="sh-title">Float it into the space</span><button class="x" data-close>&times;</button></div>
+  <div class="sh-body">
     <input id="name" type="text" placeholder="your name" maxlength="40" autocomplete="off">
     <textarea id="body" placeholder="the question you never got to ask…" maxlength="500"></textarea>
-    <div class="row">
+    <div class="cats" id="cats"></div>
+    <div class="crow">
       <span class="count" id="count">0 / 500</span>
       <button class="btn" id="post">Float it →</button>
     </div>
-  </section>
+  </div>
+</div>
 
-  <div class="feedhead"><span class="live"></span> live · floating questions</div>
-  <section id="feed"><div class="loading">loading the space…</div></section>
-</main>
-<footer>dotBro · some conversations deserve another chance</footer>
+<!-- question sheet -->
+<div class="sheet" id="qsheet">
+  <div class="sh-head"><span class="sh-title">Floating question</span><button class="x" data-close>&times;</button></div>
+  <div class="sh-body" id="qview"></div>
+  <div class="replybar">
+    <input id="rinput" type="text" placeholder="answer / discuss…" maxlength="500">
+    <button class="rbtn" id="rsend">send</button>
+  </div>
+</div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
-/* ─── config (only this block + `db` change when we migrate to Cloudflare D1) ─── */
-const SUPABASE_URL = 'https://fliheqjbwmcoggajovln.supabase.co';
-const SUPABASE_KEY = 'sb_publishable_qaGLnY9bUZ3nhveVw-64xg_kDuJLfHt';
-const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-
-/* ─── data layer (portable seam) ─── */
-const db = {
-  listQuestions: () => sb.from('questions').select('*').order('created_at',{ascending:false}).limit(200),
-  listReplies:   () => sb.from('replies').select('*').order('created_at',{ascending:true}),
-  addQuestion:  (name,body) => sb.from('questions').insert({name,body}).select().single(),
-  addReply: (question_id,name,body) => sb.from('replies').insert({question_id,name,body}).select().single(),
-  onQuestion:(cb)=>sb.channel('q').on('postgres_changes',{event:'INSERT',schema:'public',table:'questions'},p=>cb(p.new)).subscribe(),
-  onReply:(cb)=>sb.channel('r').on('postgres_changes',{event:'INSERT',schema:'public',table:'replies'},p=>cb(p.new)).subscribe(),
+/* ─── config + data layer (the only part that changes when we migrate hosts) ─── */
+const SUPABASE_URL='https://fliheqjbwmcoggajovln.supabase.co';
+const SUPABASE_KEY='sb_publishable_qaGLnY9bUZ3nhveVw-64xg_kDuJLfHt';
+const sb=supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
+const db={
+  listQuestions:()=>sb.from('questions').select('*').order('created_at',{ascending:false}).limit(300),
+  listReplies:()=>sb.from('replies').select('*').order('created_at',{ascending:true}),
+  addQuestion:(name,body,category)=>sb.from('questions').insert({name,body,category}).select().single(),
+  addReply:(question_id,name,body)=>sb.from('replies').insert({question_id,name,body}).select().single(),
+  onQuestion:cb=>sb.channel('q').on('postgres_changes',{event:'INSERT',schema:'public',table:'questions'},p=>cb(p.new)).subscribe(),
+  onReply:cb=>sb.channel('r').on('postgres_changes',{event:'INSERT',schema:'public',table:'replies'},p=>cb(p.new)).subscribe(),
 };
 
-/* ─── helpers ─── */
-const $ = s => document.querySelector(s);
-const esc = s => { const d=document.createElement('div'); d.textContent=s; return d.innerHTML; };
-function ago(ts){
-  const s=Math.floor((Date.now()-new Date(ts).getTime())/1000);
-  if(s<60)return'just now'; const m=Math.floor(s/60); if(m<60)return m+'m ago';
-  const h=Math.floor(m/60); if(h<24)return h+'h ago'; return Math.floor(h/24)+'d ago';
-}
-const state = { questions:new Map(), repliesByQ:new Map() };
+/* ─── categories = clusters. seeds of future .bros ─── */
+const CATS={
+  'ai & future':   {col:[155,135,255]},
+  'build & startup':{col:[232,163,61]},
+  'study & gyaan': {col:[200,212,0]},
+  'life':          {col:[245,245,240]},
+  'meet people':   {col:[63,167,150]},
+  'random':        {col:[220,80,70]},
+};
+const CATKEYS=Object.keys(CATS);
 
-/* ─── render ─── */
-function replyHtml(r){
-  return `<div class="r"><div class="rmeta"><b>${esc(r.name)}</b> · ${ago(r.created_at)}</div>`+
-         `<div class="rbody">${esc(r.body)}</div></div>`;
-}
-function questionHtml(q){
-  const rs=(state.repliesByQ.get(q.id)||[]).map(replyHtml).join('');
-  return `<article class="q" data-q="${q.id}">
-    <div class="qmeta"><span class="qname">${esc(q.name)}</span><span class="qtime">${ago(q.created_at)}</span></div>
-    <div class="qbody">${esc(q.body)}</div>
-    <div class="replies" data-replies="${q.id}">${rs}</div>
-    <div class="replybox">
-      <input type="text" placeholder="answer / discuss…" maxlength="500" data-input="${q.id}">
-      <button class="rbtn" data-reply="${q.id}">send</button>
-    </div>
-  </article>`;
-}
-function renderFeed(){
-  const feed=$('#feed');
-  const qs=[...state.questions.values()].sort((a,b)=>new Date(b.created_at)-new Date(a.created_at));
-  if(!qs.length){feed.innerHTML='<div class="empty">no questions yet — float the first one ↑</div>';return;}
-  feed.innerHTML=qs.map(questionHtml).join('');
-}
+/* ─── state ─── */
+const S={q:new Map(),replies:new Map(),nodes:new Map(),openId:null,cat:'random',filter:null};
+const $=s=>document.querySelector(s);
+const esc=s=>{const d=document.createElement('div');d.textContent=s;return d.innerHTML};
+const ago=ts=>{const s=Math.floor((Date.now()-new Date(ts))/1e3);if(s<60)return'just now';
+  const m=s/60|0;if(m<60)return m+'m ago';const h=m/60|0;return h<24?h+'h ago':(h/24|0)+'d ago'};
 
-/* ─── actions ─── */
-async function postQuestion(){
-  const name=$('#name').value.trim(), body=$('#body').value.trim();
-  if(name.length<1||body.length<3){alert('add your name and a real question (3+ chars).');return;}
-  const btn=$('#post'); btn.disabled=true;
-  localStorage.setItem('dotbro_name',name);
-  const {data,error}=await db.addQuestion(name,body);
-  btn.disabled=false;
-  if(error){alert('could not float that — try again.');return;}
-  $('#body').value=''; $('#count').textContent='0 / 500';
-  if(data && !state.questions.has(data.id)){state.questions.set(data.id,data);renderFeed();}
+/* ─── canvas space (physics from Ron's brain-graph prototype) ─── */
+const canvas=$('#c'),ctx=canvas.getContext('2d');
+let W,H,DPR,t=0,mouse={x:-9e3,y:-9e3},hov=null;
+const reduced=matchMedia('(prefers-reduced-motion: reduce)').matches;
+function centers(){ // category cluster centers arranged on an ellipse
+  const cx=W/2,cy=H/2,rx=W*0.30,ry=H*0.27,o={};
+  CATKEYS.forEach((k,i)=>{const a=(i/CATKEYS.length)*Math.PI*2-Math.PI/2;
+    o[k]={x:cx+Math.cos(a)*rx,y:cy+Math.sin(a)*ry}});
+  return o;
 }
-async function postReply(qid,input){
+let C={};
+function resize(){DPR=devicePixelRatio||1;W=innerWidth;H=innerHeight;
+  canvas.width=W*DPR;canvas.height=H*DPR;canvas.style.width=W+'px';canvas.style.height=H+'px';
+  ctx.setTransform(DPR,0,0,DPR,0,0);C=centers();
+  S.nodes.forEach(n=>place(n,true));}
+function gauss(){let u=Math.random(),v=Math.random();
+  return Math.sqrt(-2*Math.log(u+1e-4))*Math.cos(2*Math.PI*v)}
+function place(n,keep){const c=C[n.cat]||C['random'];
+  const sx=Math.min(W,H)*0.11,sy=Math.min(W,H)*0.09;
+  n.baseX=c.x+gauss()*sx;n.baseY=c.y+gauss()*sy;
+  if(!keep){n.x=c.x;n.y=c.y;n.pop=0}}
+function addNode(q){if(S.nodes.has(q.id))return;
+  const cat=CATS[q.category]?q.category:'random';
+  const n={id:q.id,cat,col:CATS[cat].col,phase:Math.random()*Math.PI*2,
+    x:0,y:0,vx:0,vy:0,baseX:0,baseY:0,pop:1};
+  place(n);S.nodes.set(q.id,n);}
+function nodeR(n){const nr=(S.replies.get(n.id)||[]).length;
+  return Math.min(4+Math.sqrt(nr)*2.6,13)}
+function draw(){t+=0.006;ctx.clearRect(0,0,W,H);
+  // faint category glows
+  CATKEYS.forEach(k=>{const c=C[k],[r,g,b]=CATS[k].col;
+    const gr=ctx.createRadialGradient(c.x,c.y,0,c.x,c.y,Math.min(W,H)*0.2);
+    gr.addColorStop(0,`rgba(${r},${g},${b},0.05)`);gr.addColorStop(1,'rgba(0,0,0,0)');
+    ctx.fillStyle=gr;ctx.beginPath();ctx.arc(c.x,c.y,Math.min(W,H)*0.2,0,7);ctx.fill();});
+  // physics
+  const REP=90,REP2=REP*REP;
+  hov=null;let hovD=26*26;
+  S.nodes.forEach(n=>{
+    if(!reduced){
+      const dx=n.x-mouse.x,dy=n.y-mouse.y,d2=dx*dx+dy*dy;
+      if(d2<REP2&&d2>0.1){const d=Math.sqrt(d2),f=(REP-d)/REP*2.2;n.vx+=dx/d*f;n.vy+=dy/d*f}
+      n.vx+=(n.baseX-n.x)*0.045;n.vy+=(n.baseY-n.y)*0.045;
+      n.vx+=Math.sin(t*0.7+n.phase)*0.12;n.vy+=Math.cos(t*0.5+n.phase)*0.10;
+      n.vx*=0.82;n.vy*=0.82;n.x+=n.vx;n.y+=n.vy;
+    }else{n.x=n.baseX;n.y=n.baseY}
+    if(n.pop<1)n.pop=Math.min(1,n.pop+0.04);
+    const dx2=mouse.x-n.x,dy2=mouse.y-n.y,d3=dx2*dx2+dy2*dy2;
+    if(d3<hovD&&(!S.filter||S.filter===n.cat)){hovD=d3;hov=n}});
+  // edges: question → its cluster center (hair texture)
+  S.nodes.forEach(n=>{if(S.filter&&S.filter!==n.cat)return;
+    const c=C[n.cat],[r,g,b]=n.col;
+    ctx.strokeStyle=`rgba(${r},${g},${b},0.07)`;ctx.lineWidth=0.5;
+    ctx.beginPath();ctx.moveTo(n.x,n.y);ctx.lineTo(c.x,c.y);ctx.stroke();});
+  // nodes
+  S.nodes.forEach(n=>{const dim=S.filter&&S.filter!==n.cat;
+    const [r,g,b]=n.col;const breathe=1+Math.sin(t*0.9+n.phase)*0.1;
+    const rad=nodeR(n)*breathe*n.pop*(hov===n?1.5:1);
+    const nr=(S.replies.get(n.id)||[]).length;
+    if(nr>0&&!dim){ // answered glow
+      ctx.globalAlpha=0.13;ctx.fillStyle=`rgb(${r},${g},${b})`;
+      ctx.beginPath();ctx.arc(n.x,n.y,rad*2.4,0,7);ctx.fill();ctx.globalAlpha=1;}
+    ctx.beginPath();ctx.arc(n.x,n.y,rad,0,7);
+    ctx.fillStyle=`rgba(${r},${g},${b},${dim?0.10:hov===n?1:0.82})`;ctx.fill();});
+  // tooltip
+  const tip=$('#tip');
+  if(hov&&!isTouch){const q=S.q.get(hov.id);if(q){
+    const [r,g,b]=hov.col;$('#tipc').style.color=`rgb(${r},${g},${b})`;
+    $('#tipc').textContent=hov.cat;$('#tipq').textContent=q.body.slice(0,120);
+    const nr=(S.replies.get(hov.id)||[]).length;
+    $('#tipn').textContent=q.name+' · '+ago(q.created_at)+(nr?` · ${nr} answer${nr>1?'s':''}`:' · unanswered');
+    tip.style.left=Math.min(mouse.x+16,W-260)+'px';tip.style.top=Math.min(mouse.y-10,H-110)+'px';
+    tip.style.opacity=1;canvas.style.cursor='pointer';}}
+  else{tip.style.opacity=0;canvas.style.cursor='crosshair'}
+  $('#nq').textContent=S.q.size;
+  raf=requestAnimationFrame(draw);}
+let raf;const isTouch='ontouchstart'in window;
+addEventListener('resize',resize);
+addEventListener('mousemove',e=>{mouse.x=e.clientX;mouse.y=e.clientY});
+canvas.addEventListener('click',e=>{
+  const x=e.clientX,y=e.clientY;let best=null,bd=(isTouch?34:26)**2;
+  S.nodes.forEach(n=>{if(S.filter&&S.filter!==n.cat)return;
+    const dx=x-n.x,dy=y-n.y,d=dx*dx+dy*dy;if(d<bd){bd=d;best=n}});
+  if(best)openQ(best.id);});
+document.addEventListener('visibilitychange',()=>{
+  if(document.hidden)cancelAnimationFrame(raf);else draw();});
+
+/* ─── legend (click = filter cluster) ─── */
+const legend=$('#legend');
+CATKEYS.forEach(k=>{const [r,g,b]=CATS[k].col;
+  const el=document.createElement('div');el.className='li';
+  el.innerHTML=`<div class="ld" style="background:rgb(${r},${g},${b})"></div>${k}`;
+  el.onclick=()=>{S.filter=S.filter===k?null:k;
+    [...legend.children].forEach(c=>c.classList.remove('on'));
+    if(S.filter)el.classList.add('on')};
+  legend.appendChild(el);});
+
+/* ─── sheets ─── */
+const scrim=$('#scrim');
+function open(id){$(id).classList.add('open');scrim.classList.add('open')}
+function closeAll(){document.querySelectorAll('.sheet').forEach(s=>s.classList.remove('open'));
+  scrim.classList.remove('open');S.openId=null}
+document.querySelectorAll('[data-close]').forEach(b=>b.onclick=closeAll);
+scrim.onclick=closeAll;
+addEventListener('keydown',e=>{if(e.key==='Escape')closeAll()});
+$('#fab').onclick=()=>{closeAll();open('#compose')};
+
+/* compose: category chips */
+const catsEl=$('#cats');
+CATKEYS.forEach(k=>{const [r,g,b]=CATS[k].col;
+  const c=document.createElement('button');c.className='chip';c.textContent=k;
+  c.onclick=()=>{S.cat=k;[...catsEl.children].forEach(x=>{x.classList.remove('on');x.style.background='';x.style.borderColor=''});
+    c.classList.add('on');c.style.background=`rgb(${r},${g},${b})`;c.style.borderColor=`rgb(${r},${g},${b})`};
+  catsEl.appendChild(c);
+  if(k===S.cat)setTimeout(()=>c.onclick(),0);});
+$('#body').addEventListener('input',e=>$('#count').textContent=`${e.target.value.length} / 500`);
+$('#post').onclick=async()=>{
+  const name=$('#name').value.trim(),body=$('#body').value.trim();
+  if(name.length<1||body.length<3){alert('add your name and a real question (3+ chars).');return}
+  const btn=$('#post');btn.disabled=true;localStorage.setItem('dotbro_name',name);
+  const {data,error}=await db.addQuestion(name,body,S.cat);btn.disabled=false;
+  if(error){alert('could not float that — try again.');return}
+  $('#body').value='';$('#count').textContent='0 / 500';
+  if(data&&!S.q.has(data.id)){S.q.set(data.id,data);addNode(data)}
+  closeAll();};
+
+/* question sheet */
+function renderQ(){const q=S.q.get(S.openId);if(!q)return;
+  const cat=CATS[q.category]?q.category:'random';const [r,g,b]=CATS[cat].col;
+  const rs=S.replies.get(q.id)||[];
+  $('#qview').innerHTML=
+    `<div class="qcat" style="color:rgb(${r},${g},${b})">${esc(cat)}</div>`+
+    `<div class="qbody">${esc(q.body)}</div>`+
+    `<div class="qmeta">${esc(q.name)} · ${ago(q.created_at)}</div>`+
+    `<div class="replies">`+(rs.length
+      ?rs.map(x=>`<div class="r"><div class="rmeta"><b>${esc(x.name)}</b> · ${ago(x.created_at)}</div><div class="rbody">${esc(x.body)}</div></div>`).join('')
+      :`<div class="r rmeta">no answers yet — be the first.</div>`)+`</div>`;}
+function openQ(id){closeAll();S.openId=id;open('#qsheet');renderQ();
+  setTimeout(()=>$('#rinput').focus(),150)}
+async function sendReply(){const id=S.openId;if(!id)return;
+  const input=$('#rinput'),body=input.value.trim();if(!body)return;
   const name=($('#name').value.trim())||localStorage.getItem('dotbro_name')||'anon';
-  const body=input.value.trim(); if(body.length<1)return;
-  localStorage.setItem('dotbro_name',name); input.disabled=true;
-  const {data,error}=await db.addReply(qid,name,body);
-  input.disabled=false;
-  if(error){alert('reply failed — try again.');return;}
-  input.value='';
-  if(data){addReplyToState(data);}
-}
-function addReplyToState(r){
-  const arr=state.repliesByQ.get(r.question_id)||[];
-  if(arr.some(x=>x.id===r.id))return;
-  arr.push(r); arr.sort((a,b)=>new Date(a.created_at)-new Date(b.created_at));
-  state.repliesByQ.set(r.question_id,arr);
-  const box=document.querySelector(`[data-replies="${r.question_id}"]`);
-  if(box)box.innerHTML=arr.map(replyHtml).join('');
-}
+  input.disabled=true;const {data,error}=await db.addReply(id,name,body);input.disabled=false;
+  if(error){alert('reply failed — try again.');return}
+  input.value='';if(data)pushReply(data);}
+$('#rsend').onclick=sendReply;
+$('#rinput').addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();sendReply()}});
+function pushReply(r){const arr=S.replies.get(r.question_id)||[];
+  if(arr.some(x=>x.id===r.id))return;arr.push(r);
+  arr.sort((a,b)=>new Date(a.created_at)-new Date(b.created_at));
+  S.replies.set(r.question_id,arr);
+  if(S.openId===r.question_id)renderQ();}
 
 /* ─── boot ─── */
-async function boot(){
-  const saved=localStorage.getItem('dotbro_name'); if(saved)$('#name').value=saved;
-  $('#body').addEventListener('input',e=>$('#count').textContent=`${e.target.value.length} / 500`);
-  $('#post').addEventListener('click',postQuestion);
-  $('#feed').addEventListener('click',e=>{
-    const b=e.target.closest('[data-reply]'); if(!b)return;
-    const qid=b.getAttribute('data-reply');
-    postReply(qid,document.querySelector(`[data-input="${qid}"]`));
-  });
-  $('#feed').addEventListener('keydown',e=>{
-    if(e.key==='Enter'&&e.target.matches('[data-input]')){e.preventDefault();
-      const qid=e.target.getAttribute('data-input');postReply(qid,e.target);}
-  });
-
+(async function(){
+  const saved=localStorage.getItem('dotbro_name');if(saved)$('#name').value=saved;
+  resize();
   const [{data:qs},{data:rs}]=await Promise.all([db.listQuestions(),db.listReplies()]);
-  (qs||[]).forEach(q=>state.questions.set(q.id,q));
-  (rs||[]).forEach(addReplyToStateSilent);
-  renderFeed();
-
-  db.onQuestion(q=>{ if(!state.questions.has(q.id)){state.questions.set(q.id,q);renderFeed();
-    const el=document.querySelector(`[data-q="${q.id}"]`); if(el)el.classList.add('new');}});
-  db.onReply(addReplyToState);
-  setInterval(()=>document.querySelectorAll('.qtime').forEach(()=>{}),60000);
-}
-function addReplyToStateSilent(r){
-  const arr=state.repliesByQ.get(r.question_id)||[]; arr.push(r);
-  state.repliesByQ.set(r.question_id,arr);
-}
-boot();
+  (rs||[]).forEach(r=>{const a=S.replies.get(r.question_id)||[];a.push(r);S.replies.set(r.question_id,a)});
+  (qs||[]).forEach(q=>{S.q.set(q.id,q);addNode(q)});
+  db.onQuestion(q=>{if(!S.q.has(q.id)){S.q.set(q.id,q);addNode(q)}});
+  db.onReply(pushReply);
+  draw();
+})();
 </script>
 </body>
 </html>
