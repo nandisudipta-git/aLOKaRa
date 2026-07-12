@@ -15,7 +15,7 @@ Then drive `http://localhost:8734/index.html` (landing) and `/feed.html` (the al
 
 ## Flows worth driving
 - Landing: scroll the card stack top to bottom — hero → why → how → principles → family → ronvey → footer. The companion dot should narrate each stop.
-- Family section links deep-link into the feed: `/feed.html#study-gyaan`, `#life`, `#build-startup`, `#meet-people` — the matching legend item must show as active (white/bold).
+- Family section links deep-link into the feed: `/feed.html#study-gyan`, `#life`, `#build-startup`, `#meet-people` — the matching legend item must show as active (white/bold).
 - feed.html talks to live Supabase (project `fliheqjbwmcoggajovln`) — network required; header shows "N questions floating" when connected.
 
 ## Gotchas
