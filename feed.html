@@ -119,6 +119,30 @@ canvas{display:block;position:fixed;inset:0;cursor:crosshair}
 @media(max-width:640px){.hint{display:none}}
 .scrim{position:fixed;inset:0;z-index:50;background:rgba(0,0,0,.5);display:none}
 .scrim.open{display:block}
+
+/* admin: a quiet gear in the corner, no one taps it by accident */
+.admin-chip{position:fixed;bottom:24px;right:24px;z-index:35;width:26px;height:26px;border-radius:50%;
+  background:rgba(245,245,240,.06);border:1px solid rgba(245,245,240,.12);color:rgba(245,245,240,.35);
+  display:flex;align-items:center;justify-content:center;font-size:.7rem;cursor:pointer;transition:all .2s}
+.admin-chip:hover{background:rgba(245,245,240,.12);color:rgba(245,245,240,.7)}
+.admin-chip.unlocked{border-color:var(--green);color:var(--green)}
+@media(max-width:640px){.admin-chip{bottom:90px}}
+.admin-modal{position:fixed;z-index:70;inset:0;display:none;align-items:center;justify-content:center;
+  background:rgba(0,0,0,.6)}
+.admin-modal.open{display:flex}
+.admin-box{background:#101008;border:1px solid var(--mgray);border-radius:14px;padding:20px;width:min(300px,86vw)}
+.admin-box h4{font-family:'Bebas Neue',sans-serif;font-size:1.05rem;letter-spacing:.5px;margin-bottom:12px}
+.admin-box input{width:100%;background:var(--black);color:var(--white);border:1px solid var(--mgray);
+  border-radius:9px;padding:10px 12px;font-family:'DM Sans',sans-serif;font-size:.9rem}
+.admin-box .row{display:flex;gap:8px;margin-top:12px;justify-content:flex-end}
+.admin-box .cancel{background:none;border:1px solid var(--mgray);color:var(--gray);border-radius:9px;
+  padding:8px 14px;cursor:pointer;font-family:'Space Mono',monospace;font-size:.7rem}
+.admin-err{color:var(--red);font-size:.7rem;font-family:'Space Mono',monospace;margin-top:8px;display:none}
+.qdel{margin-left:auto;background:none;border:1px solid var(--red);color:var(--red);border-radius:8px;
+  padding:5px 11px;font-family:'Space Mono',monospace;font-size:.62rem;letter-spacing:1px;text-transform:uppercase;
+  cursor:pointer;display:none}
+.qdel.show{display:inline-block}
+.qdel:hover{background:var(--red);color:var(--white)}
 </style>
 </head>
 <body>
@@ -136,6 +160,19 @@ canvas{display:block;position:fixed;inset:0;cursor:crosshair}
 <button class="fab" id="fab">Float a question →</button>
 <div class="scrim" id="scrim"></div>
 
+<div class="admin-chip" id="adminChip" title="admin">⚙</div>
+<div class="admin-modal" id="adminModal">
+  <div class="admin-box">
+    <h4>Admin unlock</h4>
+    <input id="adminPass" type="password" placeholder="passphrase" autocomplete="off">
+    <div class="admin-err" id="adminErr">wrong passphrase</div>
+    <div class="row">
+      <button class="cancel" id="adminCancel">cancel</button>
+      <button class="btn" id="adminGo">unlock</button>
+    </div>
+  </div>
+</div>
+
 <!-- compose sheet -->
 <div class="sheet" id="compose">
   <div class="sh-head"><span class="sh-title">Float it into the space</span><button class="x" data-close>&times;</button></div>
@@ -152,7 +189,7 @@ canvas{display:block;position:fixed;inset:0;cursor:crosshair}
 
 <!-- question sheet -->
 <div class="sheet" id="qsheet">
-  <div class="sh-head"><span class="sh-title">Floating question</span><button class="x" data-close>&times;</button></div>
+  <div class="sh-head"><span class="sh-title">Floating question</span><button class="qdel" id="qdel">delete</button><button class="x" data-close>&times;</button></div>
   <div class="sh-body" id="qview"></div>
   <div class="replybar">
     <input id="rinput" type="text" placeholder="answer / discuss…" maxlength="500">
@@ -296,6 +333,30 @@ function applyHash(){const k=CATKEYS.find(c=>slug(c)===location.hash.slice(1));
   [...legend.children].forEach(c=>c.classList.remove('on'));
   legend.children[CATKEYS.indexOf(k)].classList.add('on')}
 applyHash();addEventListener('hashchange',applyHash);
+
+/* ─── admin: passphrase-gated delete. server re-checks the passphrase on every
+   call — the client-side "unlocked" state only controls whether the button shows. ─── */
+const ADMIN_KEY='dotbro_admin_pass';
+const chip=$('#adminChip'),modal=$('#adminModal'),passIn=$('#adminPass'),errEl=$('#adminErr'),qdel=$('#qdel');
+function setUnlocked(on){chip.classList.toggle('unlocked',on);qdel.classList.toggle('show',on)}
+setUnlocked(!!sessionStorage.getItem(ADMIN_KEY));
+chip.onclick=()=>{modal.classList.add('open');passIn.value='';errEl.style.display='none';passIn.focus()};
+$('#adminCancel').onclick=()=>modal.classList.remove('open');
+$('#adminGo').onclick=async()=>{
+  const p=passIn.value;if(!p)return;
+  const {data}=await sb.rpc('admin_verify',{passphrase:p});
+  if(data){sessionStorage.setItem(ADMIN_KEY,p);setUnlocked(true);modal.classList.remove('open')}
+  else errEl.style.display='block';
+};
+passIn.addEventListener('keydown',e=>{if(e.key==='Enter')$('#adminGo').onclick()});
+qdel.onclick=async()=>{
+  const id=S.openId;if(!id)return;
+  const pass=sessionStorage.getItem(ADMIN_KEY);if(!pass)return;
+  if(!confirm('delete this question and its replies? this cannot be undone.'))return;
+  const {data}=await sb.rpc('admin_delete_question',{qid:id,passphrase:pass});
+  if(data){S.q.delete(id);S.replies.delete(id);S.nodes.delete(id);closeAll()}
+  else alert('delete failed — passphrase may be wrong, unlock again.');
+};
 
 /* ─── sheets ─── */
 const scrim=$('#scrim');
