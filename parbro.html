@@ -72,17 +72,18 @@ button.go:disabled{opacity:.5;cursor:not-allowed;}
 
 <div class="card" id="form">
   <p class="lede">HimShikhar ends on the 18th. Before everyone scatters — <b>one last founders' night.</b></p>
+  <p class="lede" style="color:var(--red)">Entry costs the year you were born. Everything that matters after that isn't for sale.</p>
   <p class="small">No pitching. No agenda. Max 21, founders only. The room votes the night — poll closes 14 July, 8pm, in the community.</p>
 
   <div class="rules">
-    <div class="rule"><span class="rdot"></span>Entry free. Leave anytime.</div>
-    <div class="rule"><span class="rdot"></span>Food &amp; colored water on your own bill —</div>
-    <div class="rule"><span class="rdot"></span><span class="muted">reimbursed against your House Ticket, up to ₹[your birth year].</span></div>
+    <div class="rule"><span class="rdot"></span>Entry: the year you were born, in ₹. Leave anytime.</div>
+    <div class="rule"><span class="rdot"></span>It pre-loads your House Ticket — food, colored water, stay.</div>
+    <div class="rule"><span class="rdot"></span><span class="muted">Run past your year, the rest's on you.</span></div>
   </div>
 
   <label for="nm">Name</label>
   <input id="nm" type="text" maxlength="40" placeholder="who's coming" autocomplete="off">
-  <label for="by">Birth year <span style="text-transform:none">(it's your ticket amount, in ₹)</span></label>
+  <label for="by">Birth year <span style="text-transform:none">(your entry — and your ticket balance, in ₹)</span></label>
   <input id="by" type="number" min="1900" max="2010" placeholder="1998" autocomplete="off">
   <label for="bl">What are you building? <span style="text-transform:none">(one line)</span></label>
   <input id="bl" type="text" maxlength="140" placeholder="optional, but it helps" autocomplete="off">
@@ -100,7 +101,7 @@ button.go:disabled{opacity:.5;cursor:not-allowed;}
   <div class="tkt">
     <div class="t-eyebrow">House Ticket · par.BRO · one night only</div>
     <div class="t-name" id="tName"></div>
-    <div class="t-amt">covers you up to <b id="tAmt"></b> — food, colored water, stay</div>
+    <div class="t-amt">loaded with <b id="tAmt"></b> — food, colored water, stay</div>
     <div class="t-row">
       <span class="t-code" id="tCode"></span>
       <span class="t-dot"></span>
