@@ -38,7 +38,7 @@ canvas:active{cursor:grabbing;}
 .botleft{bottom:0;left:0;padding:18px 22px;}
 .legend{display:flex;flex-direction:column;gap:4px;pointer-events:auto;}
 .lg{display:flex;align-items:center;gap:7px;font-size:8.5px;letter-spacing:.08em;text-transform:uppercase;
-  color:var(--dim);cursor:pointer;}
+  color:var(--dim);cursor:pointer;transition:color .15s ease;}
 .lg:hover,.lg.on{color:var(--paper);}
 .lg .sw{width:7px;height:7px;border-radius:50%;flex-shrink:0;border:1px solid rgba(0,0,0,.15);}
 @media(max-width:640px){.botleft{display:none;}}
@@ -47,10 +47,13 @@ canvas:active{cursor:grabbing;}
   text-transform:uppercase;color:rgba(0,0,0,.28);line-height:1.8;pointer-events:none;}
 @media(max-width:640px){.hint{display:none;}}
 
-#tip{position:fixed;pointer-events:none;z-index:20;max-width:260px;padding:10px 13px;
+#leader{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:19;}
+#leaderPath{opacity:0;transition:opacity .15s ease;}
+#leaderDot{opacity:0;transition:opacity .15s ease;}
+
+#tip{position:fixed;pointer-events:none;z-index:20;max-width:250px;padding:10px 13px;
   background:rgba(255,255,255,.97);border:1px solid var(--hair);border-radius:9px;
-  box-shadow:0 8px 30px rgba(0,0,0,.12);opacity:0;transition:opacity .12s ease;
-  transform:translate(-50%,calc(-100% - 16px));}
+  box-shadow:0 10px 28px rgba(0,0,0,.14);opacity:0;transition:opacity .15s ease;}
 #tip .tc{font-size:8px;letter-spacing:.14em;text-transform:uppercase;margin-bottom:4px;}
 #tip .tq{font-size:11.5px;line-height:1.4;color:var(--paper);}
 #tip .tm{margin-top:5px;font-size:8px;color:var(--dim);}
@@ -59,18 +62,20 @@ canvas:active{cursor:grabbing;}
   font-family:'Bebas Neue',sans-serif;font-size:1.1rem;letter-spacing:1.2px;
   background:var(--paper);color:#FFFFFF;border:none;border-radius:999px;
   padding:13px 28px;cursor:pointer;box-shadow:0 8px 30px rgba(0,0,0,.18);
-  transition:transform .15s,background .2s;}
-.fab:hover{background:var(--red);transform:translateX(-50%) scale(1.04);}
+  transition:transform .18s cubic-bezier(.2,.9,.25,1),background .2s,box-shadow .2s;}
+.fab:hover{background:var(--red);transform:translateX(-50%) scale(1.045);box-shadow:0 10px 34px rgba(230,0,0,.22);}
 .fab:active{transform:translateX(-50%) scale(.97);}
 
-.scrim{position:fixed;inset:0;z-index:50;background:rgba(0,0,0,.25);display:none;}
+.scrim{position:fixed;inset:0;z-index:50;background:rgba(255,255,255,.35);
+  backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);display:none;}
 .scrim.open{display:block;}
 .sheet{position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);z-index:60;
-  width:min(440px,90vw);max-height:82vh;background:rgba(255,255,255,.98);border:1px solid rgba(0,0,0,.1);
-  border-radius:16px;box-shadow:0 20px 60px rgba(0,0,0,.14);
+  width:min(440px,90vw);max-height:82vh;background:rgba(255,255,255,.9);border:1px solid rgba(0,0,0,.1);
+  border-radius:18px;box-shadow:0 24px 70px rgba(0,0,0,.16);
+  backdrop-filter:saturate(180%) blur(20px);-webkit-backdrop-filter:saturate(180%) blur(20px);
   display:none;flex-direction:column;overflow:hidden;}
-.sheet.open{display:flex;animation:panelIn .18s ease;}
-@keyframes panelIn{from{opacity:0;transform:translate(-50%,-50%) scale(.96)}to{opacity:1;transform:translate(-50%,-50%) scale(1)}}
+.sheet.open{display:flex;animation:panelIn .22s cubic-bezier(.2,.9,.25,1);}
+@keyframes panelIn{from{opacity:0;transform:translate(-50%,-50%) scale(.95)}to{opacity:1;transform:translate(-50%,-50%) scale(1)}}
 @media(max-width:640px){.sheet{width:92vw;}}
 .sh-head{display:flex;align-items:center;justify-content:space-between;padding:15px 18px;border-bottom:1px solid rgba(0,0,0,.06);}
 .sh-title{font-family:'Bebas Neue',sans-serif;font-size:1.2rem;letter-spacing:.5px;}
@@ -89,24 +94,39 @@ canvas:active{cursor:grabbing;}
 .crow{display:flex;align-items:center;justify-content:space-between;margin-top:14px;}
 .cnt{font-size:.6rem;color:var(--dim);}
 .btn{font-family:'Bebas Neue',sans-serif;letter-spacing:1px;font-size:1rem;background:var(--paper);
-  color:#FFFFFF;border:none;border-radius:9px;padding:9px 22px;cursor:pointer;transition:transform .12s,background .2s;}
+  color:#FFFFFF;border:none;border-radius:9px;padding:9px 22px;cursor:pointer;
+  transition:transform .12s,background .2s;align-self:flex-end;}
 .btn:hover{background:var(--red);}.btn:active{transform:scale(.97);}
 .btn:disabled{opacity:.4;cursor:not-allowed;}
 .qcat{font-size:.56rem;letter-spacing:1.4px;text-transform:uppercase;}
 .qbody{font-size:1.08rem;line-height:1.5;margin:9px 0 6px;white-space:pre-wrap;word-wrap:break-word;}
 .qmeta{font-size:.58rem;color:var(--dim);}
+
+.p-actions{display:grid;grid-template-columns:repeat(4,1fr);gap:7px;margin-top:15px;}
+@media(max-width:420px){.p-actions{grid-template-columns:repeat(2,1fr);}}
+.p-btn{background:rgba(0,0,0,.03);border:1px solid rgba(0,0,0,.08);border-radius:12px;
+  padding:11px 4px;text-align:center;cursor:pointer;user-select:none;
+  transition:all .18s cubic-bezier(.2,.8,.2,1);}
+.p-btn:hover{background:rgba(230,0,0,.06);border-color:rgba(230,0,0,.25);transform:translateY(-1px);}
+.p-btn.active{background:var(--paper);border-color:var(--paper);}
+.p-btn.active .p-icon,.p-btn.active .pb-label{color:#FFFFFF;}
+.p-btn.active .pb-count{color:rgba(255,255,255,.6);}
+.p-icon{font-size:16px;margin-bottom:4px;}
+.pb-label{font-size:8px;letter-spacing:.08em;text-transform:uppercase;font-weight:700;}
+.pb-count{font-size:8px;color:var(--dim);margin-top:3px;font-variant-numeric:tabular-nums;}
+
+.p-input{display:none;flex-direction:column;gap:8px;margin-top:12px;}
+.p-input.open{display:flex;}
+.p-input input[type=text]{background:rgba(0,0,0,.03);color:var(--paper);border:1px solid rgba(0,0,0,.1);
+  border-radius:9px;padding:10px 12px;font-family:inherit;font-size:.88rem;}
+.p-input input[type=text]:focus{outline:none;border-color:rgba(230,0,0,.4);}
+
 .replies{margin-top:16px;border-top:1px solid rgba(0,0,0,.08);padding-top:5px;}
 .r{padding:10px 0;border-bottom:1px solid rgba(0,0,0,.06);}
-.rmeta{font-size:.56rem;color:var(--dim);margin-bottom:3px;}
-.rmeta b{color:var(--red);}
+.rmeta{font-size:.56rem;color:var(--dim);margin-bottom:3px;letter-spacing:.03em;}
+.rmeta b{color:var(--paper);}
+.rmeta .rk{color:var(--red);font-weight:700;letter-spacing:.1em;}
 .rbody{font-size:.88rem;line-height:1.5;color:#3c3c3c;white-space:pre-wrap;word-wrap:break-word;}
-.replybar{display:flex;gap:8px;padding:13px 18px;border-top:1px solid rgba(0,0,0,.08);}
-.replybar input{flex:1;background:rgba(0,0,0,.03);color:var(--paper);border:1px solid rgba(0,0,0,.1);border-radius:8px;
-  padding:9px 12px;font-family:inherit;font-size:.85rem;}
-.replybar input:focus{outline:none;border-color:rgba(230,0,0,.4);}
-.rbtn{font-size:.64rem;background:transparent;color:var(--red);border:1px solid var(--red);
-  border-radius:8px;padding:0 15px;cursor:pointer;font-family:inherit;}
-.rbtn:hover{background:var(--red);color:#FFFFFF;}
 </style>
 </head>
 <body>
@@ -122,6 +142,7 @@ canvas:active{cursor:grabbing;}
 <div class="hud botleft"><div class="legend" id="legend"></div></div>
 <div class="hint">hover — read it<br>drag — spin<br>scroll — zoom<br>click — open it</div>
 
+<svg id="leader"><path id="leaderPath" fill="none" stroke="rgba(0,0,0,0.22)" stroke-width="1"/><circle id="leaderDot" r="2.5" fill="rgba(0,0,0,0.35)"/></svg>
 <div id="tip"><div class="tc"></div><div class="tq"></div><div class="tm"></div></div>
 
 <button class="fab" id="fab">Float a question →</button>
@@ -145,10 +166,6 @@ canvas:active{cursor:grabbing;}
 <div class="sheet" id="qsheet">
   <div class="sh-head"><span class="sh-title">Floating question</span><button class="x" data-close>&times;</button></div>
   <div class="sh-body" id="qview"></div>
-  <div class="replybar">
-    <input id="rinput" type="text" placeholder="answer / discuss…" maxlength="500">
-    <button class="rbtn" id="rsend">send</button>
-  </div>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -156,12 +173,13 @@ canvas:active{cursor:grabbing;}
 'use strict';
 const canvas=document.getElementById('c'), ctx=canvas.getContext('2d');
 const tip=document.getElementById('tip');
+const leaderPath=document.getElementById('leaderPath'), leaderDot=document.getElementById('leaderDot');
 const $=s=>document.querySelector(s);
 const esc=s=>{const d=document.createElement('div');d.textContent=s;return d.innerHTML};
 const ago=ts=>{const s=Math.floor((Date.now()-new Date(ts))/1e3);if(s<60)return'just now';
   const m=s/60|0;if(m<60)return m+'m ago';const h=m/60|0;return h<24?h+'h ago':(h/24|0)+'d ago'};
 
-/* ─── data layer — same live tables as feed.html ─── */
+/* ─── data layer — same live tables as feed.html, replies now carry a real kind ─── */
 const SUPABASE_URL='https://fliheqjbwmcoggajovln.supabase.co';
 const SUPABASE_KEY='sb_publishable_qaGLnY9bUZ3nhveVw-64xg_kDuJLfHt';
 const sb=supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
@@ -169,7 +187,7 @@ const db={
   listQuestions:()=>sb.from('questions').select('*').order('created_at',{ascending:false}).limit(300),
   listReplies:()=>sb.from('replies').select('*').order('created_at',{ascending:true}),
   addQuestion:(name,body,category)=>sb.from('questions').insert({name,body,category}).select().single(),
-  addReply:(question_id,name,body)=>sb.from('replies').insert({question_id,name,body}).select().single(),
+  addReply:(question_id,name,body,kind)=>sb.from('replies').insert({question_id,name,body,kind}).select().single(),
   onQuestion:cb=>sb.channel('q_alge').on('postgres_changes',{event:'INSERT',schema:'public',table:'questions'},p=>cb(p.new)).subscribe(),
   onReply:cb=>sb.channel('r_alge').on('postgres_changes',{event:'INSERT',schema:'public',table:'replies'},p=>cb(p.new)).subscribe(),
 };
@@ -185,6 +203,16 @@ const CATS={
 };
 const CATKEYS=Object.keys(CATS);
 
+/* ─── the four real actions — no scores, just what each reply actually is ─── */
+const KIND_META={
+  answer:  {icon:'&#9998;', label:'Answer',  placeholder:'Write your answer…'},
+  debate:  {icon:'&#9876;', label:'Debate',  placeholder:'State your counter-position…'},
+  discuss: {icon:'&#9993;', label:'Discuss', placeholder:'Add to the discussion…'},
+  meet:    {icon:'&#9734;', label:'Meet',    placeholder:'Say why you want to meet… (optional)'},
+};
+const KIND_ORDER=['answer','debate','discuss','meet'];
+let activeKind=null;
+
 const legendBox=$('#legend');
 CATKEYS.forEach(k=>{
   const [r,g,b]=CATS[k].col;
@@ -197,13 +225,17 @@ CATKEYS.forEach(k=>{
 });
 
 let W,H,DPR,CX,CY,R;
+function computeR(){
+  const density=Math.min(1,S.nodes.size/90);
+  return Math.min(W,H)*0.28*(1+density*0.42);
+}
 function resize(){
   DPR=Math.min(devicePixelRatio||1,2); W=innerWidth; H=innerHeight;
   canvas.width=W*DPR; canvas.height=H*DPR;
   ctx.setTransform(DPR,0,0,DPR,0,0);
-  CX=W/2; CY=H*0.48; R=Math.min(W,H)*0.28;
+  CX=W/2; CY=H*0.48; R=computeR();
 }
-addEventListener('resize',resize); resize();
+addEventListener('resize',resize);
 
 /* ─── fixed per-category anchors on the sphere (Fibonacci spread) ─── */
 const GOLDEN=Math.PI*(3-Math.sqrt(5));
@@ -216,6 +248,13 @@ CATKEYS.forEach((k,i)=>{
 const S={q:new Map(),replies:new Map(),nodes:new Map(),openId:null,cat:'random',filter:null};
 function randDir(){ const u=Math.random()*2-1, th=Math.random()*Math.PI*2, s=Math.sqrt(1-u*u);
   return {x:s*Math.cos(th), y:u, z:s*Math.sin(th)}; }
+
+function kindCounts(id){
+  const rs=S.replies.get(id)||[];
+  const c={answer:0,debate:0,discuss:0,meet:0};
+  rs.forEach(r=>{const k=c[r.kind]!==undefined?r.kind:'discuss';c[k]++;});
+  return c;
+}
 
 function makeNode(id,text,cat,createdAt,incoming){
   const c=CATS[cat]?cat:'random';
@@ -231,7 +270,12 @@ function makeNode(id,text,cat,createdAt,incoming){
     px:0,py:0,pz:0,pscale:1, ppx:0,ppy:0, incoming:!!incoming,
   };
 }
-function nodeR(n){const nr=(S.replies.get(n.id)||[]).length; return Math.min(4+Math.sqrt(nr)*2.2,12)}
+function nodeR(n){
+  const nr=(S.replies.get(n.id)||[]).length;
+  const density=Math.min(1,S.nodes.size/90);
+  const base=4.6-density*1.3;
+  return Math.min(base+Math.sqrt(nr)*2.0,12);
+}
 
 let rotY=0.5,rotX=-0.18,spin=0.0012,velY=0,velX=0,dragging=false,lx=0,ly=0,zoom=1,hover=null;
 
@@ -273,26 +317,44 @@ canvas.addEventListener('pointermove',e=>{
   if(dragging){const dx=e.clientX-lx,dy=e.clientY-ly;
     rotY+=dx*0.006;rotX+=dy*0.006;rotX=Math.max(-1.3,Math.min(1.3,rotX));
     velY=dx*0.0006;velX=dy*0.0006;lx=e.clientX;ly=e.clientY;}
-  let best=null,bd=24*24;
+  const hitR=S.nodes.size>60?16:24;
+  let best=null,bd=hitR*hitR;
   for(const p of S.nodes.values()){if(p.pz>R*0.85)continue;
     if(S.filter&&S.filter!==p.cat)continue;
     const dx=e.clientX-p.px,dy=e.clientY-p.py,d2=dx*dx+dy*dy;
     if(d2<bd){bd=d2;best=p;}}
   hover=best;
-  if(best){
-    const [r,g,b]=best.col;
-    const q=S.q.get(best.id);
-    tip.querySelector('.tc').style.color=`rgb(${r},${g},${b})`;
-    tip.querySelector('.tc').textContent=best.cat;
-    tip.querySelector('.tq').textContent=best.text.slice(0,120);
-    const nr=(S.replies.get(best.id)||[]).length;
-    tip.querySelector('.tm').textContent=(q?q.name+' · ':'')+ago(best.createdAt)+(nr?` · ${nr} repl${nr>1?'ies':'y'}`:' · unanswered');
-    tip.style.left=best.px+'px';tip.style.top=best.py+'px';tip.style.opacity='1';
-    canvas.style.cursor='pointer';
-  } else {tip.style.opacity='0';if(!dragging)canvas.style.cursor='grab';}
+  canvas.style.cursor = best ? 'pointer' : (dragging?'grabbing':'grab');
 });
-canvas.addEventListener('pointerleave',()=>{tip.style.opacity='0';hover=null;});
+canvas.addEventListener('pointerleave',()=>{hover=null;});
 canvas.addEventListener('wheel',e=>{e.preventDefault();zoom=Math.max(0.5,Math.min(2.4,zoom-e.deltaY*0.001));},{passive:false});
+
+function updateCallout(){
+  if(!hover){ tip.style.opacity='0'; leaderPath.style.opacity='0'; leaderDot.style.opacity='0'; return; }
+  const p=hover, [r,g,b]=p.col;
+  const flip = p.px > W*0.6;
+  const midx=p.px+(flip?-14:14), midy=p.py-28;
+  const endx=p.px+(flip?-36:36), endy=p.py-40;
+
+  leaderPath.setAttribute('d',`M ${p.px} ${p.py} L ${midx} ${midy} L ${endx} ${endy}`);
+  leaderPath.style.opacity='1';
+  leaderDot.setAttribute('cx',p.px); leaderDot.setAttribute('cy',p.py);
+  leaderDot.setAttribute('fill',`rgb(${r},${g},${b})`); leaderDot.style.opacity='1';
+
+  tip.style.left=endx+'px'; tip.style.top=endy+'px';
+  tip.style.transform=flip?'translate(-100%,-100%)':'translate(0,-100%)';
+  tip.querySelector('.tc').style.color=`rgb(${r},${g},${b})`;
+  tip.querySelector('.tc').textContent=p.cat;
+  tip.querySelector('.tq').textContent=p.text.slice(0,120);
+  const q=S.q.get(p.id), c=kindCounts(p.id);
+  const parts=[];
+  if(c.answer) parts.push(c.answer+' answer'+(c.answer>1?'s':''));
+  if(c.debate) parts.push(c.debate+' debate'+(c.debate>1?'s':''));
+  if(c.discuss) parts.push(c.discuss+' discuss');
+  if(c.meet) parts.push(c.meet+' meet');
+  tip.querySelector('.tm').textContent=(q?q.name+' · ':'')+ago(p.createdAt)+' · '+(parts.length?parts.join(' · '):'unanswered');
+  tip.style.opacity='1';
+}
 
 function drawGlobeSkin(){
   ctx.strokeStyle='rgba(0,0,0,0.07)';ctx.lineWidth=.8;
@@ -325,8 +387,9 @@ function draw(){
     const [r,g,b]=p.col;
     const dim=S.filter&&S.filter!==p.cat;
     const depth=1-Math.min(1,Math.max(0,(p.pz+R)/(2*R)));
-    const grow=Math.min(1,(now-p.born)/600);
-    const nr=(S.replies.get(p.id)||[]).length;
+    const t=Math.min(1,(now-p.born)/650), grow=1-Math.pow(1-t,3);
+    const repliesArr=S.replies.get(p.id);
+    const nr=repliesArr?repliesArr.length:0;
     const rad=nodeR(p)*p.pscale*grow*(0.55+depth*0.55);
     const a=(0.2+depth*0.8)*(dim?0.15:1);
 
@@ -337,11 +400,21 @@ function draw(){
     ctx.strokeStyle='rgba(0,0,0,0.18)';ctx.lineWidth=1*p.pscale;ctx.stroke();
     ctx.globalAlpha=1;
 
+    if(repliesArr&&repliesArr.length&&!dim&&depth>0.25){
+      let ansCount=0; for(const rep of repliesArr) if(rep.kind==='answer') ansCount++;
+      if(ansCount>0){
+        const arcLen=Math.min(Math.PI*2, ansCount*0.7);
+        ctx.strokeStyle=`rgba(230,0,0,${0.55*depth})`;ctx.lineWidth=1.6*p.pscale;
+        ctx.beginPath();ctx.arc(p.px,p.py,rad+5,-Math.PI/2,-Math.PI/2+arcLen);ctx.stroke();
+      }
+    }
+
     if(hover&&hover.id===p.id){
       ctx.strokeStyle=`rgb(${r},${g},${b})`;ctx.lineWidth=2;
       ctx.beginPath();ctx.arc(p.px,p.py,rad+5,0,7);ctx.stroke();}
   }
 
+  updateCallout();
   nqEl.textContent=S.q.size;
   requestAnimationFrame(draw);
 }
@@ -351,13 +424,15 @@ function addNode(q,incoming){
   if(S.nodes.has(q.id))return;
   const n=makeNode(q.id,q.body,q.category,q.created_at,incoming);
   S.nodes.set(q.id,n);
+  R=computeR();
+  for(const p of S.nodes.values()) p.targetR=R;
 }
 
 /* ─── sheets ─── */
 const scrim=$('#scrim');
 function openSheet(id){$(id).classList.add('open');scrim.classList.add('open')}
 function closeAll(){document.querySelectorAll('.sheet').forEach(s=>s.classList.remove('open'));
-  scrim.classList.remove('open');S.openId=null}
+  scrim.classList.remove('open');S.openId=null;activeKind=null;}
 document.querySelectorAll('[data-close]').forEach(b=>b.onclick=closeAll);
 scrim.onclick=closeAll;
 addEventListener('keydown',e=>{if(e.key==='Escape')closeAll()});
@@ -381,26 +456,72 @@ $('#post').onclick=async()=>{
   if(data&&!S.q.has(data.id)){S.q.set(data.id,data);addNode(data,true)}
   closeAll();};
 
-function renderQ(){const q=S.q.get(S.openId);if(!q)return;
+function renderQ(){
+  const q=S.q.get(S.openId); if(!q) return;
   const [r,g,b]=CATS[q.category]?CATS[q.category].col:CATS.random.col;
-  const rs=S.replies.get(q.id)||[];
-  $('#qview').innerHTML=
+  const rs=(S.replies.get(q.id)||[]).slice().sort((a,b)=>new Date(a.created_at)-new Date(b.created_at));
+  const counts=kindCounts(q.id);
+
+  const actionsHtml=KIND_ORDER.map(k=>{
+    const m=KIND_META[k];
+    return `<div class="p-btn${activeKind===k?' active':''}" data-kind="${k}">
+      <div class="p-icon">${m.icon}</div>
+      <div class="pb-label">${m.label}</div>
+      <div class="pb-count">${counts[k]}</div>
+    </div>`;
+  }).join('');
+
+  const isMeet=activeKind==='meet';
+  const composeHtml = activeKind ? (
+    isMeet
+    ? `<div class="p-input open"><input id="pText" type="text" maxlength="200" placeholder="${KIND_META.meet.placeholder}"><button class="btn" id="pSubmit">Send interest →</button></div>`
+    : `<div class="p-input open"><textarea id="pText" maxlength="500" placeholder="${KIND_META[activeKind].placeholder}"></textarea><button class="btn" id="pSubmit">Send →</button></div>`
+  ) : '';
+
+  const repliesHtml = rs.length
+    ? rs.map(x=>`<div class="r"><div class="rmeta"><span class="rk">${(x.kind||'discuss').toUpperCase()}</span> · <b>${esc(x.name)}</b> · ${ago(x.created_at)}</div><div class="rbody">${esc(x.body)}</div></div>`).join('')
+    : `<div class="r rmeta">nothing here yet — be the first to respond.</div>`;
+
+  $('#qview').innerHTML =
     `<div class="qcat" style="color:rgb(${r},${g},${b})">${esc(q.category)}</div>`+
     `<div class="qbody">${esc(q.body)}</div>`+
     `<div class="qmeta">${esc(q.name)} · ${ago(q.created_at)}</div>`+
-    `<div class="replies">`+(rs.length
-      ?rs.map(x=>`<div class="r"><div class="rmeta"><b>${esc(x.name)}</b> · ${ago(x.created_at)}</div><div class="rbody">${esc(x.body)}</div></div>`).join('')
-      :`<div class="r rmeta">no answers yet — be the first.</div>`)+`</div>`;}
-function openQ(id){closeAll();S.openId=id;openSheet('#qsheet');renderQ();
-  setTimeout(()=>$('#rinput').focus(),150)}
-async function sendReply(){const id=S.openId;if(!id)return;
-  const input=$('#rinput'),body=input.value.trim();if(!body)return;
+    `<div class="p-actions" id="pActions">${actionsHtml}</div>`+
+    composeHtml+
+    `<div class="replies">${repliesHtml}</div>`;
+
+  $('#pActions').querySelectorAll('.p-btn').forEach(btn=>{
+    btn.onclick=()=>{
+      const k=btn.dataset.kind;
+      activeKind = (activeKind===k) ? null : k;
+      renderQ();
+      if(activeKind){ setTimeout(()=>{const el=$('#pText'); if(el) el.focus();},60); }
+    };
+  });
+  const submitBtn=$('#pSubmit');
+  if(submitBtn) submitBtn.onclick=submitAction;
+  const textEl=$('#pText');
+  if(textEl && isMeet) textEl.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();submitAction();}});
+}
+
+async function submitAction(){
+  const id=S.openId; if(!id||!activeKind) return;
+  const input=$('#pText'); const body=(input?input.value.trim():'');
+  const isMeet=activeKind==='meet';
+  const finalBody = body || (isMeet? 'wants to connect' : '');
+  if(!isMeet && finalBody.length<1) return;
   const name=($('#name').value.trim())||localStorage.getItem('dotbro_name')||'anon';
-  input.disabled=true;const {data,error}=await db.addReply(id,name,body);input.disabled=false;
-  if(error){alert('reply failed — try again.');return}
-  input.value='';if(data)pushReply(data);}
-$('#rsend').onclick=sendReply;
-$('#rinput').addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();sendReply()}});
+  const btn=$('#pSubmit'); if(btn) btn.disabled=true;
+  const {data,error}=await db.addReply(id,name,finalBody,activeKind);
+  if(btn) btn.disabled=false;
+  if(error){ alert('could not send — try again.'); return; }
+  if(data) pushReply(data);
+  activeKind=null;
+  renderQ();
+}
+
+function openQ(id){closeAll();S.openId=id;activeKind=null;openSheet('#qsheet');renderQ();}
+
 function pushReply(r){const arr=S.replies.get(r.question_id)||[];
   if(arr.some(x=>x.id===r.id))return;arr.push(r);
   arr.sort((a,b)=>new Date(a.created_at)-new Date(b.created_at));
