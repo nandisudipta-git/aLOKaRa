@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>dotBro · the alge</title>
+<meta name="description" content="Float the question you never got to ask into the space. Watch it find its people — now in 3D.">
+<meta property="og:title" content="dotBro · the alge">
+<meta property="og:description" content="Float the question you never got to ask into the space. Watch it find its people.">
+<meta property="og:image" content="https://dotbro.in/assets/og-main.png">
+<meta property="og:url" content="https://dotbro.in/alge.html">
+<link rel="icon" type="image/png" href="/assets/favicon-red.png">
+<style>
+:root{
+  --black:#090909; --white:#F5F5F0;
+  --green:#C8D400; --green2:#E2EE00; --dim:rgba(245,245,240,.38);
+  --hair:rgba(255,255,255,.08);
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html,body{height:100%;overscroll-behavior:none;}
+body{background:var(--black);color:var(--white);font-family:'Space Mono','SF Mono',ui-monospace,monospace;
+  overflow:hidden;-webkit-font-smoothing:antialiased;}
+a{color:inherit;text-decoration:none;}
+canvas{display:block;width:100%;height:100%;position:fixed;inset:0;cursor:grab;touch-action:none;}
+canvas:active{cursor:grabbing;}
+
+.hud{position:fixed;pointer-events:none;z-index:10;}
+.topleft{top:0;left:0;padding:18px 22px;}
+.brand{font-family:'Bebas Neue','Arial Narrow',sans-serif;font-size:22px;letter-spacing:.5px;}
+.brand .dot{color:var(--green);}
+.sub{margin-top:5px;font-size:9px;letter-spacing:.2em;text-transform:uppercase;color:var(--dim);}
+
+.topright{top:0;right:0;padding:18px 22px;text-align:right;pointer-events:auto;}
+.count{font-size:10px;color:var(--dim);letter-spacing:.05em;display:flex;align-items:center;gap:7px;justify-content:flex-end;}
+.count b{color:var(--white);font-weight:700;font-variant-numeric:tabular-nums;}
+.pulse{width:6px;height:6px;border-radius:50%;background:var(--green);animation:pulse 2s infinite;}
+@keyframes pulse{0%{box-shadow:0 0 0 0 rgba(200,212,0,.6)}70%{box-shadow:0 0 0 6px rgba(200,212,0,0)}100%{box-shadow:0 0 0 0 rgba(200,212,0,0)}}
+
+.botleft{bottom:0;left:0;padding:18px 22px;}
+.legend{display:flex;flex-direction:column;gap:4px;pointer-events:auto;}
+.lg{display:flex;align-items:center;gap:7px;font-size:8.5px;letter-spacing:.08em;text-transform:uppercase;
+  color:var(--dim);cursor:pointer;}
+.lg:hover,.lg.on{color:var(--white);}
+.lg .sw{width:7px;height:7px;border-radius:50%;flex-shrink:0;}
+@media(max-width:640px){.botleft{display:none;}}
+
+.hint{position:fixed;bottom:18px;right:22px;z-index:10;text-align:right;font-size:8px;letter-spacing:.12em;
+  text-transform:uppercase;color:rgba(245,245,240,.22);line-height:1.8;pointer-events:none;}
+@media(max-width:640px){.hint{display:none;}}
+
+#tip{position:fixed;pointer-events:none;z-index:20;max-width:260px;padding:10px 13px;
+  background:rgba(9,9,9,.97);border:1px solid var(--hair);border-radius:9px;
+  box-shadow:0 8px 30px rgba(0,0,0,.4);opacity:0;transition:opacity .12s ease;
+  transform:translate(-50%,calc(-100% - 16px));}
+#tip .tc{font-size:8px;letter-spacing:.14em;text-transform:uppercase;margin-bottom:4px;}
+#tip .tq{font-size:11.5px;line-height:1.4;color:var(--white);}
+#tip .tm{margin-top:5px;font-size:8px;color:var(--dim);}
+
+.fab{position:fixed;bottom:26px;left:50%;transform:translateX(-50%);z-index:15;
+  font-family:'Bebas Neue',sans-serif;font-size:1.1rem;letter-spacing:1.2px;
+  background:var(--green);color:var(--black);border:none;border-radius:999px;
+  padding:13px 28px;cursor:pointer;box-shadow:0 8px 30px rgba(200,212,0,.22);
+  transition:transform .15s,background .2s;}
+.fab:hover{background:var(--green2);transform:translateX(-50%) scale(1.04);}
+.fab:active{transform:translateX(-50%) scale(.97);}
+
+.scrim{position:fixed;inset:0;z-index:50;background:rgba(0,0,0,.55);display:none;}
+.scrim.open{display:block;}
+.sheet{position:fixed;z-index:60;background:#101008;border:1px solid #333330;
+  display:none;flex-direction:column;overflow:hidden;}
+.sheet.open{display:flex;}
+@media(min-width:641px){
+  .sheet{top:0;right:0;bottom:0;width:min(420px,92vw);border-width:0 0 0 1px;animation:slideL .22s ease;}
+  @keyframes slideL{from{transform:translateX(24px);opacity:0}to{transform:none;opacity:1}}
+}
+@media(max-width:640px){
+  .sheet{left:0;right:0;bottom:0;max-height:82vh;border-radius:18px 18px 0 0;border-width:1px 0 0 0;animation:slideU .22s ease;}
+  @keyframes slideU{from{transform:translateY(36px);opacity:0}to{transform:none;opacity:1}}
+}
+.sh-head{display:flex;align-items:center;justify-content:space-between;padding:15px 18px;border-bottom:1px solid #333330;}
+.sh-title{font-family:'Bebas Neue',sans-serif;font-size:1.2rem;letter-spacing:.5px;}
+.x{background:none;border:none;color:var(--dim);font-size:1.4rem;cursor:pointer;line-height:1;}
+.x:hover{color:var(--white);}
+.sh-body{padding:16px 18px;overflow-y:auto;flex:1;}
+.sh-body input[type=text],.sh-body textarea{width:100%;background:var(--black);color:var(--white);
+  border:1px solid #333330;border-radius:9px;padding:11px 13px;font-family:inherit;font-size:.92rem;
+  resize:none;transition:border-color .2s;}
+.sh-body input:focus,.sh-body textarea:focus{outline:none;border-color:var(--green);}
+.sh-body textarea{margin-top:9px;min-height:88px;}
+.cats{display:flex;flex-wrap:wrap;gap:7px;margin-top:12px;}
+.chip{font-size:.6rem;letter-spacing:1px;text-transform:uppercase;border:1px solid #333330;background:none;
+  color:var(--dim);border-radius:999px;padding:6px 12px;cursor:pointer;transition:all .15s;font-family:inherit;}
+.chip.on{color:var(--black);font-weight:700;}
+.crow{display:flex;align-items:center;justify-content:space-between;margin-top:14px;}
+.cnt{font-size:.6rem;color:var(--dim);}
+.btn{font-family:'Bebas Neue',sans-serif;letter-spacing:1px;font-size:1rem;background:var(--green);
+  color:var(--black);border:none;border-radius:9px;padding:9px 22px;cursor:pointer;transition:transform .12s,background .2s;}
+.btn:hover{background:var(--green2);}.btn:active{transform:scale(.97);}
+.btn:disabled{opacity:.4;cursor:not-allowed;}
+.qcat{font-size:.56rem;letter-spacing:1.4px;text-transform:uppercase;}
+.qbody{font-size:1.08rem;line-height:1.5;margin:9px 0 6px;white-space:pre-wrap;word-wrap:break-word;}
+.qmeta{font-size:.58rem;color:var(--dim);}
+.replies{margin-top:16px;border-top:1px solid #333330;padding-top:5px;}
+.r{padding:10px 0;border-bottom:1px solid rgba(51,51,48,.5);}
+.rmeta{font-size:.56rem;color:var(--dim);margin-bottom:3px;}
+.rmeta b{color:var(--green);}
+.rbody{font-size:.88rem;line-height:1.5;color:#ddddd5;white-space:pre-wrap;word-wrap:break-word;}
+.replybar{display:flex;gap:8px;padding:13px 18px;border-top:1px solid #333330;}
+.replybar input{flex:1;background:var(--black);color:var(--white);border:1px solid #333330;border-radius:8px;
+  padding:9px 12px;font-family:inherit;font-size:.85rem;}
+.replybar input:focus{outline:none;border-color:var(--green);}
+.rbtn{font-size:.64rem;background:transparent;color:var(--green);border:1px solid var(--green);
+  border-radius:8px;padding:0 15px;cursor:pointer;font-family:inherit;}
+.rbtn:hover{background:var(--green);color:var(--black);}
+</style>
+</head>
+<body>
+<canvas id="c"></canvas>
+
+<div class="hud topleft">
+  <div class="brand">dot<span class="dot">Bro</span></div>
+  <div class="sub">the alge · live</div>
+</div>
+<div class="hud topright">
+  <div class="count"><span class="pulse"></span><b id="nq">0</b> questions floating</div>
+</div>
+<div class="hud botleft"><div class="legend" id="legend"></div></div>
+<div class="hint">hover — read it<br>drag — spin<br>scroll — zoom<br>click — open it</div>
+
+<div id="tip"><div class="tc"></div><div class="tq"></div><div class="tm"></div></div>
+
+<button class="fab" id="fab">Float a question →</button>
+<div class="scrim" id="scrim"></div>
+
+<!-- compose sheet -->
+<div class="sheet" id="compose">
+  <div class="sh-head"><span class="sh-title">Float it into the space</span><button class="x" data-close>&times;</button></div>
+  <div class="sh-body">
+    <input id="name" type="text" placeholder="your name" maxlength="40" autocomplete="off">
+    <textarea id="body" placeholder="the question you never got to ask…" maxlength="500"></textarea>
+    <div class="cats" id="cats"></div>
+    <div class="crow">
+      <span class="cnt" id="count">0 / 500</span>
+      <button class="btn" id="post">Float it →</button>
+    </div>
+  </div>
+</div>
+
+<!-- question sheet -->
+<div class="sheet" id="qsheet">
+  <div class="sh-head"><span class="sh-title">Floating question</span><button class="x" data-close>&times;</button></div>
+  <div class="sh-body" id="qview"></div>
+  <div class="replybar">
+    <input id="rinput" type="text" placeholder="answer / discuss…" maxlength="500">
+    <button class="rbtn" id="rsend">send</button>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+'use strict';
+const canvas=document.getElementById('c'), ctx=canvas.getContext('2d');
+const tip=document.getElementById('tip');
+const $=s=>document.querySelector(s);
+const esc=s=>{const d=document.createElement('div');d.textContent=s;return d.innerHTML};
+const ago=ts=>{const s=Math.floor((Date.now()-new Date(ts))/1e3);if(s<60)return'just now';
+  const m=s/60|0;if(m<60)return m+'m ago';const h=m/60|0;return h<24?h+'h ago':(h/24|0)+'d ago'};
+
+/* ─── data layer — same live tables as feed.html ─── */
+const SUPABASE_URL='https://fliheqjbwmcoggajovln.supabase.co';
+const SUPABASE_KEY='sb_publishable_qaGLnY9bUZ3nhveVw-64xg_kDuJLfHt';
+const sb=supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
+const db={
+  listQuestions:()=>sb.from('questions').select('*').order('created_at',{ascending:false}).limit(300),
+  listReplies:()=>sb.from('replies').select('*').order('created_at',{ascending:true}),
+  addQuestion:(name,body,category)=>sb.from('questions').insert({name,body,category}).select().single(),
+  addReply:(question_id,name,body)=>sb.from('replies').insert({question_id,name,body}).select().single(),
+  onQuestion:cb=>sb.channel('q_alge').on('postgres_changes',{event:'INSERT',schema:'public',table:'questions'},p=>cb(p.new)).subscribe(),
+  onReply:cb=>sb.channel('r_alge').on('postgres_changes',{event:'INSERT',schema:'public',table:'replies'},p=>cb(p.new)).subscribe(),
+};
+
+/* ─── same 6 categories + colors as feed.html ─── */
+const CATS={
+  'ai & future':    {col:[155,135,255]},
+  'build & startup':{col:[232,163,61]},
+  'study & gyaan':  {col:[200,212,0]},
+  'life':           {col:[245,245,240]},
+  'meet people':    {col:[63,167,150]},
+  'random':         {col:[220,80,70]},
+};
+const CATKEYS=Object.keys(CATS);
+
+const legendBox=$('#legend');
+CATKEYS.forEach(k=>{
+  const [r,g,b]=CATS[k].col;
+  const el=document.createElement('div'); el.className='lg';
+  el.innerHTML=`<span class="sw" style="background:rgb(${r},${g},${b})"></span>${k}`;
+  el.onclick=()=>{S.filter=S.filter===k?null:k;
+    [...legendBox.children].forEach(c=>c.classList.remove('on'));
+    if(S.filter)el.classList.add('on')};
+  legendBox.appendChild(el);
+});
+
+let W,H,DPR,CX,CY,R;
+function resize(){
+  DPR=Math.min(devicePixelRatio||1,2); W=innerWidth; H=innerHeight;
+  canvas.width=W*DPR; canvas.height=H*DPR;
+  ctx.setTransform(DPR,0,0,DPR,0,0);
+  CX=W/2; CY=H*0.48; R=Math.min(W,H)*0.28;
+}
+addEventListener('resize',resize); resize();
+
+/* ─── fixed per-category anchors on the sphere (Fibonacci spread) ─── */
+const GOLDEN=Math.PI*(3-Math.sqrt(5));
+const CAT_ANCHOR={};
+CATKEYS.forEach((k,i)=>{
+  const y=1-(i/(CATKEYS.length-1))*2, rad=Math.sqrt(Math.max(0,1-y*y)), th=GOLDEN*i;
+  CAT_ANCHOR[k]={x:Math.cos(th)*rad, y, z:Math.sin(th)*rad};
+});
+
+const S={q:new Map(),replies:new Map(),nodes:new Map(),openId:null,cat:'random',filter:null};
+function randDir(){ const u=Math.random()*2-1, th=Math.random()*Math.PI*2, s=Math.sqrt(1-u*u);
+  return {x:s*Math.cos(th), y:u, z:s*Math.sin(th)}; }
+
+function makeNode(id,text,cat,createdAt,incoming){
+  const c=CATS[cat]?cat:'random';
+  const anchor=CAT_ANCHOR[c];
+  const jitter=randDir();
+  const startR=incoming?R*3.2:R*(0.85+Math.random()*0.3);
+  return {
+    id, text, cat:c, col:CATS[c].col,
+    x:(anchor.x*0.7+jitter.x*0.3)*startR, y:(anchor.y*0.7+jitter.y*0.3)*startR, z:(anchor.z*0.7+jitter.z*0.3)*startR,
+    vx:0,vy:0,vz:0, fx:0,fy:0,fz:0,
+    curR:startR, targetR:R,
+    born:performance.now(), createdAt: createdAt||new Date().toISOString(),
+    px:0,py:0,pz:0,pscale:1, ppx:0,ppy:0, incoming:!!incoming,
+  };
+}
+function nodeR(n){const nr=(S.replies.get(n.id)||[]).length; return Math.min(4+Math.sqrt(nr)*2.2,12)}
+
+let rotY=0.5,rotX=-0.18,spin=0.0012,velY=0,velX=0,dragging=false,lx=0,ly=0,zoom=1,hover=null;
+
+function physics(){
+  const nodes=[...S.nodes.values()], n=nodes.length;
+  for(let i=0;i<n;i++){const p=nodes[i];p.fx=0;p.fy=0;p.fz=0;}
+  const REP=560;
+  for(let i=0;i<n;i++){const a=nodes[i];for(let j=i+1;j<n;j++){const b=nodes[j];
+    let dx=a.x-b.x,dy=a.y-b.y,dz=a.z-b.z,d2=dx*dx+dy*dy+dz*dz+.01;
+    const d=Math.sqrt(d2),f=REP/d2;
+    const fx=dx/d*f,fy=dy/d*f,fz=dz/d*f;
+    a.fx+=fx;a.fy+=fy;a.fz+=fz;b.fx-=fx;b.fy-=fy;b.fz-=fz;}}
+  for(let i=0;i<n;i++){const p=nodes[i];
+    const anc=CAT_ANCHOR[p.cat];
+    p.fx+=(anc.x*R-p.x)*0.012; p.fy+=(anc.y*R-p.y)*0.012; p.fz+=(anc.z*R-p.z)*0.012;
+    p.vx=(p.vx+p.fx)*0.86;p.vy=(p.vy+p.fy)*0.86;p.vz=(p.vz+p.fz)*0.86;
+    p.x+=p.vx*0.08;p.y+=p.vy*0.08;p.z+=p.vz*0.08;
+    if(p.curR>p.targetR+.5)p.curR+=(p.targetR-p.curR)*0.045;
+    else{p.curR=p.targetR;p.incoming=false;}
+    const len=Math.sqrt(p.x*p.x+p.y*p.y+p.z*p.z)+1e-6;
+    p.x+=(p.x/len*p.curR-p.x)*0.22;p.y+=(p.y/len*p.curR-p.y)*0.22;p.z+=(p.z/len*p.curR-p.z)*0.22;
+  }
+}
+function project(p){
+  const cY=Math.cos(rotY),sY=Math.sin(rotY),cX=Math.cos(rotX),sX=Math.sin(rotX);
+  let x=p.x*cY-p.z*sY,z=p.x*sY+p.z*cY,y=p.y*cX-z*sX;z=p.y*sX+z*cX;
+  const fov=900*zoom,scale=fov/(fov+z+R*1.4);
+  p.px=CX+x*scale;p.py=CY+y*scale;p.pz=z;p.pscale=scale;
+}
+
+canvas.addEventListener('pointerdown',e=>{dragging=true;lx=e.clientX;ly=e.clientY;
+  try{canvas.setPointerCapture(e.pointerId);}catch(_){}});
+canvas.addEventListener('pointerup',e=>{
+  if(!dragging) return; dragging=false;
+  const dx=e.clientX-lx,dy=e.clientY-ly;
+  if(Math.abs(dx)+Math.abs(dy)<6 && hover){ openQ(hover.id); }
+});
+canvas.addEventListener('pointermove',e=>{
+  if(dragging){const dx=e.clientX-lx,dy=e.clientY-ly;
+    rotY+=dx*0.006;rotX+=dy*0.006;rotX=Math.max(-1.3,Math.min(1.3,rotX));
+    velY=dx*0.0006;velX=dy*0.0006;lx=e.clientX;ly=e.clientY;}
+  let best=null,bd=24*24;
+  for(const p of S.nodes.values()){if(p.pz>R*0.85)continue;
+    if(S.filter&&S.filter!==p.cat)continue;
+    const dx=e.clientX-p.px,dy=e.clientY-p.py,d2=dx*dx+dy*dy;
+    if(d2<bd){bd=d2;best=p;}}
+  hover=best;
+  if(best){
+    const [r,g,b]=best.col;
+    const q=S.q.get(best.id);
+    tip.querySelector('.tc').style.color=`rgb(${r},${g},${b})`;
+    tip.querySelector('.tc').textContent=best.cat;
+    tip.querySelector('.tq').textContent=best.text.slice(0,120);
+    const nr=(S.replies.get(best.id)||[]).length;
+    tip.querySelector('.tm').textContent=(q?q.name+' · ':'')+ago(best.createdAt)+(nr?` · ${nr} repl${nr>1?'ies':'y'}`:' · unanswered');
+    tip.style.left=best.px+'px';tip.style.top=best.py+'px';tip.style.opacity='1';
+    canvas.style.cursor='pointer';
+  } else {tip.style.opacity='0';if(!dragging)canvas.style.cursor='grab';}
+});
+canvas.addEventListener('pointerleave',()=>{tip.style.opacity='0';hover=null;});
+canvas.addEventListener('wheel',e=>{e.preventDefault();zoom=Math.max(0.5,Math.min(2.4,zoom-e.deltaY*0.001));},{passive:false});
+
+function drawGlobeSkin(){
+  ctx.strokeStyle='rgba(255,255,255,0.05)';ctx.lineWidth=.8;
+  const seg=48,q={};
+  for(let k=-2;k<=2;k++){const lat=k*0.42,rr=Math.cos(lat)*R,yy=Math.sin(lat)*R;ctx.beginPath();
+    for(let s=0;s<=seg;s++){const th=s/seg*Math.PI*2;q.x=Math.cos(th)*rr;q.y=yy;q.z=Math.sin(th)*rr;
+      project(q);if(s===0)ctx.moveTo(q.px,q.py);else ctx.lineTo(q.px,q.py);}ctx.stroke();}
+  for(let k=0;k<3;k++){const lon=k*Math.PI/3;ctx.beginPath();
+    for(let s=0;s<=seg;s++){const ph=s/seg*Math.PI*2;q.x=Math.cos(lon)*Math.cos(ph)*R;q.y=Math.sin(ph)*R;
+      q.z=Math.sin(lon)*Math.cos(ph)*R;project(q);if(s===0)ctx.moveTo(q.px,q.py);else ctx.lineTo(q.px,q.py);}ctx.stroke();}
+}
+
+const nqEl=$('#nq');
+function draw(){
+  ctx.fillStyle='#090909';ctx.fillRect(0,0,W,H);
+  if(!dragging){rotY+=spin+velY;rotX+=velX;velY*=0.94;velX*=0.94;rotX=Math.max(-1.3,Math.min(1.3,rotX));}
+  physics(); for(const p of S.nodes.values()) project(p);
+  drawGlobeSkin();
+
+  for(const p of S.nodes.values()){if(p.incoming&&p.ppx){const [r,g,b]=p.col;
+    const g2=ctx.createLinearGradient(p.ppx,p.ppy,p.px,p.py);
+    g2.addColorStop(0,`rgba(${r},${g},${b},0)`);g2.addColorStop(1,`rgba(${r},${g},${b},0.5)`);
+    ctx.strokeStyle=g2;ctx.lineWidth=2*p.pscale;
+    ctx.beginPath();ctx.moveTo(p.ppx,p.ppy);ctx.lineTo(p.px,p.py);ctx.stroke();}
+    p.ppx=p.px;p.ppy=p.py;}
+
+  const order=[...S.nodes.values()].sort((a,b)=>a.pz-b.pz);
+  const now=performance.now();
+  for(const p of order){
+    const [r,g,b]=p.col;
+    const dim=S.filter&&S.filter!==p.cat;
+    const depth=1-Math.min(1,Math.max(0,(p.pz+R)/(2*R)));
+    const grow=Math.min(1,(now-p.born)/600);
+    const nr=(S.replies.get(p.id)||[]).length;
+    const rad=nodeR(p)*p.pscale*grow*(0.55+depth*0.55);
+    const a=(0.2+depth*0.8)*(dim?0.15:1);
+
+    if(nr>0&&!dim){ctx.globalAlpha=a*0.15;ctx.fillStyle=`rgb(${r},${g},${b})`;
+      ctx.beginPath();ctx.arc(p.px,p.py,rad*2.2,0,7);ctx.fill();}
+    ctx.globalAlpha=a;ctx.fillStyle=`rgb(${r},${g},${b})`;
+    ctx.beginPath();ctx.arc(p.px,p.py,rad,0,7);ctx.fill();
+    ctx.globalAlpha=1;
+
+    if(hover&&hover.id===p.id){
+      ctx.strokeStyle=`rgb(${r},${g},${b})`;ctx.lineWidth=2;
+      ctx.beginPath();ctx.arc(p.px,p.py,rad+5,0,7);ctx.stroke();}
+  }
+
+  nqEl.textContent=S.q.size;
+  requestAnimationFrame(draw);
+}
+
+/* ─── real data: add / receive live ─── */
+function addNode(q,incoming){
+  if(S.nodes.has(q.id))return;
+  const n=makeNode(q.id,q.body,q.category,q.created_at,incoming);
+  S.nodes.set(q.id,n);
+}
+
+/* ─── sheets ─── */
+const scrim=$('#scrim');
+function openSheet(id){$(id).classList.add('open');scrim.classList.add('open')}
+function closeAll(){document.querySelectorAll('.sheet').forEach(s=>s.classList.remove('open'));
+  scrim.classList.remove('open');S.openId=null}
+document.querySelectorAll('[data-close]').forEach(b=>b.onclick=closeAll);
+scrim.onclick=closeAll;
+addEventListener('keydown',e=>{if(e.key==='Escape')closeAll()});
+$('#fab').onclick=()=>{closeAll();openSheet('#compose')};
+
+const catsEl=$('#cats');
+CATKEYS.forEach(k=>{const [r,g,b]=CATS[k].col;
+  const c=document.createElement('button');c.className='chip';c.textContent=k;
+  c.onclick=()=>{S.cat=k;[...catsEl.children].forEach(x=>{x.classList.remove('on');x.style.background='';x.style.borderColor=''});
+    c.classList.add('on');c.style.background=`rgb(${r},${g},${b})`;c.style.borderColor=`rgb(${r},${g},${b})`};
+  catsEl.appendChild(c);
+  if(k===S.cat)setTimeout(()=>c.onclick(),0);});
+$('#body').addEventListener('input',e=>$('#count').textContent=`${e.target.value.length} / 500`);
+$('#post').onclick=async()=>{
+  const name=$('#name').value.trim(),body=$('#body').value.trim();
+  if(name.length<1||body.length<3){alert('add your name and a real question (3+ chars).');return}
+  const btn=$('#post');btn.disabled=true;localStorage.setItem('dotbro_name',name);
+  const {data,error}=await db.addQuestion(name,body,S.cat);btn.disabled=false;
+  if(error){alert('could not float that — try again.');return}
+  $('#body').value='';$('#count').textContent='0 / 500';
+  if(data&&!S.q.has(data.id)){S.q.set(data.id,data);addNode(data,true)}
+  closeAll();};
+
+function renderQ(){const q=S.q.get(S.openId);if(!q)return;
+  const [r,g,b]=CATS[q.category]?CATS[q.category].col:CATS.random.col;
+  const rs=S.replies.get(q.id)||[];
+  $('#qview').innerHTML=
+    `<div class="qcat" style="color:rgb(${r},${g},${b})">${esc(q.category)}</div>`+
+    `<div class="qbody">${esc(q.body)}</div>`+
+    `<div class="qmeta">${esc(q.name)} · ${ago(q.created_at)}</div>`+
+    `<div class="replies">`+(rs.length
+      ?rs.map(x=>`<div class="r"><div class="rmeta"><b>${esc(x.name)}</b> · ${ago(x.created_at)}</div><div class="rbody">${esc(x.body)}</div></div>`).join('')
+      :`<div class="r rmeta">no answers yet — be the first.</div>`)+`</div>`;}
+function openQ(id){closeAll();S.openId=id;openSheet('#qsheet');renderQ();
+  setTimeout(()=>$('#rinput').focus(),150)}
+async function sendReply(){const id=S.openId;if(!id)return;
+  const input=$('#rinput'),body=input.value.trim();if(!body)return;
+  const name=($('#name').value.trim())||localStorage.getItem('dotbro_name')||'anon';
+  input.disabled=true;const {data,error}=await db.addReply(id,name,body);input.disabled=false;
+  if(error){alert('reply failed — try again.');return}
+  input.value='';if(data)pushReply(data);}
+$('#rsend').onclick=sendReply;
+$('#rinput').addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();sendReply()}});
+function pushReply(r){const arr=S.replies.get(r.question_id)||[];
+  if(arr.some(x=>x.id===r.id))return;arr.push(r);
+  arr.sort((a,b)=>new Date(a.created_at)-new Date(b.created_at));
+  S.replies.set(r.question_id,arr);
+  if(S.openId===r.question_id)renderQ();}
+
+/* ─── boot ─── */
+(async function(){
+  const saved=localStorage.getItem('dotbro_name');if(saved)$('#name').value=saved;
+  resize();
+  const [{data:qs},{data:rs}]=await Promise.all([db.listQuestions(),db.listReplies()]);
+  (rs||[]).forEach(r=>{const a=S.replies.get(r.question_id)||[];a.push(r);S.replies.set(r.question_id,a)});
+  (qs||[]).slice().reverse().forEach(q=>{S.q.set(q.id,q);addNode(q,false)});
+  db.onQuestion(q=>{if(!S.q.has(q.id)){S.q.set(q.id,q);addNode(q,true)}});
+  db.onReply(pushReply);
+  draw();
+})();
+</script>
+</body>
+</html>
