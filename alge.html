@@ -313,11 +313,12 @@ function resize(){
   canvas.width=W*DPR; canvas.height=H*DPR;
   ctx.setTransform(DPR,0,0,DPR,0,0);
   CX=W/2; CY=H*0.48; R=computeR();
-  if(!IS_STATIC)for(const p of S.arr)p.targetR=R;
+  if(!IS_STATIC)for(const p of S.arr)p.targetR=R*ORBIT;
 }
 addEventListener('resize',resize);
 
 const GOLDEN=Math.PI*(3-Math.sqrt(5));
+const ORBIT=1.16; // conversations float on a shell above the surface
 const CAT_OFF={};
 CATKEYS.forEach((k,i)=>{
   const y=1-(i/5)*2, rad=Math.sqrt(Math.max(0,1-y*y)), th=GOLDEN*i;
@@ -335,7 +336,7 @@ function makeNode(id,text,cat,createdAt,incoming,lat,lon){
   const al=Math.sqrt(ax*ax+ay*ay+az*az);
   const anchor={x:ax/al,y:ay/al,z:az/al};
   const jitter=randDir();
-  const startR=incoming?R*1.06:R*(0.85+Math.random()*0.3);
+  const startR=incoming?R*ORBIT*1.04:R*ORBIT*(0.9+Math.random()*0.2);
   const jw=incoming?0.08:0.10;
   let sx=anchor.x+jitter.x*jw,sy=anchor.y+jitter.y*jw,sz=anchor.z+jitter.z*jw;
   const sl=Math.sqrt(sx*sx+sy*sy+sz*sz);sx/=sl;sy/=sl;sz/=sl;
@@ -343,7 +344,7 @@ function makeNode(id,text,cat,createdAt,incoming,lat,lon){
     id, text, cat:c, col:CATS[c].col, anchor,
     x:sx*startR, y:sy*startR, z:sz*startR,
     vx:0,vy:0,vz:0, fx:0,fy:0,fz:0,
-    curR:startR, targetR:R,
+    curR:startR, targetR:R*ORBIT,
     born:performance.now(), createdAt: createdAt||new Date().toISOString(),
     ts:createdAt?new Date(createdAt).getTime():Date.now(),
     px:0,py:0,pz:0,pscale:1, ppx:0,ppy:0, incoming:!!incoming, la:0,
@@ -425,7 +426,7 @@ function physics(){
     a.fx+=fx;a.fy+=fy;a.fz+=fz;b.fx-=fx;b.fy-=fy;b.fz-=fz;}}
   for(let i=0;i<n;i++){const p=nodes[i];
     const anc=p.anchor;
-    p.fx+=(anc.x*R-p.x)*0.012; p.fy+=(anc.y*R-p.y)*0.012; p.fz+=(anc.z*R-p.z)*0.012;
+    p.fx+=(anc.x*R*ORBIT-p.x)*0.012; p.fy+=(anc.y*R*ORBIT-p.y)*0.012; p.fz+=(anc.z*R*ORBIT-p.z)*0.012;
     p.vx=(p.vx+p.fx)*0.86;p.vy=(p.vy+p.fy)*0.86;p.vz=(p.vz+p.fz)*0.86;
     p.x+=p.vx*0.08;p.y+=p.vy*0.08;p.z+=p.vz*0.08;
     if(p.curR>p.targetR+.5)p.curR+=(p.targetR-p.curR)*0.045;
@@ -448,7 +449,7 @@ function positionAll(now){
   if(IS_STATIC){
     const t=now*0.0006;
     for(const p of S.arr){
-      const wob=R*(1+0.009*Math.sin(t+(p.h%628)*0.01));
+      const wob=R*ORBIT*(1+0.009*Math.sin(t+(p.h%628)*0.01));
       projectXYZ(p,p.dx*wob,p.dy*wob,p.dz*wob);
     }
   }else{
@@ -729,6 +730,20 @@ function drawFull(now){
     const rad=nodeR(p)*p.pscale*grow*(0.7+depth*0.4);
     const a=(0.5+depth*0.5)*(dim?0.15:1);
 
+    if(!dim&&!p.launch&&depth>0.25){
+      const len=Math.sqrt(p.x*p.x+p.y*p.y+p.z*p.z)+1e-6;
+      const q2={};projectXYZ(q2,p.x/len*R,p.y/len*R,p.z/len*R);
+      if(q2.pz<0){
+        ctx.globalAlpha=a*0.35;
+        ctx.strokeStyle='rgba(0,0,0,0.35)';ctx.lineWidth=0.6;
+        ctx.beginPath();ctx.moveTo(q2.px,q2.py);ctx.lineTo(p.px,p.py);ctx.stroke();
+        ctx.globalAlpha=a*0.8;
+        ctx.fillStyle=`rgb(${r},${g},${b})`;
+        ctx.beginPath();ctx.arc(q2.px,q2.py,1.4,0,7);ctx.fill();
+        ctx.globalAlpha=1;
+      }
+    }
+
     if(!dim&&!IS_STATIC){ctx.globalAlpha=a*(nr?0.18:0.09);ctx.fillStyle=`rgb(${r},${g},${b})`;
       ctx.beginPath();ctx.arc(p.px,p.py,rad*2.1,0,7);ctx.fill();}
     ctx.globalAlpha=a;ctx.fillStyle='#FFFFFF';
@@ -798,7 +813,7 @@ function addNode(q,incoming){
   const n=makeNode(q.id,q.body,q.category,q.created_at,incoming,q.lat,q.lon);
   S.nodes.set(q.id,n);S.arr.push(n);
   R=computeR();
-  for(const p of S.arr)p.targetR=R;
+  for(const p of S.arr)p.targetR=R*ORBIT;
 }
 
 /* ─── sheets ─── */
