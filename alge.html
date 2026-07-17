@@ -155,8 +155,16 @@ body:not(.arrived) .hud,body:not(.arrived) .fab{opacity:0;pointer-events:none;}
 <canvas id="c"></canvas>
 
 <div class="hud topleft">
-  <div class="brand"><span class="dot"></span><span class="wm">alge</span></div>
+  <a href="/" style="pointer-events:auto;text-decoration:none;color:inherit;display:inline-block">
+    <div class="brand"><span class="dot"></span><span class="wm">alge</span></div>
+  </a>
   <div class="sub">dotBro · live</div>
+  <div style="pointer-events:auto;margin-top:9px;display:flex;gap:12px;">
+    <a href="/feed.html" style="font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:var(--dim);text-decoration:none;">the space</a>
+    <a href="https://con.dotbro.in" style="font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:var(--dim);text-decoration:none;">con.BRO</a>
+    <a href="/parbro.html" style="font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:var(--dim);text-decoration:none;">par.BRO</a>
+    <a href="/podbro.html" style="font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:#FF7A1A;text-decoration:none;">pod.BRO</a>
+  </div>
 </div>
 <div class="hud topright">
   <div class="count"><span class="pulse"></span><b id="nq">0</b> conversations floating</div>
@@ -610,23 +618,43 @@ let LAND=[];
       const x=Math.cos(th)*rad,z=Math.sin(th)*rad;
       const la=Math.asin(-fy)*180/Math.PI,lo=Math.atan2(z,x)*180/Math.PI;
       if(isLand(la,lo))dots.push({x,y:fy,z,
-        c:(la>60||la<-60)?'#C8D2C8':(i%4?'#7B9E63':'#90AC74')});}
+        t:(la>60||la<-60)?2:(i%4?0:1)});}
     LAND=dots;
   }catch(_){/* offline: abstract globe still works */}
 })();
 
+/* lit-sphere shading: fixed key light from upper-left-front */
+const LIGHT={x:-0.44,y:-0.53,z:-0.72};
+const LAND_RAMP=[[],[],[]];
+(function(){const specs=[[95,26,26,62],[95,22,30,66],[110,8,52,86]];
+  specs.forEach((s,ti)=>{for(let i=0;i<8;i++)
+    LAND_RAMP[ti].push(`hsl(${s[0]},${s[1]}%,${(s[2]+(s[3]-s[2])*i/7).toFixed(1)}%)`);});})();
+
 function drawGlobeSkin(){
   const q={};
   const sil=R*(_fov/(_fov+R*1.4));
-  const g=ctx.createRadialGradient(CX-sil*0.35,CY-sil*0.4,sil*0.1,CX,CY,sil);
-  g.addColorStop(0,'#F0F8FC');
-  g.addColorStop(0.55,'#D3E7F2');
-  g.addColorStop(1,'#A5C8DE');
-  ctx.fillStyle=g;
-  ctx.beginPath();ctx.arc(CX,CY,sil,0,7);ctx.fill();
-  ctx.strokeStyle='rgba(70,110,140,0.28)';ctx.lineWidth=1;
+  let g=ctx.createRadialGradient(CX,CY,sil*0.96,CX,CY,sil*1.07);
+  g.addColorStop(0,'rgba(140,185,225,0)');
+  g.addColorStop(0.55,'rgba(140,185,225,0.35)');
+  g.addColorStop(1,'rgba(140,185,225,0)');
+  ctx.fillStyle=g;ctx.beginPath();ctx.arc(CX,CY,sil*1.07,0,7);ctx.fill();
+  g=ctx.createRadialGradient(CX-sil*0.38,CY-sil*0.42,sil*0.08,CX,CY,sil);
+  g.addColorStop(0,'#F4FBFE');
+  g.addColorStop(0.5,'#C6DFEF');
+  g.addColorStop(1,'#8FB4CE');
+  ctx.fillStyle=g;ctx.beginPath();ctx.arc(CX,CY,sil,0,7);ctx.fill();
+  g=ctx.createRadialGradient(CX-sil*0.5,CY-sil*0.55,sil*0.35,CX-sil*0.5,CY-sil*0.55,sil*1.9);
+  g.addColorStop(0,'rgba(25,45,70,0)');
+  g.addColorStop(0.6,'rgba(25,45,70,0.05)');
+  g.addColorStop(1,'rgba(25,45,70,0.28)');
+  ctx.fillStyle=g;ctx.beginPath();ctx.arc(CX,CY,sil,0,7);ctx.fill();
+  g=ctx.createRadialGradient(CX-sil*0.42,CY-sil*0.48,0,CX-sil*0.42,CY-sil*0.48,sil*0.32);
+  g.addColorStop(0,'rgba(255,255,255,0.5)');
+  g.addColorStop(1,'rgba(255,255,255,0)');
+  ctx.fillStyle=g;ctx.beginPath();ctx.arc(CX,CY,sil,0,7);ctx.fill();
+  ctx.strokeStyle='rgba(60,95,125,0.30)';ctx.lineWidth=1;
   ctx.beginPath();ctx.arc(CX,CY,sil,0,7);ctx.stroke();
-  ctx.strokeStyle='rgba(255,255,255,0.35)';ctx.lineWidth=.7;
+  ctx.strokeStyle='rgba(255,255,255,0.30)';ctx.lineWidth=.7;
   const seg=48;
   for(let k=-2;k<=2;k++){const lat=k*0.42,rr=Math.cos(lat)*R,yy=Math.sin(lat)*R;ctx.beginPath();
     for(let s=0;s<=seg;s++){const th=s/seg*Math.PI*2;
@@ -639,10 +667,12 @@ function drawGlobeSkin(){
   for(const d of LAND){
     projectXYZ(q,d.x*R,d.y*R,d.z*R);
     if(q.pz>0)continue;
-    const depth=1-Math.min(1,Math.max(0,(q.pz+R)/(2*R)));
+    const nx=(q.px-CX)/(q.pscale*R),ny=(q.py-CY)/(q.pscale*R),nz=q.pz/R;
+    let sh=nx*LIGHT.x+ny*LIGHT.y+nz*LIGHT.z;
+    sh=Math.max(0,Math.min(1,sh));
     const s=1.7*q.pscale;
-    ctx.globalAlpha=0.55+depth*0.4;
-    ctx.fillStyle=d.c;
+    ctx.globalAlpha=0.5+sh*0.45;
+    ctx.fillStyle=LAND_RAMP[d.t][Math.min(7,(sh*8)|0)];
     ctx.fillRect(q.px-s/2,q.py-s/2,s,s);
   }
   ctx.globalAlpha=1;

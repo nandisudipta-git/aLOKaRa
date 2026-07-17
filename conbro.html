@@ -95,8 +95,14 @@ canvas:active{cursor:grabbing;}
 
 <!-- HUD -->
 <div class="hud topleft">
-  <div class="brand"><span class="dot"></span><span class="wm">con.BRO</span></div>
+  <a href="/" style="text-decoration:none;color:inherit;pointer-events:auto;display:inline-block">
+    <div class="brand"><span class="dot"></span><span class="wm">con.BRO</span></div>
+  </a>
   <div class="sub">Unfinished Conversations</div>
+  <div style="pointer-events:auto;margin-top:9px;display:flex;gap:12px;">
+    <a href="/parbro.html" style="font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:var(--dim);text-decoration:none;">par.BRO</a>
+    <a href="/podbro.html" style="font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:#FF7A1A;text-decoration:none;">pod.BRO</a>
+  </div>
 </div>
 <div class="hud topright">
   <span class="algo-badge">Live</span>
