@@ -41,6 +41,12 @@ body::after{content:'';position:fixed;inset:0;pointer-events:none;z-index:5;
 .demo-badge{display:none;margin-top:7px;font-size:8px;letter-spacing:.16em;text-transform:uppercase;color:var(--red);}
 .demo-badge.on{display:block;}
 
+.zoomui{position:fixed;right:20px;bottom:24px;z-index:15;display:flex;flex-direction:column;gap:10px;}
+.zoomui button{width:44px;height:44px;border-radius:50%;border:1px solid rgba(28,46,62,.3);
+  background:rgba(255,255,255,.5);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
+  color:var(--paper);font-size:20px;line-height:1;cursor:pointer;font-family:inherit;
+  transition:border-color .15s,background .15s;}
+.zoomui button:hover{border-color:var(--steel);background:rgba(255,255,255,.75);}
 .botleft{bottom:0;left:0;padding:18px 22px;}
 .legend{display:flex;flex-direction:column;gap:4px;pointer-events:auto;}
 .lg{display:flex;align-items:center;gap:7px;font-size:8.5px;letter-spacing:.08em;text-transform:uppercase;
@@ -180,6 +186,7 @@ body:not(.arrived) .hud,body:not(.arrived) .fab{opacity:0;pointer-events:none;}
 <div id="tip"><div class="ts">&#10022; you might have missed</div><div class="tc"></div><div class="tq"></div><div class="tm"></div></div>
 
 <button class="fab" id="fab">Start a conversation →</button>
+<div class="zoomui"><button id="zin" aria-label="zoom in">+</button><button id="zout" aria-label="zoom out">−</button></div>
 <div class="scrim" id="scrim"></div>
 
 <!-- compose sheet -->
@@ -418,7 +425,8 @@ const intro={active:!REDUCED,done:false,dur:5200,t0:0};
 let introAlpha=REDUCED?1:0;
 let rotY=REDUCED?HOME_ROTY:HOME_ROTY-2.2,rotX=REDUCED?HOME_ROTX:0.95,
     spin=IS_MASSIVE?0.0007:0.0012,velY=0,velX=0,dragging=false,lx=0,ly=0,zoom=REDUCED?1:0.55,hover=null;
-let lastInteract=0,camTgt=null;
+let lastInteract=0,camTgt=null,zoomT=1;
+const ptrs=new Map();let pinchD0=0,pinchZ0=1,pinching=false;
 function contentTarget(){
   let x=HOME_DIR.x,y=HOME_DIR.y,z=HOME_DIR.z;
   for(const p of S.arr){x+=p.anchor.x;y+=p.anchor.y;z+=p.anchor.z;}
@@ -427,7 +435,7 @@ function contentTarget(){
 }
 function endIntro(){
   if(intro.done)return;intro.done=true;intro.active=false;
-  rotY=HOME_ROTY;rotX=HOME_ROTX;zoom=1;introAlpha=1;
+  rotY=HOME_ROTY;rotX=HOME_ROTX;zoom=1;zoomT=1;introAlpha=1;
   document.body.classList.add('arrived');
   spotNextAt=performance.now()+5000;
   captureGeo();
@@ -457,13 +465,14 @@ function physics(){
   }
 }
 
-let _cY,_sY,_cX,_sX,_fov;
-function beginProjection(){_cY=Math.cos(rotY);_sY=Math.sin(rotY);_cX=Math.cos(rotX);_sX=Math.sin(rotX);_fov=900*zoom;}
+let _cY,_sY,_cX,_sX,_fov,_zs,_ns;
+function beginProjection(){_cY=Math.cos(rotY);_sY=Math.sin(rotY);_cX=Math.cos(rotX);_sX=Math.sin(rotX);
+  _fov=900;_zs=zoom;_ns=Math.sqrt(zoom);}
 function projectXYZ(p,wx,wy,wz){
   const x=wx*_cY-wz*_sY;let z=wx*_sY+wz*_cY;
   const y=wy*_cX-z*_sX;z=wy*_sX+z*_cX;
   const scale=_fov/(_fov+z+R*1.4);
-  p.px=CX+x*scale;p.py=CY+y*scale;p.pz=z;p.pscale=scale;
+  p.px=CX+x*scale*_zs;p.py=CY+y*scale*_zs;p.pz=z;p.pscale=scale*_ns;
 }
 function positionAll(now){
   beginProjection();
@@ -478,16 +487,30 @@ function positionAll(now){
   }
 }
 
-canvas.addEventListener('pointerdown',e=>{dragging=true;lx=e.clientX;ly=e.clientY;
+canvas.addEventListener('pointerdown',e=>{
+  ptrs.set(e.pointerId,{x:e.clientX,y:e.clientY});
+  if(ptrs.size===2){const a=[...ptrs.values()];
+    pinchD0=Math.hypot(a[0].x-a[1].x,a[0].y-a[1].y);pinchZ0=zoomT;pinching=true;dragging=false;}
+  else{dragging=true;lx=e.clientX;ly=e.clientY;}
   lastInteract=performance.now();
   try{canvas.setPointerCapture(e.pointerId);}catch(_){}});
 canvas.addEventListener('pointerup',e=>{
+  ptrs.delete(e.pointerId);
+  if(ptrs.size<2)pinching=false;
   if(!dragging) return; dragging=false;
   lastInteract=performance.now();
   const dx=e.clientX-lx,dy=e.clientY-ly;
   if(Math.abs(dx)+Math.abs(dy)<6 && hover){ openQ(hover.id); }
 });
+canvas.addEventListener('pointercancel',e=>{ptrs.delete(e.pointerId);pinching=false;dragging=false;});
 canvas.addEventListener('pointermove',e=>{
+  if(ptrs.has(e.pointerId))ptrs.set(e.pointerId,{x:e.clientX,y:e.clientY});
+  if(pinching&&ptrs.size>=2){
+    const a=[...ptrs.values()];
+    const d=Math.hypot(a[0].x-a[1].x,a[0].y-a[1].y);
+    if(pinchD0>0)zoomT=Math.max(0.5,Math.min(7,pinchZ0*d/pinchD0));
+    lastInteract=performance.now();hover=null;return;
+  }
   if(dragging){const dx=e.clientX-lx,dy=e.clientY-ly;
     rotY+=dx*0.006;rotX+=dy*0.006;rotX=Math.max(-1.3,Math.min(1.3,rotX));
     velY=dx*0.0006;velX=dy*0.0006;lx=e.clientX;ly=e.clientY;}
@@ -503,7 +526,9 @@ canvas.addEventListener('pointermove',e=>{
 });
 canvas.addEventListener('pointerleave',()=>{hover=null;});
 canvas.addEventListener('wheel',e=>{e.preventDefault();lastInteract=performance.now();
-  zoom=Math.max(0.4,Math.min(2.4,zoom-e.deltaY*0.001));},{passive:false});
+  zoomT=Math.max(0.5,Math.min(7,zoomT*Math.exp(-e.deltaY*0.0016)));},{passive:false});
+document.getElementById('zin').onclick=()=>{lastInteract=performance.now();zoomT=Math.min(7,zoomT*1.45);};
+document.getElementById('zout').onclick=()=>{lastInteract=performance.now();zoomT=Math.max(0.5,zoomT/1.45);};
 ['pointerdown','wheel','keydown'].forEach(ev=>addEventListener(ev,()=>{if(intro.active)endIntro();},{passive:true}));
 
 /* ─── spotlight: resurface an old / unanswered question the user likely missed ─── */
@@ -637,7 +662,7 @@ let LAND=[];
 const LIGHT={x:-0.44,y:-0.53,z:-0.72};
 
 /* photoreal satellite texture (Google-Earth look); dotted land remains the fallback */
-let TEX=null;const TW=1024,TH=512;
+let TEX=null;const TW=2048,TH=1024;
 let texCv=null,texCtx=null,texImg=null,lastRas={y:9e9,x:9e9,s:0};
 (async function loadTexture(){
   try{
@@ -647,10 +672,17 @@ let texCv=null,texCtx=null,texImg=null,lastRas={y:9e9,x:9e9,s:0};
     const c=document.createElement('canvas');c.width=TW;c.height=TH;
     const cc=c.getContext('2d');cc.drawImage(img,0,0,TW,TH);
     TEX=cc.getImageData(0,0,TW,TH).data;
+    for(let i=0;i<TEX.length;i+=4){ // mont-fort grade: desaturated dark slate, blue lift
+      const r=TEX[i],g1=TEX[i+1],b=TEX[i+2];
+      const gr=r*0.30+g1*0.59+b*0.11;
+      TEX[i]  =Math.min(255,gr*0.30+r*0.36+6);
+      TEX[i+1]=Math.min(255,gr*0.30+g1*0.36+12);
+      TEX[i+2]=Math.min(255,gr*0.30+b*0.36+30);
+    }
   }catch(_){TEX=null;}
 })();
 function rasterEarth(sil){
-  const S=Math.min(520,Math.max(160,Math.round(sil*2)));
+  const S=Math.min(W<700?560:820,Math.max(160,Math.round(sil*2)));
   if(!texCv||texCv.width!==S){
     texCv=document.createElement('canvas');texCv.width=texCv.height=S;
     texCtx=texCv.getContext('2d');texImg=texCtx.createImageData(S,S);}
@@ -687,11 +719,11 @@ const LAND_RAMP=[[],[],[]];
 
 function drawGlobeSkin(){
   const q={};
-  const sil=R*(_fov/(_fov+R*1.4));
+  const sil=R*(_fov/(_fov+R*1.4))*_zs;
   let g=ctx.createRadialGradient(CX,CY,sil*0.96,CX,CY,sil*1.07);
-  g.addColorStop(0,'rgba(140,185,225,0)');
-  g.addColorStop(0.55,'rgba(140,185,225,0.35)');
-  g.addColorStop(1,'rgba(140,185,225,0)');
+  g.addColorStop(0,'rgba(205,225,242,0)');
+  g.addColorStop(0.55,'rgba(205,225,242,0.5)');
+  g.addColorStop(1,'rgba(205,225,242,0)');
   ctx.fillStyle=g;ctx.beginPath();ctx.arc(CX,CY,sil*1.07,0,7);ctx.fill();
 
   if(TEX){
@@ -918,6 +950,7 @@ function draw(){
     }
     rotX=Math.max(-1.3,Math.min(1.3,rotX));
   }
+  if(!intro.active)zoom+=(zoomT-zoom)*0.12;
   if(!IS_STATIC)physics();
   positionAll(now);
   applyLaunches(now);
