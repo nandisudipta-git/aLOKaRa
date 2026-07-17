@@ -318,16 +318,25 @@ function resize(){
 addEventListener('resize',resize);
 
 const GOLDEN=Math.PI*(3-Math.sqrt(5));
+const CAT_OFF={};
+CATKEYS.forEach((k,i)=>{
+  const y=1-(i/5)*2, rad=Math.sqrt(Math.max(0,1-y*y)), th=GOLDEN*i;
+  CAT_OFF[k]={x:Math.cos(th)*rad, y, z:Math.sin(th)*rad};
+});
 
 function randDir(){ const u=Math.random()*2-1, th=Math.random()*Math.PI*2, s=Math.sqrt(1-u*u);
   return {x:s*Math.cos(th), y:u, z:s*Math.sin(th)}; }
 
 function makeNode(id,text,cat,createdAt,incoming,lat,lon){
   const c=CATS[cat]?cat:'random';
-  const anchor=(lat!=null&&lon!=null)?latLonDir(lat,lon):HOME_DIR;
+  const base=(lat!=null&&lon!=null)?latLonDir(lat,lon):HOME_DIR;
+  const off=CAT_OFF[c];
+  let ax=base.x+off.x*0.13,ay=base.y+off.y*0.13,az=base.z+off.z*0.13;
+  const al=Math.sqrt(ax*ax+ay*ay+az*az);
+  const anchor={x:ax/al,y:ay/al,z:az/al};
   const jitter=randDir();
   const startR=incoming?R*1.06:R*(0.85+Math.random()*0.3);
-  const jw=incoming?0.08:0.22;
+  const jw=incoming?0.08:0.10;
   let sx=anchor.x+jitter.x*jw,sy=anchor.y+jitter.y*jw,sz=anchor.z+jitter.z*jw;
   const sl=Math.sqrt(sx*sx+sy*sy+sz*sz);sx/=sl;sy/=sl;sz/=sl;
   return {
@@ -720,11 +729,11 @@ function drawFull(now){
     const rad=nodeR(p)*p.pscale*grow*(0.7+depth*0.4);
     const a=(0.5+depth*0.5)*(dim?0.15:1);
 
-    if(nr>0&&!dim&&!IS_STATIC){ctx.globalAlpha=a*0.15;ctx.fillStyle=`rgb(${r},${g},${b})`;
-      ctx.beginPath();ctx.arc(p.px,p.py,rad*2.2,0,7);ctx.fill();}
-    ctx.globalAlpha=a;ctx.fillStyle=`rgb(${r},${g},${b})`;
+    if(!dim&&!IS_STATIC){ctx.globalAlpha=a*(nr?0.18:0.09);ctx.fillStyle=`rgb(${r},${g},${b})`;
+      ctx.beginPath();ctx.arc(p.px,p.py,rad*2.1,0,7);ctx.fill();}
+    ctx.globalAlpha=a;ctx.fillStyle='#FFFFFF';
     ctx.beginPath();ctx.arc(p.px,p.py,rad,0,7);ctx.fill();
-    ctx.strokeStyle='rgba(0,0,0,0.28)';ctx.lineWidth=Math.min(1*p.pscale,1);ctx.stroke();
+    ctx.strokeStyle=`rgb(${r},${g},${b})`;ctx.lineWidth=Math.max(1.4,rad*0.4);ctx.stroke();
     ctx.globalAlpha=1;
 
     const na=IS_DEMO?p.na:(nr?repliesOf(p.id).filter(x=>x.kind==='answer').length:0);
