@@ -4,9 +4,9 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>alge · dotBro</title>
-<meta name="description" content="Float the question you never got to ask into the space. Watch it find its people — now in 3D.">
+<meta name="description" content="What conversation are you leaving unfinished? Say it — it finds its people.">
 <meta property="og:title" content="alge · dotBro">
-<meta property="og:description" content="Float the question you never got to ask into the space. Watch it find its people.">
+<meta property="og:description" content="What conversation are you leaving unfinished?">
 <meta property="og:image" content="https://dotbro.in/assets/og-main.png">
 <meta property="og:url" content="https://dotbro.in/alge.html">
 <link rel="icon" type="image/png" href="/assets/favicon-red.png">
@@ -47,9 +47,16 @@ body::after{content:'';position:fixed;inset:0;pointer-events:none;z-index:5;
 .lg .sw{width:7px;height:7px;border-radius:50%;flex-shrink:0;border:1px solid rgba(0,0,0,.15);}
 @media(max-width:640px){.botleft{display:none;}}
 
-.hint{position:fixed;bottom:18px;right:22px;z-index:10;text-align:right;font-size:8px;letter-spacing:.12em;
-  text-transform:uppercase;color:rgba(0,0,0,.28);line-height:1.8;pointer-events:none;}
-@media(max-width:640px){.hint{display:none;}}
+#hook{position:fixed;inset:0;z-index:30;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:20px;pointer-events:none;text-align:center;padding:0 24px;}
+#hook .hk-dot{width:8px;height:8px;border-radius:50%;background:var(--red);box-shadow:0 0 14px 3px rgba(230,0,0,.3);
+  opacity:0;animation:hookIn 1.4s ease .6s forwards;}
+#hook .hk-q{max-width:22ch;font-size:clamp(1.15rem,2.6vw,1.6rem);line-height:1.7;color:var(--paper);
+  opacity:0;animation:hookIn 1.8s ease 1.2s forwards;}
+@keyframes hookIn{to{opacity:1}}
+#hook.gone{transition:opacity .9s ease;opacity:0;}
+.hud,.fab{transition:opacity 1.2s ease;}
+body:not(.arrived) .hud,body:not(.arrived) .fab{opacity:0;pointer-events:none;}
 
 #leader{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:19;}
 #leaderPath{opacity:0;transition:opacity .15s ease;}
@@ -143,35 +150,35 @@ body::after{content:'';position:fixed;inset:0;pointer-events:none;z-index:5;
   <div class="sub">dotBro · live</div>
 </div>
 <div class="hud topright">
-  <div class="count"><span class="pulse"></span><b id="nq">0</b> questions floating</div>
+  <div class="count"><span class="pulse"></span><b id="nq">0</b> conversations floating</div>
   <div class="demo-badge" id="demoBadge">demo data · read only</div>
 </div>
 <div class="hud botleft"><div class="legend" id="legend"></div></div>
-<div class="hint">hover — read it<br>drag — spin<br>scroll — zoom<br>click — open it</div>
+<div id="hook"><span class="hk-dot"></span><div class="hk-q">What conversation are you leaving unfinished?</div></div>
 
 <svg id="leader"><path id="leaderPath" fill="none" stroke="rgba(0,0,0,0.22)" stroke-width="1"/><circle id="leaderDot" r="2.5" fill="rgba(0,0,0,0.35)"/></svg>
 <div id="tip"><div class="ts">&#10022; you might have missed</div><div class="tc"></div><div class="tq"></div><div class="tm"></div></div>
 
-<button class="fab" id="fab">Float a question →</button>
+<button class="fab" id="fab">Start a conversation →</button>
 <div class="scrim" id="scrim"></div>
 
 <!-- compose sheet -->
 <div class="sheet" id="compose">
-  <div class="sh-head"><span class="sh-title">Float it into the space</span><button class="x" data-close>&times;</button></div>
+  <div class="sh-head"><span class="sh-title">Start a conversation</span><button class="x" data-close>&times;</button></div>
   <div class="sh-body">
     <input id="name" type="text" placeholder="your name" maxlength="40" autocomplete="off">
-    <textarea id="body" placeholder="the question you never got to ask…" maxlength="500"></textarea>
+    <textarea id="body" placeholder="What conversation are you leaving unfinished?" maxlength="500"></textarea>
     <div class="cats" id="cats"></div>
     <div class="crow">
       <span class="cnt" id="count">0 / 500</span>
-      <button class="btn" id="post">Float it →</button>
+      <button class="btn" id="post">Say it →</button>
     </div>
   </div>
 </div>
 
 <!-- question sheet -->
 <div class="sheet" id="qsheet">
-  <div class="sh-head"><span class="sh-title">Floating question</span><button class="x" data-close>&times;</button></div>
+  <div class="sh-head"><span class="sh-title">Unfinished conversation</span><button class="x" data-close>&times;</button></div>
   <div class="sh-body" id="qview"></div>
 </div>
 
@@ -211,7 +218,7 @@ const CATS={
   'ai & future':    {col:[155,135,255]},
   'build & startup':{col:[232,163,61]},
   'study & gyaan':  {col:[200,212,0]},
-  'life':           {col:[245,245,240]},
+  'life':           {col:[128,126,120]},
   'meet people':    {col:[63,167,150]},
   'random':         {col:[220,80,70]},
 };
@@ -220,7 +227,7 @@ const CATKEYS=Object.keys(CATS);
 const KIND_META={
   answer:  {icon:'&#9998;', label:'Answer',  placeholder:'Write your answer…'},
   debate:  {icon:'&#9876;', label:'Debate',  placeholder:'State your counter-position…'},
-  discuss: {icon:'&#9993;', label:'Discuss', placeholder:'Add to the discussion…'},
+  discuss: {icon:'&#9993;', label:'Continue', placeholder:'Continue the conversation…'},
   meet:    {icon:'&#9734;', label:'Meet',    placeholder:'Say why you want to meet… (optional)'},
 };
 const KIND_ORDER=['answer','debate','discuss','meet'];
@@ -302,10 +309,15 @@ function makeNode(id,text,cat,createdAt,incoming){
   const c=CATS[cat]?cat:'random';
   const anchor=CAT_ANCHOR[c];
   const jitter=randDir();
-  const startR=incoming?R*3.2:R*(0.85+Math.random()*0.3);
+  const startR=incoming?R*1.06:R*(0.85+Math.random()*0.3);
+  let sx,sy,sz;
+  if(incoming){ // new conversations rise from the community's point on the globe
+    sx=HOME_DIR.x+jitter.x*0.08;sy=HOME_DIR.y+jitter.y*0.08;sz=HOME_DIR.z+jitter.z*0.08;
+    const sl=Math.sqrt(sx*sx+sy*sy+sz*sz);sx/=sl;sy/=sl;sz/=sl;
+  }else{sx=anchor.x*0.7+jitter.x*0.3;sy=anchor.y*0.7+jitter.y*0.3;sz=anchor.z*0.7+jitter.z*0.3;}
   return {
     id, text, cat:c, col:CATS[c].col,
-    x:(anchor.x*0.7+jitter.x*0.3)*startR, y:(anchor.y*0.7+jitter.y*0.3)*startR, z:(anchor.z*0.7+jitter.z*0.3)*startR,
+    x:sx*startR, y:sy*startR, z:sz*startR,
     vx:0,vy:0,vz:0, fx:0,fy:0,fz:0,
     curR:startR, targetR:R,
     born:performance.now(), createdAt: createdAt||new Date().toISOString(),
@@ -318,7 +330,7 @@ function nodeR(n){
   if(IS_MASSIVE)return 1.4+(nr?0.9:0);
   if(IS_STATIC)return Math.min(2.6+Math.sqrt(nr)*1.2,5);
   const density=Math.min(1,S.arr.length/90);
-  const base=4.6-density*1.3;
+  const base=5.4-density*1.5;
   return Math.min(base+Math.sqrt(nr)*2.0,12);
 }
 
@@ -356,7 +368,26 @@ function generateDemo(N){
   }
 }
 
-let rotY=0.5,rotX=-0.18,spin=IS_MASSIVE?0.0007:0.0012,velY=0,velX=0,dragging=false,lx=0,ly=0,zoom=1,hover=null;
+/* ─── home: the community this globe grows from (MVP: IIT Mandi, 31.78N 76.99E) ─── */
+const HOME_LAT=31.78*Math.PI/180, HOME_LON=76.99*Math.PI/180;
+const HOME_DIR={x:Math.cos(HOME_LAT)*Math.cos(HOME_LON),y:Math.sin(HOME_LAT),z:Math.cos(HOME_LAT)*Math.sin(HOME_LON)};
+const HOME_ROTY=Math.atan2(HOME_DIR.x,HOME_DIR.z)+Math.PI;
+const HOME_ROTX=-HOME_LAT;
+const REDUCED=matchMedia('(prefers-reduced-motion: reduce)').matches;
+const hookEl=document.getElementById('hook');
+const intro={active:!REDUCED,done:false,dur:5200,t0:0};
+let introAlpha=REDUCED?1:0;
+let rotY=REDUCED?HOME_ROTY:HOME_ROTY-2.2,rotX=REDUCED?HOME_ROTX:-0.95,
+    spin=IS_MASSIVE?0.0007:0.0012,velY=0,velX=0,dragging=false,lx=0,ly=0,zoom=REDUCED?1:0.55,hover=null;
+function endIntro(){
+  if(intro.done)return;intro.done=true;intro.active=false;
+  rotY=HOME_ROTY;rotX=HOME_ROTX;zoom=1;introAlpha=1;
+  document.body.classList.add('arrived');
+  spotNextAt=performance.now()+5000;
+  hookEl.classList.add('gone');setTimeout(()=>hookEl.style.display='none',1000);
+}
+if(REDUCED){intro.done=true;document.body.classList.add('arrived');
+  setTimeout(()=>{hookEl.classList.add('gone');setTimeout(()=>hookEl.style.display='none',1000);},3400);}
 
 function physics(){
   const nodes=S.arr, n=nodes.length;
@@ -423,6 +454,7 @@ canvas.addEventListener('pointermove',e=>{
 });
 canvas.addEventListener('pointerleave',()=>{hover=null;});
 canvas.addEventListener('wheel',e=>{e.preventDefault();zoom=Math.max(0.4,Math.min(2.4,zoom-e.deltaY*0.001));},{passive:false});
+['pointerdown','wheel','keydown'].forEach(ev=>addEventListener(ev,()=>{if(intro.active)endIntro();},{passive:true}));
 
 /* ─── spotlight: resurface an old / unanswered question the user likely missed ─── */
 let spot=null,spotNextAt=4000;const spotRecent=[];
@@ -454,6 +486,7 @@ function updateSpot(now){
 }
 
 function updateCallout(){
+  if(intro.active){tip.style.opacity='0';leaderPath.style.opacity='0';leaderDot.style.opacity='0';return;}
   const focus=hover||(spot&&spot.node)||null;
   tip.classList.toggle('missed',!hover&&!!spot);
   if(!focus){ tip.style.opacity='0'; leaderPath.style.opacity='0'; leaderDot.style.opacity='0'; return; }
@@ -472,13 +505,9 @@ function updateCallout(){
   tip.querySelector('.tc').style.color=`rgb(${r},${g},${b})`;
   tip.querySelector('.tc').textContent=p.cat;
   tip.querySelector('.tq').textContent=p.text.slice(0,120);
-  const q=qOf(p.id), c=kindCounts(p.id);
-  const parts=[];
-  if(c.answer) parts.push(c.answer+' answer'+(c.answer>1?'s':''));
-  if(c.debate) parts.push(c.debate+' debate'+(c.debate>1?'s':''));
-  if(c.discuss) parts.push(c.discuss+' discuss');
-  if(c.meet) parts.push(c.meet+' meet');
-  tip.querySelector('.tm').textContent=(q?q.name+' · ':'')+ago(p.createdAt||p.ts)+' · '+(parts.length?parts.join(' · '):'unanswered');
+  const q=qOf(p.id), rs=repliesOf(p.id);
+  tip.querySelector('.tm').textContent=(q?q.name+' · ':'')+ago(p.createdAt||p.ts)+' · '+
+    (rs.length?rs.length+(rs.length>1?' voices':' voice'):'still unfinished');
   tip.style.opacity='1';
 }
 
@@ -511,8 +540,8 @@ function drawLabels(){
     let label=p.text.length>44?p.text.slice(0,43)+'…':p.text;
     const flip=p.px>W*0.72;
     ctx.save();
-    ctx.globalAlpha=0.42*p.la*Math.max(0.4,depth);
-    ctx.font='10px "Space Mono",ui-monospace,monospace';
+    ctx.globalAlpha=0.62*p.la*Math.max(0.55,depth);
+    ctx.font='11px "Space Mono",ui-monospace,monospace';
     ctx.fillStyle='#1D1D1F';
     ctx.textAlign=flip?'right':'left';
     ctx.textBaseline='middle';
@@ -534,6 +563,19 @@ function drawGlobeSkin(){
       if(s===0)ctx.moveTo(q.px,q.py);else ctx.lineTo(q.px,q.py);}ctx.stroke();}
 }
 
+function drawHome(){
+  const q={};projectXYZ(q,HOME_DIR.x*R,HOME_DIR.y*R,HOME_DIR.z*R);
+  if(q.pz>0)return;
+  const depth=1-Math.min(1,Math.max(0,(q.pz+R)/(2*R)));
+  ctx.save();
+  ctx.globalAlpha=0.6*depth;ctx.fillStyle='#E60000';
+  ctx.beginPath();ctx.arc(q.px,q.py,2,0,7);ctx.fill();
+  ctx.globalAlpha=0.38*depth;ctx.font='7px "Space Mono",ui-monospace,monospace';
+  ctx.fillStyle='#86868B';ctx.textAlign='left';ctx.textBaseline='middle';
+  ctx.fillText('IIT MANDI',q.px+7,q.py+1);
+  ctx.restore();
+}
+
 const nqEl=$('#nq');
 function drawMassive(){
   // point-cloud pass: front hemisphere only, unsorted, square dots batched by category color
@@ -543,7 +585,7 @@ function drawMassive(){
     const depth=1-Math.min(1,Math.max(0,(p.pz+R)/(2*R)));
     const rad=nodeR(p)*p.pscale*(0.5+depth*0.6);
     const [r,g,b]=p.col;
-    ctx.globalAlpha=(0.16+depth*0.84)*(dim?0.08:1);
+    ctx.globalAlpha=(0.32+depth*0.68)*(dim?0.08:1);
     ctx.fillStyle=`rgb(${r},${g},${b})`;
     ctx.fillRect(p.px-rad,p.py-rad,rad*2,rad*2);
   }
@@ -569,14 +611,14 @@ function drawFull(now){
     const depth=1-Math.min(1,Math.max(0,(p.pz+R)/(2*R)));
     const t=p.born?Math.min(1,(now-p.born)/650):1, grow=1-Math.pow(1-t,3);
     const nr=IS_DEMO?p.nr:(S.replies.get(p.id)||[]).length;
-    const rad=nodeR(p)*p.pscale*grow*(0.55+depth*0.55);
-    const a=(0.2+depth*0.8)*(dim?0.15:1);
+    const rad=nodeR(p)*p.pscale*grow*(0.7+depth*0.4);
+    const a=(0.5+depth*0.5)*(dim?0.15:1);
 
     if(nr>0&&!dim&&!IS_STATIC){ctx.globalAlpha=a*0.15;ctx.fillStyle=`rgb(${r},${g},${b})`;
       ctx.beginPath();ctx.arc(p.px,p.py,rad*2.2,0,7);ctx.fill();}
     ctx.globalAlpha=a;ctx.fillStyle=`rgb(${r},${g},${b})`;
     ctx.beginPath();ctx.arc(p.px,p.py,rad,0,7);ctx.fill();
-    ctx.strokeStyle='rgba(0,0,0,0.18)';ctx.lineWidth=Math.min(1*p.pscale,1);ctx.stroke();
+    ctx.strokeStyle='rgba(0,0,0,0.28)';ctx.lineWidth=Math.min(1*p.pscale,1);ctx.stroke();
     ctx.globalAlpha=1;
 
     const na=IS_DEMO?p.na:(nr?repliesOf(p.id).filter(x=>x.kind==='answer').length:0);
@@ -606,17 +648,28 @@ function drawSpot(now){
 function draw(){
   const now=performance.now();
   ctx.fillStyle='#FFFFFF';ctx.fillRect(0,0,W,H);
-  if(!dragging){rotY+=spin+velY;rotX+=velX;velY*=0.94;velX*=0.94;rotX=Math.max(-1.3,Math.min(1.3,rotX));}
+  if(intro.active){
+    if(!intro.t0)intro.t0=now+250;
+    const k=Math.min(1,Math.max(0,(now-intro.t0)/intro.dur));
+    const e=1-Math.pow(1-k,3);
+    rotY=HOME_ROTY-2.2*(1-e);
+    rotX=-0.95+(HOME_ROTX+0.95)*e;
+    zoom=0.55+0.45*e;
+    introAlpha=Math.min(1,k*1.9);
+    if(k>=1)endIntro();
+  }else if(!dragging){rotY+=spin+velY;rotX+=velX;velY*=0.94;velX*=0.94;rotX=Math.max(-1.3,Math.min(1.3,rotX));}
   if(!IS_STATIC)physics();
   positionAll(now);
   drawGlobeSkin();
   if(IS_MASSIVE)drawMassive();else drawFull(now);
+  drawHome();
 
   if(++labelFrame%90===1)rebuildLabels();
   drawLabels();
-  updateSpot(now);
+  if(!intro.active)updateSpot(now);
   drawSpot(now);
   updateCallout();
+  if(introAlpha<1){ctx.fillStyle='rgba(255,255,255,'+(1-introAlpha)+')';ctx.fillRect(0,0,W,H);}
   nqEl.textContent=S.arr.length.toLocaleString('en-US');
   requestAnimationFrame(draw);
 }
@@ -651,10 +704,10 @@ $('#body').addEventListener('input',e=>$('#count').textContent=`${e.target.value
 $('#post').onclick=async()=>{
   if(IS_DEMO){alert('demo data — read only. Remove ?n= from the URL to go live.');return}
   const name=$('#name').value.trim(),body=$('#body').value.trim();
-  if(name.length<1||body.length<3){alert('add your name and a real question (3+ chars).');return}
+  if(name.length<1||body.length<3){alert('add your name and what you want to say (3+ chars).');return}
   const btn=$('#post');btn.disabled=true;localStorage.setItem('dotbro_name',name);
   const {data,error}=await db.addQuestion(name,body,S.cat);btn.disabled=false;
-  if(error){alert('could not float that — try again.');return}
+  if(error){alert("couldn't start it — try again.");return}
   $('#body').value='';$('#count').textContent='0 / 500';
   if(data&&!S.q.has(data.id)){S.q.set(data.id,data);addNode(data,true)}
   closeAll();};
@@ -677,13 +730,13 @@ function renderQ(){
   const isMeet=activeKind==='meet';
   const composeHtml = activeKind ? (
     isMeet
-    ? `<div class="p-input open"><input id="pText" type="text" maxlength="200" placeholder="${KIND_META.meet.placeholder}"><button class="btn" id="pSubmit">Send interest →</button></div>`
-    : `<div class="p-input open"><textarea id="pText" maxlength="500" placeholder="${KIND_META[activeKind].placeholder}"></textarea><button class="btn" id="pSubmit">Send →</button></div>`
+    ? `<div class="p-input open"><input id="pText" type="text" maxlength="200" placeholder="${KIND_META.meet.placeholder}"><button class="btn" id="pSubmit">Reach out →</button></div>`
+    : `<div class="p-input open"><textarea id="pText" maxlength="500" placeholder="${KIND_META[activeKind].placeholder}"></textarea><button class="btn" id="pSubmit">Say it →</button></div>`
   ) : '';
 
   const repliesHtml = rs.length
-    ? rs.map(x=>`<div class="r"><div class="rmeta"><span class="rk">${(x.kind||'discuss').toUpperCase()}</span> · <b>${esc(x.name)}</b> · ${ago(x.created_at)}</div><div class="rbody">${esc(x.body)}</div></div>`).join('')
-    : `<div class="r rmeta">nothing here yet — be the first to respond.</div>`;
+    ? rs.map(x=>`<div class="r"><div class="rmeta"><span class="rk">${(KIND_META[x.kind]?KIND_META[x.kind].label:'continue').toUpperCase()}</span> · <b>${esc(x.name)}</b> · ${ago(x.created_at)}</div><div class="rbody">${esc(x.body)}</div></div>`).join('')
+    : `<div class="r rmeta">no one has continued this yet — be the first.</div>`;
 
   $('#qview').innerHTML =
     `<div class="qcat" style="color:rgb(${r},${g},${b})">${esc(q.category)}</div>`+
