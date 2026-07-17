@@ -588,7 +588,8 @@ let LAND=[];
     for(let i=0;i<N;i++){const fy=1-(i/(N-1))*2,rad=Math.sqrt(Math.max(0,1-fy*fy)),th=GOLDEN*i;
       const x=Math.cos(th)*rad,z=Math.sin(th)*rad;
       const la=Math.asin(-fy)*180/Math.PI,lo=Math.atan2(z,x)*180/Math.PI;
-      if(isLand(la,lo))dots.push({x,y:fy,z});}
+      if(isLand(la,lo))dots.push({x,y:fy,z,
+        c:(la>60||la<-60)?'#C8D2C8':(i%4?'#7B9E63':'#90AC74')});}
     LAND=dots;
   }catch(_){/* offline: abstract globe still works */}
 })();
@@ -596,9 +597,15 @@ let LAND=[];
 function drawGlobeSkin(){
   const q={};
   const sil=R*(_fov/(_fov+R*1.4));
-  ctx.strokeStyle='rgba(0,0,0,0.10)';ctx.lineWidth=1;
+  const g=ctx.createRadialGradient(CX-sil*0.35,CY-sil*0.4,sil*0.1,CX,CY,sil);
+  g.addColorStop(0,'#F0F8FC');
+  g.addColorStop(0.55,'#D3E7F2');
+  g.addColorStop(1,'#A5C8DE');
+  ctx.fillStyle=g;
+  ctx.beginPath();ctx.arc(CX,CY,sil,0,7);ctx.fill();
+  ctx.strokeStyle='rgba(70,110,140,0.28)';ctx.lineWidth=1;
   ctx.beginPath();ctx.arc(CX,CY,sil,0,7);ctx.stroke();
-  ctx.strokeStyle='rgba(0,0,0,0.045)';ctx.lineWidth=.8;
+  ctx.strokeStyle='rgba(255,255,255,0.35)';ctx.lineWidth=.7;
   const seg=48;
   for(let k=-2;k<=2;k++){const lat=k*0.42,rr=Math.cos(lat)*R,yy=Math.sin(lat)*R;ctx.beginPath();
     for(let s=0;s<=seg;s++){const th=s/seg*Math.PI*2;
@@ -608,13 +615,13 @@ function drawGlobeSkin(){
     for(let s=0;s<=seg;s++){const ph=s/seg*Math.PI*2;
       projectXYZ(q,Math.cos(lon)*Math.cos(ph)*R,Math.sin(ph)*R,Math.sin(lon)*Math.cos(ph)*R);
       if(s===0)ctx.moveTo(q.px,q.py);else ctx.lineTo(q.px,q.py);}ctx.stroke();}
-  ctx.fillStyle='#1D1D1F';
   for(const d of LAND){
     projectXYZ(q,d.x*R,d.y*R,d.z*R);
     if(q.pz>0)continue;
     const depth=1-Math.min(1,Math.max(0,(q.pz+R)/(2*R)));
-    const s=1.5*q.pscale;
-    ctx.globalAlpha=0.05+depth*0.13;
+    const s=1.7*q.pscale;
+    ctx.globalAlpha=0.45+depth*0.45;
+    ctx.fillStyle=d.c;
     ctx.fillRect(q.px-s/2,q.py-s/2,s,s);
   }
   ctx.globalAlpha=1;
