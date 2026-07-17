@@ -588,9 +588,11 @@ function drawLabels(){
     ctx.save();
     ctx.globalAlpha=0.62*p.la*Math.max(0.55,depth);
     ctx.font='11px "Space Mono",ui-monospace,monospace';
-    ctx.fillStyle='#3A3A3E';
     ctx.textAlign=nx<-0.25?'right':'left';
     ctx.textBaseline='middle';
+    ctx.strokeStyle='rgba(255,255,255,0.8)';ctx.lineWidth=3;ctx.lineJoin='round';
+    ctx.strokeText(label,p.px+nx*22,p.py+ny*22);
+    ctx.fillStyle='#3A3A3E';
     ctx.fillText(label,p.px+nx*22,p.py+ny*22);
     ctx.restore();
   }
@@ -625,6 +627,51 @@ let LAND=[];
 
 /* lit-sphere shading: fixed key light from upper-left-front */
 const LIGHT={x:-0.44,y:-0.53,z:-0.72};
+
+/* photoreal satellite texture (Google-Earth look); dotted land remains the fallback */
+let TEX=null;const TW=1024,TH=512;
+let texCv=null,texCtx=null,texImg=null,lastRas={y:9e9,x:9e9,s:0};
+(async function loadTexture(){
+  try{
+    const img=new Image();img.crossOrigin='anonymous';
+    img.src='https://cdn.jsdelivr.net/gh/mrdoob/three.js@r134/examples/textures/planets/earth_atmos_2048.jpg';
+    await img.decode();
+    const c=document.createElement('canvas');c.width=TW;c.height=TH;
+    const cc=c.getContext('2d');cc.drawImage(img,0,0,TW,TH);
+    TEX=cc.getImageData(0,0,TW,TH).data;
+  }catch(_){TEX=null;}
+})();
+function rasterEarth(sil){
+  const S=Math.min(520,Math.max(160,Math.round(sil*2)));
+  if(!texCv||texCv.width!==S){
+    texCv=document.createElement('canvas');texCv.width=texCv.height=S;
+    texCtx=texCv.getContext('2d');texImg=texCtx.createImageData(S,S);}
+  const d=texImg.data;
+  const cYr=Math.cos(rotY),sYr=Math.sin(rotY),cXr=Math.cos(rotX),sXr=Math.sin(rotX);
+  const half=S/2;let k=0;
+  for(let j=0;j<S;j++){
+    const uy=(j-half)/half;
+    for(let i=0;i<S;i++,k+=4){
+      const ux=(i-half)/half;
+      const d2=ux*ux+uy*uy;
+      if(d2>1){d[k+3]=0;continue;}
+      const uz=-Math.sqrt(1-d2);
+      const wy=uy*cXr+uz*sXr;
+      const z1=-uy*sXr+uz*cXr;
+      const wx=ux*cYr+z1*sYr;
+      const wz=-ux*sYr+z1*cYr;
+      const lat=Math.asin(Math.max(-1,Math.min(1,-wy)));
+      const lon=Math.atan2(wz,wx);
+      let u=((lon+Math.PI)/(2*Math.PI)*TW)|0;if(u>=TW)u=TW-1;if(u<0)u=0;
+      let v=((Math.PI/2-lat)/Math.PI*TH)|0;if(v>=TH)v=TH-1;if(v<0)v=0;
+      const t=(v*TW+u)*4;
+      let sh=ux*LIGHT.x+uy*LIGHT.y+uz*LIGHT.z;
+      sh=0.4+0.72*Math.max(0,sh);
+      d[k]=TEX[t]*sh;d[k+1]=TEX[t+1]*sh;d[k+2]=TEX[t+2]*sh;d[k+3]=255;
+    }
+  }
+  texCtx.putImageData(texImg,0,0);
+}
 const LAND_RAMP=[[],[],[]];
 (function(){const specs=[[95,26,26,62],[95,22,30,66],[110,8,52,86]];
   specs.forEach((s,ti)=>{for(let i=0;i<8;i++)
@@ -638,6 +685,20 @@ function drawGlobeSkin(){
   g.addColorStop(0.55,'rgba(140,185,225,0.35)');
   g.addColorStop(1,'rgba(140,185,225,0)');
   ctx.fillStyle=g;ctx.beginPath();ctx.arc(CX,CY,sil*1.07,0,7);ctx.fill();
+
+  if(TEX){
+    const delta=Math.abs(rotY-lastRas.y)+Math.abs(rotX-lastRas.x)+Math.abs(sil-lastRas.s);
+    if(delta>0.0008)  {rasterEarth(sil);lastRas={y:rotY,x:rotX,s:sil};}
+    ctx.drawImage(texCv,CX-sil,CY-sil,sil*2,sil*2);
+    g=ctx.createRadialGradient(CX-sil*0.42,CY-sil*0.48,0,CX-sil*0.42,CY-sil*0.48,sil*0.36);
+    g.addColorStop(0,'rgba(255,255,255,0.28)');
+    g.addColorStop(1,'rgba(255,255,255,0)');
+    ctx.fillStyle=g;ctx.beginPath();ctx.arc(CX,CY,sil,0,7);ctx.fill();
+    ctx.strokeStyle='rgba(40,70,100,0.35)';ctx.lineWidth=1;
+    ctx.beginPath();ctx.arc(CX,CY,sil,0,7);ctx.stroke();
+    return;
+  }
+
   g=ctx.createRadialGradient(CX-sil*0.38,CY-sil*0.42,sil*0.08,CX,CY,sil);
   g.addColorStop(0,'#F4FBFE');
   g.addColorStop(0.5,'#C6DFEF');
